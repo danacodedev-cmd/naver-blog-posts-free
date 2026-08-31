@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>셀프염색약 유니딧 브로우 눈썹만 뜬 색 집에서 잡는 올인원 염색약</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" style="background:#fbeff3;color:#8c3757;border:1.5px solid #f0cad8;">화장품/미용</span></div>
+  <h1 id="titleText" class="visually-hidden">셀프염색약 유니딧 브로우 눈썹만 뜬 색 집에서 잡는 올인원 염색약</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">유니딧 브로우 무드 스위치 셀프 염색 올인원 염색제 베이지 브라운 30회분, 1개</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="셀프염색약 유니딧 브로우 눈썹만 뜬 색 집에서 잡는 올인원 염색약"><span class="tp-num">1</span><span class="tp-text">셀프염색약 유니딧 브로우 눈썹만 뜬 색 집에서 잡는 올인원 염색약</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="염색약추천 유니딧 브로우 머리는 했는데 눈썹만 붉게 떴다면 눈썹 염색약"><span class="tp-num">2</span><span class="tp-text">염색약추천 유니딧 브로우 머리는 했는데 눈썹만 붉게 떴다면 눈썹 염색약</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="유니딧브로우 무드 스위치 베이지브라운 색 고를 때 보는 셀프 염색약"><span class="tp-num">3</span><span class="tp-text">유니딧브로우 무드 스위치 베이지브라운 색 고를 때 보는 셀프 염색약</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<div id="msg"></div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/koyuni128/222178319943" target="_blank" rel="noopener noreferrer">[유니디헤어 유니] 플라워펌,물결펌,운정스타필드미용실</a></li>
+      <li><a href="https://blog.naver.com/koyuni128/222239306847" target="_blank" rel="noopener noreferrer">[유니디헤어] 다크애쉬그레이염색,운정역미용실추천</a></li>
+      <li><a href="https://blog.naver.com/koyuni128/220568516865" target="_blank" rel="noopener noreferrer">유니쌤의 남자아이롱펌, 초코브라운염색, 야당미용실 테오헤어</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 3장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-1.jpg" alt="유니딧 염색약 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-2.jpg" alt="유니딧 염색약 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-3.jpg" alt="유니딧 염색약 크기 비교 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 3</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-3.jpg" data-n="3">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">눈썹만 붉게 뜨거나 흰 털이 섞여서</p><p style="text-align:center;margin:0;color:#000000;">미용실 갈 날만 미룬 지 몇 달째라면요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그대로 두면 3년 뒤에도</p><p style="text-align:center;margin:0;color:#000000;">똑같은 고민으로 또 검색하게 됩니다.</p><p style="text-align:center;margin:0;color:#000000;">눈썹 색만 손보러 매번 미용실 가긴 아깝고,</p><p style="text-align:center;margin:0;color:#000000;">안 하면 얼굴 전체 인상이 계속 붕</p><p style="text-align:center;margin:0;color:#000000;">떠 보이니까요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 글도 좋은 얘기만 할 것 같지만,</p><p style="text-align:center;margin:0;color:#000000;">먼저 말할 게 있습니다.</p><p style="text-align:center;margin:0;color:#000000;">이 제품은 머리 전체 염색이 아니라</p><p style="text-align:center;margin:0;color:#000000;">눈썹만 칠하는 브로우 전용 염색약입니다.</p><p style="text-align:center;margin:0;color:#000000;">헤어 염색을 기대하고 고르면</p><p style="text-align:center;margin:0;color:#000000;">용도가 안 맞습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-1.jpg" alt="유니딧 염색약 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> 눈썹만 칠하는 부분염색이 필요한 이유</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 30회분이라는 숫자가 의미하는 것</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 색상은 베이지 브라운 하나뿐</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> 살지 말지 정하기 전에</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">눈썹만 칠하는 부분염색이 필요한 이유</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">머리 염색약을 눈썹에 쓰면</p><p style="text-align:center;margin:0;color:#000000;">발림이 뭉치거나 색이 과하게</p><p style="text-align:center;margin:0;color:#000000;">진해지기 쉽습니다.</p><p style="text-align:center;margin:0;color:#000000;">판매자 태그에도 눈썹브로우,</p><p style="text-align:center;margin:0;color:#000000;">부분염색약이라고</p><p style="text-align:center;margin:0;color:#000000;">따로 붙어 있는 이유가 여기 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">유니딧 브로우는 처음부터</p><p style="text-align:center;margin:0;color:#000000;">눈썹이라는 좁은 부위에 맞춰</p><p style="text-align:center;margin:0;color:#000000;">나온 제품입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-2.jpg" alt="유니딧 염색약 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">머리 전체가 아니라 눈썹만 다시<br>칠하고 싶을 때 쓰는 제품입니다.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">셀프염색이라는 태그도 같이 붙어 있는데,</p><p style="text-align:center;margin:0;color:#000000;">이건 미용실 시술이 아니라</p><p style="text-align:center;margin:0;color:#000000;">집에서 혼자 바르는 용도라는 뜻입니다.</p><p style="text-align:center;margin:0;color:#000000;">&quot;유니딧 브로우 방법&quot;을 따로 찾아보는</p><p style="text-align:center;margin:0;color:#000000;">사람이 많은 이유도,</p><p style="text-align:center;margin:0;color:#000000;">셀프로 하는 만큼 손에 익히는 과정이</p><p style="text-align:center;margin:0;color:#000000;">필요하기 때문입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">브로우 전용 구성이 실제로 어떻게 들어있는지는<br>상세페이지에서 바로 보입니다.</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/G1pKAze6</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">30회분이라는 숫자가 의미하는 것</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">상품명에 붙은 30회분은</p><p style="text-align:center;margin:0;color:#000000;">한 통으로 눈썹 염색을 몇 번 할 수</p><p style="text-align:center;margin:0;color:#000000;">있는지를 말해줍니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 달에 한 번 정도 눈썹 색을 손본다고 하면</p><p style="text-align:center;margin:0;color:#000000;">30회분은 꽤 오래 갈 분량입니다.</p><p style="text-align:center;margin:0;color:#000000;">매번 새로 사는 게</p><p style="text-align:center;margin:0;color:#000000;">번거로워서 미뤄왔다면,</p><p style="text-align:center;margin:0;color:#000000;">이번에 한 번 넉넉히 채워두는 쪽이 다음 몇</p><p style="text-align:center;margin:0;color:#000000;">달을 편하게 만듭니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이름에 올인원이 붙은 것도</p><p style="text-align:center;margin:0;color:#000000;">염색에 필요한 구성이 한 세트에 묶여</p><p style="text-align:center;margin:0;color:#000000;">있다는 뜻으로 보면 됩니다.</p><p style="text-align:center;margin:0;color:#000000;">따로 재료를 사러 다닐 필요 없이</p><p style="text-align:center;margin:0;color:#000000;">이 한 통으로 눈썹 염색을 반복해서 할 수</p><p style="text-align:center;margin:0;color:#000000;">있는 구조입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-31T14-06-26/img/15-3.jpg" alt="유니딧 염색약 크기 비교 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">색상은 베이지 브라운 하나뿐</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지금 나온 구성은 베이지 브라운</p><p style="text-align:center;margin:0;color:#000000;">색 하나입니다.</p><p style="text-align:center;margin:0;color:#000000;">색을 골라 살 수 있는 라인이 아니라서,</p><p style="text-align:center;margin:0;color:#000000;">내 눈썹 톤과 이 베이지 브라운이</p><p style="text-align:center;margin:0;color:#000000;">잘 맞을지를 미리 가늠해봐야 합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">태그에 자연스러운발색, 자연스러운눈썹컬러라고</p><p style="text-align:center;margin:0;color:#000000;">붙어 있는 걸 보면</p><p style="text-align:center;margin:0;color:#000000;">진하게 튀는 색보다는 뭉근하게 스며드는</p><p style="text-align:center;margin:0;color:#000000;">쪽을 지향하는 제품입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">색이 하나뿐이라,<br>이 베이지 브라운이 내 눈썹과<br>맞는지가 관건입니다.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지속력좋은이라는 태그도 붙어 있는데,</p><p style="text-align:center;margin:0;color:#000000;">매번 다시 칠해야 하는 번거로움을</p><p style="text-align:center;margin:0;color:#000000;">줄이고 싶은 사람에게</p><p style="text-align:center;margin:0;color:#000000;">눈여겨볼 지점입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">살지 말지 정하기 전에</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">머리 염색이 필요한 상황이라면 이 제품은</p><p style="text-align:center;margin:0;color:#000000;">답이 아닙니다.</p><p style="text-align:center;margin:0;color:#000000;">눈썹만 다시 칠하고 싶은 상황이라면</p><p style="text-align:center;margin:0;color:#000000;">30회분이라는 분량과</p><p style="text-align:center;margin:0;color:#000000;">베이지 브라운 한 가지 색이</p><p style="text-align:center;margin:0;color:#000000;">지금 내 상황에 맞는지만 보면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정가 59,000원에서</p><p style="text-align:center;margin:0;color:#000000;">35,900원까지 내려와 있고,</p><p style="text-align:center;margin:0;color:#000000;">네이버 멤버십이면 여기에 적립</p><p style="text-align:center;margin:0;color:#000000;">포인트가 더 붙습니다.</p><p style="text-align:center;margin:0;color:#000000;">다만 이 포인트는 현금이</p><p style="text-align:center;margin:0;color:#000000;">아니라 적립금이라</p><p style="text-align:center;margin:0;color:#000000;">바로 쓸 수 있는 돈은 아니라는 점은</p><p style="text-align:center;margin:0;color:#000000;">같이 알아두는 게 좋습니다.</p><p style="text-align:center;margin:0;color:#000000;">배송비도 따로 들지 않는 상태입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">눈썹 색만 미뤄온 시간을</p><p style="text-align:center;margin:0;color:#000000;">이번엔 유니딧 염색약</p><p style="text-align:center;margin:0;color:#000000;">30회분으로 끝낼지,</p><p style="text-align:center;margin:0;color:#000000;">그 판단은 이 두 가지 조건에</p><p style="text-align:center;margin:0;color:#000000;">달려 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">지금 적립되는 포인트까지 더하면 실제 값이<br>얼마인지 페이지에서 계산해볼 수 있습니다.</span></b><br><br><b><span style="font-size:16px;color:#2563eb;">👉 유니딧 브로우 무드 스위치 셀프 염색 올인원 염색제 베이지 브라운 30회분, 1개<br>구성·혜택 확인하기</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/G1pKAze6</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#유니딧 #염색약 #헤어스타일링 #눈썹브로우 #셀프염색 #염모제 #염색 #부분염색 #부분염색약 #지속력좋은 #셀프염색약추천 #염색약추천 #유니딧브로우 #셀프염색약 #대용량염색약</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">눈썹만 붉게 뜨거나 흰 털이 섞여서
+미용실 갈 날만 미룬 지 몇 달째라면요.
+
+
+그대로 두면 3년 뒤에도
+똑같은 고민으로 또 검색하게 됩니다.
+눈썹 색만 손보러 매번 미용실 가긴 아깝고,
+안 하면 얼굴 전체 인상이 계속 붕
+떠 보이니까요.
+
+
+이 글도 좋은 얘기만 할 것 같지만,
+먼저 말할 게 있습니다.
+이 제품은 머리 전체 염색이 아니라
+눈썹만 칠하는 브로우 전용 염색약입니다.
+헤어 염색을 기대하고 고르면
+용도가 안 맞습니다.
+
+
+사진1
+
+
+이 글에서 다루는 것
+
+1. 눈썹만 칠하는 부분염색이 필요한 이유
+2. 30회분이라는 숫자가 의미하는 것
+3. 색상은 베이지 브라운 하나뿐
+4. 살지 말지 정하기 전에
+
+
+눈썹만 칠하는 부분염색이 필요한 이유
+
+
+머리 염색약을 눈썹에 쓰면
+발림이 뭉치거나 색이 과하게
+진해지기 쉽습니다.
+판매자 태그에도 눈썹브로우,
+부분염색약이라고
+따로 붙어 있는 이유가 여기 있습니다.
+
+
+유니딧 브로우는 처음부터
+눈썹이라는 좁은 부위에 맞춰
+나온 제품입니다.
+
+
+사진2
+
+
+머리 전체가 아니라 눈썹만 다시
+칠하고 싶을 때 쓰는 제품입니다.
+
+
+셀프염색이라는 태그도 같이 붙어 있는데,
+이건 미용실 시술이 아니라
+집에서 혼자 바르는 용도라는 뜻입니다.
+&quot;유니딧 브로우 방법&quot;을 따로 찾아보는
+사람이 많은 이유도,
+셀프로 하는 만큼 손에 익히는 과정이
+필요하기 때문입니다.
+
+
+브로우 전용 구성이 실제로 어떻게 들어있는지는
+상세페이지에서 바로 보입니다.
+
+https://naver.me/G1pKAze6
+
+
+30회분이라는 숫자가 의미하는 것
+
+
+상품명에 붙은 30회분은
+한 통으로 눈썹 염색을 몇 번 할 수
+있는지를 말해줍니다.
+
+
+한 달에 한 번 정도 눈썹 색을 손본다고 하면
+30회분은 꽤 오래 갈 분량입니다.
+매번 새로 사는 게
+번거로워서 미뤄왔다면,
+이번에 한 번 넉넉히 채워두는 쪽이 다음 몇
+달을 편하게 만듭니다.
+
+
+이름에 올인원이 붙은 것도
+염색에 필요한 구성이 한 세트에 묶여
+있다는 뜻으로 보면 됩니다.
+따로 재료를 사러 다닐 필요 없이
+이 한 통으로 눈썹 염색을 반복해서 할 수
+있는 구조입니다.
+
+
+사진3
+
+
+색상은 베이지 브라운 하나뿐
+
+
+지금 나온 구성은 베이지 브라운
+색 하나입니다.
+색을 골라 살 수 있는 라인이 아니라서,
+내 눈썹 톤과 이 베이지 브라운이
+잘 맞을지를 미리 가늠해봐야 합니다.
+
+
+태그에 자연스러운발색, 자연스러운눈썹컬러라고
+붙어 있는 걸 보면
+진하게 튀는 색보다는 뭉근하게 스며드는
+쪽을 지향하는 제품입니다.
+
+
+색이 하나뿐이라,
+이 베이지 브라운이 내 눈썹과
+맞는지가 관건입니다.
+
+
+지속력좋은이라는 태그도 붙어 있는데,
+매번 다시 칠해야 하는 번거로움을
+줄이고 싶은 사람에게
+눈여겨볼 지점입니다.
+
+
+살지 말지 정하기 전에
+
+
+머리 염색이 필요한 상황이라면 이 제품은
+답이 아닙니다.
+눈썹만 다시 칠하고 싶은 상황이라면
+30회분이라는 분량과
+베이지 브라운 한 가지 색이
+지금 내 상황에 맞는지만 보면 됩니다.
+
+
+정가 59,000원에서
+35,900원까지 내려와 있고,
+네이버 멤버십이면 여기에 적립
+포인트가 더 붙습니다.
+다만 이 포인트는 현금이
+아니라 적립금이라
+바로 쓸 수 있는 돈은 아니라는 점은
+같이 알아두는 게 좋습니다.
+배송비도 따로 들지 않는 상태입니다.
+
+
+눈썹 색만 미뤄온 시간을
+이번엔 유니딧 염색약
+30회분으로 끝낼지,
+그 판단은 이 두 가지 조건에
+달려 있습니다.
+
+
+지금 적립되는 포인트까지 더하면 실제 값이
+얼마인지 페이지에서 계산해볼 수 있습니다.
+
+https://naver.me/G1pKAze6
+
+
+#유니딧 #염색약 #헤어스타일링 #눈썹브로우 #셀프염색 #염모제 #염색 #부분염색 #부분염색약 #지속력좋은 #셀프염색약추천 #염색약추천 #유니딧브로우 #셀프염색약 #대용량염색약</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage) {
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      say(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.'
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.'
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+})();
+</script>
+</body>
+</html>
