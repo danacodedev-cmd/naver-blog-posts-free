@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>스탠드선풍기 듀플렉스 DPK 55CF 잘못 고르면 내년 여름에도 새로 삽니다</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" style="background:#eef3fc;color:#23477e;border:1.5px solid #c3d4f2;">디지털/가전</span></div>
+  <h1 id="titleText" class="visually-hidden">스탠드선풍기 듀플렉스 DPK 55CF 잘못 고르면 내년 여름에도 새로 삽니다</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">듀플렉스 써큘레이터 스탠드 에어서큘레이터 선풍기 DPK-55CF</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="스탠드선풍기 듀플렉스 DPK 55CF 잘못 고르면 내년 여름에도 새로 삽니다"><span class="tp-num">1</span><span class="tp-text">스탠드선풍기 듀플렉스 DPK 55CF 잘못 고르면 내년 여름에도 새로 삽니다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="선풍기서큘레이터 차이 모르고 사면 듀플렉스 DPK 55CF도 자리만 차지합니다"><span class="tp-num">2</span><span class="tp-text">선풍기서큘레이터 차이 모르고 사면 듀플렉스 DPK 55CF도 자리만 차지합니다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="서큘레이터선풍기차이 헷갈릴 때 듀플렉스 DPK 55CF 높이조절부터 보세요"><span class="tp-num">3</span><span class="tp-text">서큘레이터선풍기차이 헷갈릴 때 듀플렉스 DPK 55CF 높이조절부터 보세요</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<div id="msg"></div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/raon375/224341686201" target="_blank" rel="noopener noreferrer">에어서큘레이터 추천 듀플렉스 DPK-55CF 한 달 사용 후기, 장점과 단점 정리</a></li>
+      <li><a href="https://blog.naver.com/broilman/224330283838" target="_blank" rel="noopener noreferrer">듀플렉스 DPK-55CF 에어 서큘레이터 쓰는 진짜이유—선풍기만 믿다간 이번 여름 후회합니다</a></li>
+      <li><a href="https://blog.naver.com/danang_traveler/224343567433" target="_blank" rel="noopener noreferrer">듀플렉스 써큘레이터 DPK-55CF 후기 강력한 바람과 넓은 공기순환 스탠드형 에어서큘레이터 추천</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 2장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-01T04-05-23/img/06-1.jpg" alt="듀플렉스 서큘레이터 배터리 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-01T04-05-23/img/06-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-01T04-05-23/img/06-2.jpg" alt="듀플렉스 서큘레이터 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-01T04-05-23/img/06-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">여름마다 미니 선풍기를 새로 삽니다.</p><p style="text-align:center;margin:0;color:#000000;">작년 것도, 재작년 것도</p><p style="text-align:center;margin:0;color:#000000;">서랍 어딘가에 있을 텐데</p><p style="text-align:center;margin:0;color:#000000;">바람이 약해서 손이 안 갑니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">3년 뒤에 또 같은 걸 사게 됩니다.</p><p style="text-align:center;margin:0;color:#000000;">문제는 선풍기가 아니라</p><p style="text-align:center;margin:0;color:#000000;">방 전체 공기가 안 도는 거였거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 글 링크를 걸어두고 이런 말을 하긴 좀</p><p style="text-align:center;margin:0;color:#000000;">그런데,</p><p style="text-align:center;margin:0;color:#000000;">에어컨을 계속 트실 거면 이 제품보다</p><p style="text-align:center;margin:0;color:#000000;">에어컨 냉기를 방 전체로 퍼뜨리는 용도로</p><p style="text-align:center;margin:0;color:#000000;">더 잘 맞습니다. 실내에서 강풍으로 오래</p><p style="text-align:center;margin:0;color:#000000;">쓰실 분들 얘기고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밖에서 잠깐씩 쓰는 손선풍기하고는 아예</p><p style="text-align:center;margin:0;color:#000000;">다른 물건입니다. 스탠드형이라 바닥에</p><p style="text-align:center;margin:0;color:#000000;">세워두고 방 전체 공기를</p><p style="text-align:center;margin:0;color:#000000;">돌리는 쪽이거든요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-01T04-05-23/img/06-1.jpg" alt="듀플렉스 서큘레이터 배터리 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> 4엽 날개, 세워두면 존재감부터 다릅니다</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 에어컨 켠 방에서 더 효과 봅니다</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 어느 집에 세워둘지부터 정하세요</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">4엽 날개, 세워두면 존재감부터 다릅니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">듀플렉스 서큘레이터 DPK-55CF는 이름부터</p><p style="text-align:center;margin:0;color:#000000;">써큘레이터와 선풍기를 같이 씁니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그럴 만한 게,</p><p style="text-align:center;margin:0;color:#000000;">날개가 4엽 구조입니다.</p><p style="text-align:center;margin:0;color:#000000;">일반 선풍기 날개보다 적은 수로</p><p style="text-align:center;margin:0;color:#000000;">바람을 더 멀리,</p><p style="text-align:center;margin:0;color:#000000;">더 직선으로 보내는 방식이에요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-01T04-05-23/img/06-2.jpg" alt="듀플렉스 서큘레이터 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">바람을 방 전체로<br>밀어내는 구조입니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">높이는 조절이 됩니다. 낮춰서 얼굴 앞에</p><p style="text-align:center;margin:0;color:#000000;">두거나,</p><p style="text-align:center;margin:0;color:#000000;">높여서 방 전체로 바람을 퍼뜨리거나</p><p style="text-align:center;margin:0;color:#000000;">상황에 맞게 바꿀 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">좌우 자동 회전도 됩니다. 한 자리에 고정해서</p><p style="text-align:center;margin:0;color:#000000;">트는 게 아니라,</p><p style="text-align:center;margin:0;color:#000000;">켜두면 방 이쪽저쪽으로 바람이</p><p style="text-align:center;margin:0;color:#000000;">오가는 구조입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">색은 무채색 계열로 나와서 거실이든 원룸이든</p><p style="text-align:center;margin:0;color:#000000;">튀지 않습니다. 사무실 한쪽에 세워둬도</p><p style="text-align:center;margin:0;color:#000000;">어색하지 않은 생김새예요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">에어컨 켠 방에서 더 효과 봅니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">써큘레이터의 진짜 역할은 에어컨과 같이 쓸</p><p style="text-align:center;margin:0;color:#000000;">때 나옵니다. 에어컨만 틀면 찬 공기가</p><p style="text-align:center;margin:0;color:#000000;">바닥으로 가라앉아서,</p><p style="text-align:center;margin:0;color:#000000;">정작 서 있는 위치는 안 시원한</p><p style="text-align:center;margin:0;color:#000000;">경우가 많거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이럴 때 써큘레이터를 에어컨 반대쪽에 두고</p><p style="text-align:center;margin:0;color:#000000;">공기를 밀어주면,</p><p style="text-align:center;margin:0;color:#000000;">냉기가 방 전체로 섞입니다. 에어컨 설정</p><p style="text-align:center;margin:0;color:#000000;">온도를 더 낮추지 않아도 체감</p><p style="text-align:center;margin:0;color:#000000;">온도가 내려가요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">리모컨이 있어서 세워둔 자리에서 일어나지</p><p style="text-align:center;margin:0;color:#000000;">않고 회전이나 세기를 바꿀 수 있습니다.</p><p style="text-align:center;margin:0;color:#000000;">자기 전에 눕혀놓고 손만 뻗어 조절하기에</p><p style="text-align:center;margin:0;color:#000000;">편한 구성이에요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">4엽 날개가 분리되는 구조인지는 상세페이지<br>구성 사진에서 바로 보입니다.</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GKIapzGw</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">관리는 어렵지 않습니다. 날개 부분이</p><p style="text-align:center;margin:0;color:#000000;">분리되는 구조라 먼지가 쌓이면 떼서</p><p style="text-align:center;margin:0;color:#000000;">닦을 수 있습니다. 스탠드형 선풍기는</p><p style="text-align:center;margin:0;color:#000000;">날개 뒤편에 먼지가 쌓이기 쉬운데,</p><p style="text-align:center;margin:0;color:#000000;">분리가 안 되면 여름 내내 방치하다</p><p style="text-align:center;margin:0;color:#000000;">다음 해에 곰팡내가 나기도 하거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 듀플렉스 안에서도 라인이 나뉩니다.</p><p style="text-align:center;margin:0;color:#000000;">휴대용 손선풍기는 15,900원대로 가방에</p><p style="text-align:center;margin:0;color:#000000;">넣고 다니는 용도고,</p><p style="text-align:center;margin:0;color:#000000;">이 스탠드형은 39,800원대로 방 하나를</p><p style="text-align:center;margin:0;color:#000000;">채우는 용도입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">더 위로는 AI 음성인식이 붙은 저소음</p><p style="text-align:center;margin:0;color:#000000;">서큘레이터가 89,000원대로 있고,</p><p style="text-align:center;margin:0;color:#000000;">업소용급 50cm 대형은</p><p style="text-align:center;margin:0;color:#000000;">59,800원대입니다. 원룸이나 거실</p><p style="text-align:center;margin:0;color:#000000;">한 대로 충분하면 이 스탠드형이 딱</p><p style="text-align:center;margin:0;color:#000000;">맞는 자리고,</p><p style="text-align:center;margin:0;color:#000000;">사무실처럼 넓은 공간을 계속 돌려야</p><p style="text-align:center;margin:0;color:#000000;">하면 대형 쪽을 보는 게 낫습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">어느 집에 세워둘지부터 정하세요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 정도 크기면 원룸이든 거실이든 한쪽</p><p style="text-align:center;margin:0;color:#000000;">구석에 세워두고 방 전체를 순환시키는 용도로</p><p style="text-align:center;margin:0;color:#000000;">맞습니다. 손선풍기처럼 들고 다니는</p><p style="text-align:center;margin:0;color:#000000;">물건은 아니에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">에어컨을 아예 안 쓰고 선풍기 하나로</p><p style="text-align:center;margin:0;color:#000000;">버티실 거면,</p><p style="text-align:center;margin:0;color:#000000;">4엽 날개의 직선 바람이 일반 선풍기보다</p><p style="text-align:center;margin:0;color:#000000;">멀리 갑니다. 에어컨과 같이 쓰신다면</p><p style="text-align:center;margin:0;color:#000000;">냉기를 섞어주는 보조 역할로</p><p style="text-align:center;margin:0;color:#000000;">더 빛을 봅니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가정용 서큘레이터 DPK-55CF는 정가</p><p style="text-align:center;margin:0;color:#000000;">78,800원에서 지금 39,800원까지</p><p style="text-align:center;margin:0;color:#000000;">내려와 있고,</p><p style="text-align:center;margin:0;color:#000000;">네이버 멤버십이면 포인트가 최대</p><p style="text-align:center;margin:0;color:#000000;">11,600원까지 붙습니다. 포인트는</p><p style="text-align:center;margin:0;color:#000000;">현금이 아니라 다음 구매 때 쓰는</p><p style="text-align:center;margin:0;color:#000000;">적립금이라는 점은 참고하시고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">배송비는 따로 들지 않습니다. 서큘레이터선풍기</p><p style="text-align:center;margin:0;color:#000000;">하나로 여름 내내 방치된 손선풍기 대신 방</p><p style="text-align:center;margin:0;color:#000000;">전체 공기를 도는 걸 원하시면,</p><p style="text-align:center;margin:0;color:#000000;">스탠드선풍기 쪽으로 방향을 잡으시면 됩니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">높이 조절 범위가 우리 집 자리에 맞는지는<br>상세페이지에서 한 번 더 보고<br>정하는 게 낫습니다.</span></b><br><br><b><span style="font-size:16px;color:#2563eb;">👉 듀플렉스 써큘레이터 스탠드 에어서큘레이터 선풍기 DPK-55CF<br>가격·구성 확인하기</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GKIapzGw</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#듀플렉스 #서큘레이터 #선풍기 #시원한바람 #무소음선풍기 #저소음선풍기 #사무실선풍기 #공기순환 #N도착보장 #간편한선풍기 #손선풍기 #업소용선풍기 #선풍기추천 #가정용선풍기 #스탠드선풍기</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">여름마다 미니 선풍기를 새로 삽니다.
+작년 것도, 재작년 것도
+서랍 어딘가에 있을 텐데
+바람이 약해서 손이 안 갑니다.
+
+
+3년 뒤에 또 같은 걸 사게 됩니다.
+문제는 선풍기가 아니라
+방 전체 공기가 안 도는 거였거든요.
+
+
+이 글 링크를 걸어두고 이런 말을 하긴 좀
+그런데,
+에어컨을 계속 트실 거면 이 제품보다
+에어컨 냉기를 방 전체로 퍼뜨리는 용도로
+더 잘 맞습니다. 실내에서 강풍으로 오래
+쓰실 분들 얘기고요.
+
+
+밖에서 잠깐씩 쓰는 손선풍기하고는 아예
+다른 물건입니다. 스탠드형이라 바닥에
+세워두고 방 전체 공기를
+돌리는 쪽이거든요.
+
+
+사진1
+
+
+이 글에서 다루는 것
+
+1. 4엽 날개, 세워두면 존재감부터 다릅니다
+2. 에어컨 켠 방에서 더 효과 봅니다
+3. 어느 집에 세워둘지부터 정하세요
+
+
+4엽 날개, 세워두면 존재감부터 다릅니다
+
+
+듀플렉스 서큘레이터 DPK-55CF는 이름부터
+써큘레이터와 선풍기를 같이 씁니다.
+
+
+그럴 만한 게,
+날개가 4엽 구조입니다.
+일반 선풍기 날개보다 적은 수로
+바람을 더 멀리,
+더 직선으로 보내는 방식이에요.
+
+
+사진2
+
+
+바람을 방 전체로
+밀어내는 구조입니다
+
+
+높이는 조절이 됩니다. 낮춰서 얼굴 앞에
+두거나,
+높여서 방 전체로 바람을 퍼뜨리거나
+상황에 맞게 바꿀 수 있어요.
+
+
+좌우 자동 회전도 됩니다. 한 자리에 고정해서
+트는 게 아니라,
+켜두면 방 이쪽저쪽으로 바람이
+오가는 구조입니다.
+
+
+색은 무채색 계열로 나와서 거실이든 원룸이든
+튀지 않습니다. 사무실 한쪽에 세워둬도
+어색하지 않은 생김새예요.
+
+
+에어컨 켠 방에서 더 효과 봅니다
+
+
+써큘레이터의 진짜 역할은 에어컨과 같이 쓸
+때 나옵니다. 에어컨만 틀면 찬 공기가
+바닥으로 가라앉아서,
+정작 서 있는 위치는 안 시원한
+경우가 많거든요.
+
+
+이럴 때 써큘레이터를 에어컨 반대쪽에 두고
+공기를 밀어주면,
+냉기가 방 전체로 섞입니다. 에어컨 설정
+온도를 더 낮추지 않아도 체감
+온도가 내려가요.
+
+
+리모컨이 있어서 세워둔 자리에서 일어나지
+않고 회전이나 세기를 바꿀 수 있습니다.
+자기 전에 눕혀놓고 손만 뻗어 조절하기에
+편한 구성이에요.
+
+
+4엽 날개가 분리되는 구조인지는 상세페이지
+구성 사진에서 바로 보입니다.
+
+https://naver.me/GKIapzGw
+
+
+관리는 어렵지 않습니다. 날개 부분이
+분리되는 구조라 먼지가 쌓이면 떼서
+닦을 수 있습니다. 스탠드형 선풍기는
+날개 뒤편에 먼지가 쌓이기 쉬운데,
+분리가 안 되면 여름 내내 방치하다
+다음 해에 곰팡내가 나기도 하거든요.
+
+
+같은 듀플렉스 안에서도 라인이 나뉩니다.
+휴대용 손선풍기는 15,900원대로 가방에
+넣고 다니는 용도고,
+이 스탠드형은 39,800원대로 방 하나를
+채우는 용도입니다.
+
+
+더 위로는 AI 음성인식이 붙은 저소음
+서큘레이터가 89,000원대로 있고,
+업소용급 50cm 대형은
+59,800원대입니다. 원룸이나 거실
+한 대로 충분하면 이 스탠드형이 딱
+맞는 자리고,
+사무실처럼 넓은 공간을 계속 돌려야
+하면 대형 쪽을 보는 게 낫습니다.
+
+
+어느 집에 세워둘지부터 정하세요
+
+
+이 정도 크기면 원룸이든 거실이든 한쪽
+구석에 세워두고 방 전체를 순환시키는 용도로
+맞습니다. 손선풍기처럼 들고 다니는
+물건은 아니에요.
+
+
+에어컨을 아예 안 쓰고 선풍기 하나로
+버티실 거면,
+4엽 날개의 직선 바람이 일반 선풍기보다
+멀리 갑니다. 에어컨과 같이 쓰신다면
+냉기를 섞어주는 보조 역할로
+더 빛을 봅니다.
+
+
+가정용 서큘레이터 DPK-55CF는 정가
+78,800원에서 지금 39,800원까지
+내려와 있고,
+네이버 멤버십이면 포인트가 최대
+11,600원까지 붙습니다. 포인트는
+현금이 아니라 다음 구매 때 쓰는
+적립금이라는 점은 참고하시고요.
+
+
+배송비는 따로 들지 않습니다. 서큘레이터선풍기
+하나로 여름 내내 방치된 손선풍기 대신 방
+전체 공기를 도는 걸 원하시면,
+스탠드선풍기 쪽으로 방향을 잡으시면 됩니다.
+
+
+높이 조절 범위가 우리 집 자리에 맞는지는
+상세페이지에서 한 번 더 보고
+정하는 게 낫습니다.
+
+https://naver.me/GKIapzGw
+
+
+#듀플렉스 #서큘레이터 #선풍기 #시원한바람 #무소음선풍기 #저소음선풍기 #사무실선풍기 #공기순환 #N도착보장 #간편한선풍기 #손선풍기 #업소용선풍기 #선풍기추천 #가정용선풍기 #스탠드선풍기</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage) {
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      say(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.'
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.'
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+})();
+</script>
+</body>
+</html>
