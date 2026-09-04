@@ -31,6 +31,10 @@
   #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
     padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
   #msg.show { display: block; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a;
+    font-weight: 700; font-size: 14.5px; }
   #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
   #post img { max-width: 100%; height: auto; }
   #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
@@ -96,7 +100,7 @@
     <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
     <button id="publishToggle" type="button">발행 전</button>
   </div>
-  <div class="cat-wrap"><span class="cat-chip" style="background:#fdf2ec;color:#8e4726;border:1.5px solid #f5d2bd;">식품</span></div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="식품" style="background:#fdf2ec;color:#8e4726;border:1.5px solid #f5d2bd;">식품</span></div>
   <h1 id="titleText" class="visually-hidden">한우투뿔 설로인 한우 선물세트 명절에 값 하는 구이용 마블링 한우세트</h1>
   <div class="product-name">엑셀 상품명: <span id="productNameText">[손종원 PICK] 설로인 투뿔 한우 소고기 선물 세트 구이용 명절 추석 설 어버이날 마블링</span></div>
   <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
@@ -332,6 +336,29 @@ https://naver.me/5g41VM4b
   function say(text) {
     msg.textContent = text || '';
     msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    if (!cat) { say(text); return; }
+    if (cat === DEFAULT_CATEGORY) {
+      say('카테고리는 ' + cat + ' 그대로 두시면 됩니다. ' + text);
+      return;
+    }
+    msg.textContent = '카테고리를 “' + cat + '”으로 바꾸세요. 발행창은 ' +
+      DEFAULT_CATEGORY + '으로 열립니다. ' + text;
+    msg.classList.add('show', 'warn');
   }
 
   // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
@@ -427,7 +454,8 @@ https://naver.me/5g41VM4b
   //
   // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
   // async, and Safari rejects a write() that isn't issued in the same tick as the click.
-  function copyBody(htmlPromise, okMessage) {
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
     var text = plainTextPayload();
     if (!(navigator.clipboard && window.ClipboardItem)) {
       htmlPromise.then(function (html) {
@@ -442,7 +470,7 @@ https://naver.me/5g41VM4b
         'text/plain': new Blob([text], { type: 'text/plain' })
       })
     ]).then(function () {
-      say(okMessage);
+      ok(okMessage);
     }).catch(function () {
       htmlPromise.then(function (html) {
         showManualCopyBox(html);
@@ -455,7 +483,8 @@ https://naver.me/5g41VM4b
     say('');
     copyBody(
       Promise.resolve(titleHtml() + bodyHtmlForPaste()),
-      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.'
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
+      sayWithCategory
     );
   });
 
@@ -465,7 +494,8 @@ https://naver.me/5g41VM4b
       say('');
       copyBody(
         Promise.resolve(titleHtml() + bodyHtmlForPaste()),
-        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.'
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
       );
     });
   }
