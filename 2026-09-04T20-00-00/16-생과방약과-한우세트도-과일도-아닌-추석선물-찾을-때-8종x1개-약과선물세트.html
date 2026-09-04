@@ -444,7 +444,7 @@ https://naver.me/xzHG182g
     if (!(navigator.clipboard && window.ClipboardItem)) {
       htmlPromise.then(function (html) {
         showManualCopyBox(html);
-        say('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
       });
       return;
     }
@@ -458,7 +458,7 @@ https://naver.me/xzHG182g
     }).catch(function () {
       htmlPromise.then(function (html) {
         showManualCopyBox(html);
-        say('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
       });
     });
   }
