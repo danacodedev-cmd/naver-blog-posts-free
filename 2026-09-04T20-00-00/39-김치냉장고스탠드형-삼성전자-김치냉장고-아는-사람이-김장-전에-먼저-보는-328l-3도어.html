@@ -31,6 +31,23 @@
   #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
     padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
   #msg.show { display: block; }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
   /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
      평범한 알림으로 읽히고 그냥 지나갑니다. */
   #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
@@ -113,6 +130,14 @@
   <button id="copyProductNameBtn" type="button">제품명 복사</button>
 </div>
 <div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
 <div id="refs">
   <h2>참고한 상위 노출 글 3개</h2>
   <ol>
@@ -380,21 +405,40 @@ https://naver.me/Gmp85iLQ
   }
 
   // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
   function sayWithCategory(text) {
     var cat = postCategory();
-    if (!cat) { say(text); return; }
-    // 카테고리는 별도 줄로 세웁니다. 한 줄로 이으면 뒤에 붙는 사진 안내가 훨씬 길어서
-    // 눈이 그대로 흘러가고, 정작 카테고리는 안 읽힙니다.
-    var head = document.createElement('strong');
-    head.className = 'cat-line';
-    head.textContent = cat === DEFAULT_CATEGORY
-      ? '카테고리: ' + cat + ' — 발행창 기본값 그대로 두시면 됩니다'
-      : '카테고리를 ' + cat + ' 으로 바꾸세요 (발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다)';
-    msg.textContent = '';
-    msg.appendChild(head);
-    msg.appendChild(document.createTextNode(text));
-    msg.classList.add('show');
-    msg.classList.toggle('warn', cat !== DEFAULT_CATEGORY);
+    say(text);
+    showCatPop(cat);
   }
 
   // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
