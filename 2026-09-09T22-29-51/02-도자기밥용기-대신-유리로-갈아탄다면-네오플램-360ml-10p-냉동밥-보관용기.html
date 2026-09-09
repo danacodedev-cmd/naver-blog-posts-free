@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>도자기밥용기 대신 유리로 갈아탄다면, 네오플램 360ml 10P 냉동밥 보관용기</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="생활/건강" style="background:#edf6f0;color:#1f5f42;border:1.5px solid #bfdfcb;">생활/건강</span></div>
+  <h1 id="titleText" class="visually-hidden">도자기밥용기 대신 유리로 갈아탄다면, 네오플램 360ml 10P 냉동밥 보관용기</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">네오플램 전자렌지 용기 냉동 밥 보관용기 반찬통세트 360ML 10P</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="도자기밥용기 대신 유리로 갈아탄다면, 네오플램 360ml 10P 냉동밥 보관용기"><span class="tp-num">1</span><span class="tp-text">도자기밥용기 대신 유리로 갈아탄다면, 네오플램 360ml 10P 냉동밥 보관용기</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="냉동보관용기 밥 한 공기씩 얼려 두는 사람이 고르는 네오플램 360ml 10P 유리반찬통세트"><span class="tp-num">2</span><span class="tp-text">냉동보관용기 밥 한 공기씩 얼려 두는 사람이 고르는 네오플램 360ml 10P 유리반찬통세트</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="도자기수저통까지 다 바꾸는 김에, 네오플램 전자렌지 냉동밥용기 360ml 10P 유리밀폐용기"><span class="tp-num">3</span><span class="tp-text">도자기수저통까지 다 바꾸는 김에, 네오플램 전자렌지 냉동밥용기 360ml 10P 유리밀폐용기</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/jeejee101/224322085826" target="_blank" rel="noopener noreferrer">네오플램 새밥 용기 내돈내산 후기★ 인터넷구매</a></li>
+      <li><a href="https://blog.naver.com/y2u7b0n3uyak/224388122793" target="_blank" rel="noopener noreferrer">네오플램 냉동밥 용기 10개 직접 써보니 전자레인지 활용이 정말 편할까</a></li>
+      <li><a href="https://blog.naver.com/hyuni_boy/223694567121" target="_blank" rel="noopener noreferrer">냉동밥 보관 유리용기 네오플램 즉석밥</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 2장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-09T22-29-51/img/02-1.jpg" alt="네오플램 도자기/유리용기세트 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-09T22-29-51/img/02-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-09T22-29-51/img/02-2.jpg" alt="네오플램 도자기/유리용기세트 구성품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-09T22-29-51/img/02-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">네오플램 밀폐용기는 이름이</p><p style="text-align:center;margin:0;color:#000000;">여러 갈래입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 브랜드 안에서도 냉동밥용,</p><p style="text-align:center;margin:0;color:#000000;">반찬 소분용,</p><p style="text-align:center;margin:0;color:#000000;">계란찜용으로 태그가 따로 붙어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 글에서 보는 건 360ml</p><p style="text-align:center;margin:0;color:#000000;">10P 세트입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밥 한 공기 기준으로 짜인</p><p style="text-align:center;margin:0;color:#000000;">크기라, 반찬통까지 겸하고</p><p style="text-align:center;margin:0;color:#000000;">싶은 분께는 좀 작습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-09T22-29-51/img/02-1.jpg" alt="네오플램 도자기/유리용기세트 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> 냉동밥용기는 용량보다 한 공기 기준으로 고르셔야 합니다</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 360ml 10P가 생활에서 뜻하는 건 이겁니다</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 사기 전에 이것부터 확인하세요</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">냉동밥용기는 용량보다 한 공기 기준으로 고르셔야 합니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밀폐용기를 고를 때 큰 것부터</p><p style="text-align:center;margin:0;color:#000000;">보는 습관이 있는데,</p><p style="text-align:center;margin:0;color:#000000;">냉동밥은 반대예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 번에 먹을 양보다 크면 밥이</p><p style="text-align:center;margin:0;color:#000000;">통 안에서 납작하게 퍼져 얼고,</p><p style="text-align:center;margin:0;color:#000000;">데울 때 가장자리만 마릅니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">냉동밥은 넉넉한 통보다<br>딱 맞는 통이 낫습니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">두 번째로 볼 건 재질입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">플라스틱은 김치나 카레를</p><p style="text-align:center;margin:0;color:#000000;">담으면 색이 배고,</p><p style="text-align:center;margin:0;color:#000000;">오래 쓰면 표면이 긁혀 그</p><p style="text-align:center;margin:0;color:#000000;">자국에 냄새가 남아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">유리는 그 걱정이 없고,</p><p style="text-align:center;margin:0;color:#000000;">안에 뭐가 들었는지 뚜껑을 열지</p><p style="text-align:center;margin:0;color:#000000;">않고도 보입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">세 번째는 개수예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밥을 얼려 두는 사람은</p><p style="text-align:center;margin:0;color:#000000;">통이 늘 모자랍니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">씻어서 마르는 동안 쓸</p><p style="text-align:center;margin:0;color:#000000;">게 없으니까요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">360ml 10P가 생활에서 뜻하는 건 이겁니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">360ml는 밥 한 공기</p><p style="text-align:center;margin:0;color:#000000;">조금 넘게 들어가는 크기입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">즉석밥 한 개 분량이라고</p><p style="text-align:center;margin:0;color:#000000;">보시면 감이 잡혀요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">주말에 밥을 지어 열 개를</p><p style="text-align:center;margin:0;color:#000000;">다 채우면, 평일 저녁 두</p><p style="text-align:center;margin:0;color:#000000;">주 치가 냉동실에 서</p><p style="text-align:center;margin:0;color:#000000;">있는 셈입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 통에 두 공기씩 눌러 담는</p><p style="text-align:center;margin:0;color:#000000;">분이라면 이 크기는 작습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그때는 더 큰 용량</p><p style="text-align:center;margin:0;color:#000000;">쪽을 보셔야 해요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">10P라 돌려쓰기가 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다섯 개가 냉동실에 있고,</p><p style="text-align:center;margin:0;color:#000000;">세 개는 식탁에 나와 있고,</p><p style="text-align:center;margin:0;color:#000000;">두 개는 건조대에 있어도</p><p style="text-align:center;margin:0;color:#000000;">흐름이 안 끊겨요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-09-09T22-29-51/img/02-2.jpg" alt="네오플램 도자기/유리용기세트 구성품 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">통이 모자라서 밥을 못 얼리는 일이<br>열 개면 잘 안 생깁니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">유리반찬통으로도 쓰입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">판매자 태그에 소분용기,</p><p style="text-align:center;margin:0;color:#000000;">냉동실보관용기가 같이 붙어 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 360ml는 국물</p><p style="text-align:center;margin:0;color:#000000;">반찬을 넉넉히 담기엔 작은</p><p style="text-align:center;margin:0;color:#000000;">편이라, 마른반찬이나 나물</p><p style="text-align:center;margin:0;color:#000000;">한 끼분에 맞습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">냉동실 문 열 때마다 어느 게<br>밥인지 뒤적이던 일,<br>이제 눈으로 보고 바로 꺼내세요.</span></b><cite style="display:block;margin-top:14px;font-style:normal;font-size:13px;color:#8a8f96;line-height:1.6;">네오플램 전자렌지 용기 냉동 밥 보관용기 반찬통세트 360ML 10P<br>⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</cite></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GkI22Rlw</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">사기 전에 이것부터 확인하세요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">네오플램 안에 비슷한 용기</p><p style="text-align:center;margin:0;color:#000000;">구성이 여럿이라,</p><p style="text-align:center;margin:0;color:#000000;">값이 17,800원부터</p><p style="text-align:center;margin:0;color:#000000;">39,900원까지</p><p style="text-align:center;margin:0;color:#000000;">벌어져 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 세트는 39,900원</p><p style="text-align:center;margin:0;color:#000000;">쪽이고, 10P라 개수가</p><p style="text-align:center;margin:0;color:#000000;">많은 구성입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">17,800원짜리는 개수가 적은</p><p style="text-align:center;margin:0;color:#000000;">구성이니, 통을 이미 갖고 계시고</p><p style="text-align:center;margin:0;color:#000000;">몇 개만 보태려는 거면 그쪽을</p><p style="text-align:center;margin:0;color:#000000;">보시는 게 맞아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">두 번째로 볼 건 뚜껑입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">전자레인지에 넣을 때</p><p style="text-align:center;margin:0;color:#000000;">뚜껑을 덮은 채 돌리는지,</p><p style="text-align:center;margin:0;color:#000000;">열고 돌리는지는 제품마다</p><p style="text-align:center;margin:0;color:#000000;">달라서 상세페이지에 적힌</p><p style="text-align:center;margin:0;color:#000000;">사용법을 그대로 따라야 합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">세 번째는 냉동실 칸 높이예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">유리 밀폐용기는 뚜껑까지</p><p style="text-align:center;margin:0;color:#000000;">덮으면 생각보다 높아집니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">서랍식 냉동실이면 세워서</p><p style="text-align:center;margin:0;color:#000000;">몇 줄이 들어가는지 미리</p><p style="text-align:center;margin:0;color:#000000;">재보시면 낭패가 없어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">마지막으로 무게입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">유리는 플라스틱보다 확실히 무겁습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">열 개를 한 번에 옮기는</p><p style="text-align:center;margin:0;color:#000000;">일은 없겠지만,</p><p style="text-align:center;margin:0;color:#000000;">손목이 약하신 분께는 이</p><p style="text-align:center;margin:0;color:#000000;">재질 자체가 안</p><p style="text-align:center;margin:0;color:#000000;">맞을 수 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#d0d4d9;">───────────</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정가 49,900원짜리가</p><p style="text-align:center;margin:0;color:#000000;">지금 39,900원까지</p><p style="text-align:center;margin:0;color:#000000;">내려와 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">20% 내려간 값이라<br>정가보다 10,000원 쌉니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">적립 포인트도 최대</p><p style="text-align:center;margin:0;color:#000000;">6,994원까지 따로 붙습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 냉동밥 보관용기는 주말에</p><p style="text-align:center;margin:0;color:#000000;">밥을 몰아 짓고 한 공기씩</p><p style="text-align:center;margin:0;color:#000000;">얼려 두는 1인 가구에 맞습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">현재 할인 가격 확인하기<br>👇 지금 받을 수 있는 혜택 👇 아래에서 확인하세요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GkI22Rlw</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#네오플램 #도자기 #보관 #네오플램유리그릇 #유리밀폐용기 #냉동밥용기 #전자렌지용밥용기 #밥보관용기 #전자렌지밥용기 #햇반용기 #전자렌지용기 #도자기화분 #도자기체험 #도자기수저통 #도자기컵 #도자기밥용기 #도자기접시 #냉동보관용기 #도자기화병 #도자기만들기</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">네오플램 밀폐용기는 이름이
+여러 갈래입니다.
+
+
+같은 브랜드 안에서도 냉동밥용,
+반찬 소분용,
+계란찜용으로 태그가 따로 붙어요.
+
+
+이 글에서 보는 건 360ml
+10P 세트입니다.
+
+
+밥 한 공기 기준으로 짜인
+크기라, 반찬통까지 겸하고
+싶은 분께는 좀 작습니다.
+
+
+사진1
+
+
+이 글에서 다루는 것
+
+1. 냉동밥용기는 용량보다 한 공기 기준으로 고르셔야 합니다
+2. 360ml 10P가 생활에서 뜻하는 건 이겁니다
+3. 사기 전에 이것부터 확인하세요
+
+
+냉동밥용기는 용량보다 한 공기 기준으로 고르셔야 합니다
+
+
+밀폐용기를 고를 때 큰 것부터
+보는 습관이 있는데,
+냉동밥은 반대예요.
+
+
+한 번에 먹을 양보다 크면 밥이
+통 안에서 납작하게 퍼져 얼고,
+데울 때 가장자리만 마릅니다.
+
+
+냉동밥은 넉넉한 통보다
+딱 맞는 통이 낫습니다
+
+
+두 번째로 볼 건 재질입니다.
+
+
+플라스틱은 김치나 카레를
+담으면 색이 배고,
+오래 쓰면 표면이 긁혀 그
+자국에 냄새가 남아요.
+
+
+유리는 그 걱정이 없고,
+안에 뭐가 들었는지 뚜껑을 열지
+않고도 보입니다.
+
+
+세 번째는 개수예요.
+
+
+밥을 얼려 두는 사람은
+통이 늘 모자랍니다.
+
+
+씻어서 마르는 동안 쓸
+게 없으니까요.
+
+
+360ml 10P가 생활에서 뜻하는 건 이겁니다
+
+
+360ml는 밥 한 공기
+조금 넘게 들어가는 크기입니다.
+
+
+즉석밥 한 개 분량이라고
+보시면 감이 잡혀요.
+
+
+주말에 밥을 지어 열 개를
+다 채우면, 평일 저녁 두
+주 치가 냉동실에 서
+있는 셈입니다.
+
+
+한 통에 두 공기씩 눌러 담는
+분이라면 이 크기는 작습니다.
+
+
+그때는 더 큰 용량
+쪽을 보셔야 해요.
+
+
+10P라 돌려쓰기가 됩니다.
+
+
+다섯 개가 냉동실에 있고,
+세 개는 식탁에 나와 있고,
+두 개는 건조대에 있어도
+흐름이 안 끊겨요.
+
+
+사진2
+
+
+통이 모자라서 밥을 못 얼리는 일이
+열 개면 잘 안 생깁니다
+
+
+유리반찬통으로도 쓰입니다.
+
+
+판매자 태그에 소분용기,
+냉동실보관용기가 같이 붙어 있어요.
+
+
+다만 360ml는 국물
+반찬을 넉넉히 담기엔 작은
+편이라, 마른반찬이나 나물
+한 끼분에 맞습니다.
+
+
+냉동실 문 열 때마다 어느 게
+밥인지 뒤적이던 일,
+이제 눈으로 보고 바로 꺼내세요.
+
+https://naver.me/GkI22Rlw
+
+
+사기 전에 이것부터 확인하세요
+
+
+네오플램 안에 비슷한 용기
+구성이 여럿이라,
+값이 17,800원부터
+39,900원까지
+벌어져 있습니다.
+
+
+이 세트는 39,900원
+쪽이고, 10P라 개수가
+많은 구성입니다.
+
+
+17,800원짜리는 개수가 적은
+구성이니, 통을 이미 갖고 계시고
+몇 개만 보태려는 거면 그쪽을
+보시는 게 맞아요.
+
+
+두 번째로 볼 건 뚜껑입니다.
+
+
+전자레인지에 넣을 때
+뚜껑을 덮은 채 돌리는지,
+열고 돌리는지는 제품마다
+달라서 상세페이지에 적힌
+사용법을 그대로 따라야 합니다.
+
+
+세 번째는 냉동실 칸 높이예요.
+
+
+유리 밀폐용기는 뚜껑까지
+덮으면 생각보다 높아집니다.
+
+
+서랍식 냉동실이면 세워서
+몇 줄이 들어가는지 미리
+재보시면 낭패가 없어요.
+
+
+마지막으로 무게입니다.
+
+
+유리는 플라스틱보다 확실히 무겁습니다.
+
+
+열 개를 한 번에 옮기는
+일은 없겠지만,
+손목이 약하신 분께는 이
+재질 자체가 안
+맞을 수 있습니다.
+
+
+───────────
+
+
+정가 49,900원짜리가
+지금 39,900원까지
+내려와 있습니다.
+
+
+20% 내려간 값이라
+정가보다 10,000원 쌉니다
+
+
+적립 포인트도 최대
+6,994원까지 따로 붙습니다.
+
+
+이 냉동밥 보관용기는 주말에
+밥을 몰아 짓고 한 공기씩
+얼려 두는 1인 가구에 맞습니다.
+
+
+현재 할인 가격 확인하기
+👇 지금 받을 수 있는 혜택 👇 아래에서 확인하세요
+
+https://naver.me/GkI22Rlw
+
+
+#네오플램 #도자기 #보관 #네오플램유리그릇 #유리밀폐용기 #냉동밥용기 #전자렌지용밥용기 #밥보관용기 #전자렌지밥용기 #햇반용기 #전자렌지용기 #도자기화분 #도자기체험 #도자기수저통 #도자기컵 #도자기밥용기 #도자기접시 #냉동보관용기 #도자기화병 #도자기만들기</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
+      sayWithCategory
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+})();
+</script>
+</body>
+</html>
