@@ -210,9 +210,9 @@
         }
       ],
       "titleCandidates": [
-        "건식족욕기 물 안 받는데 효과 있나 싶다면, 건식 족욕 족탕기 JOY 010 따져보니",
-        "족욕기 추석 선물로 부모님 드릴 거라면 봐야 할 것, 건식 좌훈 족욕 족탕기 JOY 010",
-        "족욕효능 보려면 온도가 먼저입니다, 건식 좌훈 족욕 족탕기 JOY 010으로 매일 챙겨보세요"
+        "족욕효능 물 안 받고 켜기만 하는 에버조이 건식 좌훈 족욕기",
+        "족욕효능 부모님 선물로 뭘 볼지 따져보니, 에버조이 건식 좌훈 족욕기",
+        "족욕효능 매일 하게 되는 건식 좌훈기, 에버조이 물 없는 족탕기 JOY 010"
       ],
       "slug": "건식-건식-좌훈-족욕기-joy-010",
       "templateId": "llm-claude-opus",
@@ -303,7 +303,18 @@
           "avgTitleLength": 25
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/453744143"
+      "productUrl": "https://smartstore.naver.com/main/products/453744143",
+      "targetKeyword": {
+        "keyword": "족욕효능",
+        "volume": 2830,
+        "was": {
+          "keyword": "족욕효능",
+          "volume": 2830
+        },
+        "changed": false,
+        "reason": "후보가 하나뿐",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -551,9 +562,9 @@
         }
       ],
       "titleCandidates": [
-        "차량용목쿠션 아임반 SP누빔 2세대, 같은 값에 1열 헤드레스트째 바꾸는 목베개",
-        "차량용 목쿠션 위험하다는 말 왜 나올까, 아임반 SP누빔 2세대 헤드레스트 목베개 따져보니",
-        "차량용목쿠션 아임반 SP누빔 2세대, 가을 장거리 늘기 전에 목 받치고 다녀보세요"
+        "차량용목쿠션 아임반 SP누빔 2세대 28% 할인 1열 헤드레스트쿠션",
+        "차량용목쿠션 아임반 운전석만이면 1P로 되나, 2개 세트랑 따져보니",
+        "차량용목쿠션 덧대는 쿠션은 뒤로 밀립니다, 아임반 헤드레스트 교체형 목쿠션"
       ],
       "slug": "아임반-아임반-sp누빔-2세대-헤드레스트-차량용-목쿠션-자동차-목베개-헤드쿠션-1열-1p",
       "templateId": "llm-claude-opus",
@@ -694,7 +705,18 @@
           "avgTitleLength": 32
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/2113241809"
+      "productUrl": "https://smartstore.naver.com/main/products/2113241809",
+      "targetKeyword": {
+        "keyword": "차량용목쿠션",
+        "volume": 12460,
+        "was": {
+          "keyword": "차량용목쿠션",
+          "volume": 12460
+        },
+        "changed": false,
+        "reason": "타 브랜드명(테슬라·카니발)과 브랜드 단독형(아임반 헤드레스트)을 제외하면 남는 후보 중 검색량이 가장 크고 의도도 상품과 정확히 맞습니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -929,9 +951,9 @@
         }
       ],
       "titleCandidates": [
-        "가온카매트 TPE랑 코일매트 뭐가 다른지 비교해보니",
-        "바닥매트 흙 털어도 카펫이 젖는다면 가온 TPE 오니핏 입체 앞좌석 카매트",
-        "가온카매트 오니핏 TPE 앞좌석, 캠핑 다니는 차에 두는 통짜 바닥매트"
+        "바닥매트 앞좌석 두 장만 필요하다면 가온 오니핏 TPE 입체 카매트",
+        "바닥매트 젖은 신발 밟고 타도 물이 안 번지는 가온 TPE 입체 카매트",
+        "바닥매트 코일이냐 TPE냐 가온 오니핏 앞좌석 2장 구성 따져보니"
       ],
       "slug": "가온-가온-tpe-카매트-오니핏-발매트-발판-고무-차량-입체-바닥-앞좌석",
       "templateId": "llm-claude-opus",
@@ -1033,7 +1055,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/13098960958"
+      "productUrl": "https://smartstore.naver.com/main/products/13098960958",
+      "targetKeyword": {
+        "keyword": "바닥매트",
+        "volume": 16640,
+        "was": {
+          "keyword": "바닥매트",
+          "volume": 16640
+        },
+        "changed": false,
+        "reason": "후보 전부 집·유아용 바닥재 의도라 차량용 카매트 상품과 안 맞아서, 통과하는 게 없으니 현재 키워드를 유지함.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -1279,9 +1312,9 @@
         }
       ],
       "titleCandidates": [
-        "20L쓰레기통 손 안 대고 열리는 다룸 센서 휴지통, 집들이선물 출산선물로 같이 보는 20L 자동쓰레기통",
-        "센서휴지통 20L랑 30L 중에 뭘 사야 하나, 다룸 센서 휴지통 종량제 봉투 기준으로 따져보니",
-        "자동센서쓰레기통 60% 할인, 다룸 센서 휴지통 20L 냄새 새지 않는 밀폐형 자동휴지통"
+        "20L쓰레기통 손 안 대고 열리는 다룸 센서휴지통 20L 자동휴지통",
+        "20L쓰레기통 종량제 봉투 규격 맞나, 다룸 센서휴지통 비교해보니",
+        "20L쓰레기통 뚜껑 닫아도 냄새 새면 다룸 화이트 자동센서 휴지통"
       ],
       "slug": "다룸-다룸-자동센서-스마트-쓰레기통-가정용-사무실용-휴지통-일반형-20l-화이트",
       "templateId": "llm-claude-opus",
@@ -1418,7 +1451,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/7098365909"
+      "productUrl": "https://smartstore.naver.com/main/products/7098365909",
+      "targetKeyword": {
+        "keyword": "20L쓰레기통",
+        "volume": 2330,
+        "was": {
+          "keyword": "20L쓰레기통",
+          "volume": 2330
+        },
+        "changed": false,
+        "reason": "후보가 하나뿐",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -1649,9 +1693,9 @@
         }
       ],
       "titleCandidates": [
-        "자동회전냄비 기름 튀는 게 싫어서 미뤄뒀다면, 램프쿡 양수냄비 SC 0020 더뉴일립스",
-        "램프쿡자동회전냄비 삼겹살 구울 때 뒤집개 안 잡아도 되는 이유가 뭘까요, 램프쿡 양수냄비 SC 0020 통주물 세라믹팬",
-        "양수냄비 램프쿡 양수냄비 SC 0020 일립스 미니랑 뭐가 다른지 44% 할인가로 비교해보니"
+        "양수냄비 램프쿡 미니랑 뭐가 다른지, 4인 가족이 한 번에 굽는 자동회전냄비",
+        "양수냄비 고기 굽고 찌개까지 올리는 램프쿡 자동회전냄비 통주물 세라믹",
+        "양수냄비 인덕션에 올려도 되나, 램프쿡 더뉴일립스 25년형 기름 빠지는 구조 따져보니"
       ],
       "slug": "램프쿡-램프쿡-자동회전냄비-더뉴일립스-25년형-sc-0020",
       "templateId": "llm-claude-opus",
@@ -1765,7 +1809,18 @@
           "avgTitleLength": 42
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/11424220493"
+      "productUrl": "https://smartstore.naver.com/main/products/11424220493",
+      "targetKeyword": {
+        "keyword": "양수냄비",
+        "volume": 2470,
+        "was": {
+          "keyword": "양수냄비",
+          "volume": 2470
+        },
+        "changed": false,
+        "reason": "후보가 하나뿐",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2006,9 +2061,9 @@
         }
       ],
       "titleCandidates": [
-        "트렁크정리함 흙 묻은 신발 봉지째 굴리다 매트까지 버립니다, 크레이지몬스터 몬스터박스 세차 툴백",
-        "차량용트렁크정리함 신발보관함까지 겸하는 게 있을까, 크레이지몬스터 몬스터박스 찾아보니",
-        "신발보관함 차에 두고 쓸 거면 투명 아크릴 말고 크레이지몬스터 몬스터박스 트렁크정리함"
+        "세차 툴백 트렁크정리함 대형 아크릴 말고 접히는 몬스터박스",
+        "세차 툴백 크레이지몬스터 SUV 바닥에 맞는 대형 신발보관함",
+        "세차 툴백 흙 묻은 신발이랑 타월 같이 넣는 사람이 보는 칸막이"
       ],
       "slug": "크레이지몬스터-크레이지몬스터-트렁크-정리함-수납함-신발-보관함-차량용-세차-가방-툴백-몬스터박스",
       "templateId": "llm-claude-opus",
@@ -2125,7 +2180,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/12389738124"
+      "productUrl": "https://smartstore.naver.com/main/products/12389738124",
+      "targetKeyword": {
+        "keyword": "세차 툴백",
+        "volume": 1100,
+        "was": {
+          "keyword": "차량용트렁크정리함",
+          "volume": 320
+        },
+        "changed": true,
+        "reason": "상품이 실제 세차 툴백 겸용 수납함이라 의도가 맞고, 타사 차종명(카니발·쏘렌토·레이)을 뺀 후보 중 검색량이 가장 큽니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2346,9 +2412,9 @@
         }
       ],
       "titleCandidates": [
-        "고급 차량용 방향제 명품 값에 이만큼 담긴 적 있었나, 벤딕트 차량용방향제 애트모어 인스탠스",
-        "명품 차량용 방향제 베이직이랑 인스탠스 뭐가 다른지 벤딕트 차량용방향제 비교해보니",
-        "차량용방향제 선물로 줄 건데 종이는 좀 그렇다면, 벤딕트 차량용방향제 애트모어 IoT 디퓨저"
+        "고급차량용방향제 종이 태그와 값이 서른다섯 배 차이 나는 이유 따져보니",
+        "고급차량용방향제 새차 선물로 뭘 보내지, 벤딕트 애트모어 IoT 전자 디퓨저",
+        "고급차량용방향제 마지막 날까지 향 세기 같은 벤딕트 애트모어 인스탠스 차방향제"
       ],
       "slug": "벤딕트-벤딕트-차량용-방향제-자동차-명품-디퓨저-차방향제-고급-전자-iot-애트모어-인스탠스",
       "templateId": "llm-claude-opus",
@@ -2478,7 +2544,18 @@
           "avgTitleLength": 38
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/13210651224"
+      "productUrl": "https://smartstore.naver.com/main/products/13210651224",
+      "targetKeyword": {
+        "keyword": "고급차량용방향제",
+        "volume": 2230,
+        "was": {
+          "keyword": "고급차량용방향제",
+          "volume": 2230
+        },
+        "changed": false,
+        "reason": "브랜드명 없이 상품 정체(고급 차량용 방향제)를 그대로 담은 의도 일치 키워드 중 검색량이 2,230회로 압도적으로 크다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2715,9 +2792,9 @@
         }
       ],
       "titleCandidates": [
-        "인덕션실리콘매트 20cm 두 장 24cm 한 장, 3구 인덕션에 맞춰 나온 하루의공간 냄비받침",
-        "인덕션보호매트 다이소에서 사면 되는 거 아닌가, 하루의공간 냄비받침 3개 세트 따져보니",
-        "냄비받침대 신혼 주방에 원목 말고 실리콘 깔아보세요, 하루의공간 인덕션보호매트 3개 세트"
+        "인덕션 보호매트 냄비 끌 때 잔기스 걱정 없는 하루의공간 2mm 실리콘매트",
+        "인덕션 보호매트 다이소 원형 말고 사각이 필요한 사람이 고르는 3개세트",
+        "인덕션 보호매트 3구 화구에 그대로 맞는 20cm 두장 24cm 한장 실리콘매트"
       ],
       "slug": "하루의공간-하루의공간-레터링-인덕션-보호-실리콘-매트-3개-세트",
       "templateId": "llm-claude-opus",
@@ -2833,7 +2910,18 @@
           "avgTitleLength": 36
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/11038475373"
+      "productUrl": "https://smartstore.naver.com/main/products/11038475373",
+      "targetKeyword": {
+        "keyword": "인덕션 보호매트",
+        "volume": 6420,
+        "was": {
+          "keyword": "냄비받침대",
+          "volume": 2570
+        },
+        "changed": true,
+        "reason": "상품이 바로 인덕션 보호 실리콘 매트라 검색 의도가 정확히 맞고, 타사 브랜드어가 없으며 통과 후보 중 검색량(6,420회)이 가장 크다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -3057,9 +3145,9 @@
         }
       ],
       "titleCandidates": [
-        "뿌리는바퀴벌레약 아이랑 강아지 있는 집에서 뿌리기 전에 보는 페스트세븐가드250ml 살충제",
-        "스프레이 하수구에서 한 마리 봤다면 이미 늦은 겁니다, 페스트세븐가드250ml 뿌리는바퀴벌레약",
-        "에어졸 약국에서 살까 하다가 페스트세븐가드250ml 뿌리는 바퀴벌레약 4개들이까지 따져보니"
+        "바퀴벌레약 아이 강아지 있는 집이 보는 페스트세븐 250ml 살충제",
+        "바퀴벌레약 하수구 틈에 뿌리는 페스트세븐 빈대 벼룩 250ml 스프레이",
+        "바퀴벌레약 집벌레마다 따로 사던 집, 페스트세븐 30% 할인 살충제"
       ],
       "slug": "페스트세븐가드250ml-페스트세븐가드250ml-뿌리는-바퀴벌레약-빈대-벼룩-집벌레-벌레-살충제-트랩-약-박멸",
       "templateId": "llm-claude-opus",
@@ -3171,7 +3259,18 @@
           "avgTitleLength": 27
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/4673065817"
+      "productUrl": "https://smartstore.naver.com/main/products/4673065817",
+      "targetKeyword": {
+        "keyword": "바퀴벌레약",
+        "volume": 27920,
+        "was": {
+          "keyword": "뿌리는바퀴벌레약",
+          "volume": 900
+        },
+        "changed": true,
+        "reason": "연막탄은 형태가 다름. 상위 개념으로 되돌림",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -3397,9 +3496,9 @@
         }
       ],
       "titleCandidates": [
-        "높이조절독서대 아이 목 숙이는 게 자세 습관 탓인 줄 알았다면, 노르잇 독서대 PR02A 확인해보니",
-        "휴대용 독서대 개강하고 미룬 아이 책상, 노르잇 독서대 PR02A 투명 아크릴 북스탠드",
-        "아크릴 독서대 PR01A랑 PR02A 뭐가 다른지, 노르잇 독서대 2단 높이조절 비교해보니"
+        "노르잇 투명독서대 목 숙이는 건 각도 아니라 높이, 2단 높이조절 북스탠드",
+        "노르잇 투명독서대 PR02A는 왜 두 배인지 확인해보니 2단 높이조절",
+        "노르잇 투명독서대 책 아랫줄 안 가리는 아크릴 받침, 높이조절독서대"
       ],
       "slug": "노르잇-노르잇-투명독서대-높이조절-아크릴-책받침대-북스탠드-pr02a",
       "templateId": "llm-claude-opus",
@@ -3554,7 +3653,18 @@
           "avgTitleLength": 37
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/8514792794"
+      "productUrl": "https://smartstore.naver.com/main/products/8514792794",
+      "targetKeyword": {
+        "keyword": "노르잇 투명독서대",
+        "volume": 5160,
+        "was": {
+          "keyword": "독서대추천",
+          "volume": 1160
+        },
+        "changed": true,
+        "reason": "자사 브랜드명에 상품 종류(투명독서대)까지 붙어 의도가 정확히 맞고, 통과 후보 중 검색량이 가장 크다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": false,

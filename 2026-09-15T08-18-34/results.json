@@ -246,9 +246,9 @@
         }
       ],
       "titleCandidates": [
-        "멀티탭6구 다 꽂고 나서 바꾸면 늦습니다, 수피 바이올렛 타워형 6구 멀티탭",
-        "6구멀티탭 신혼집 집들이선물로 고를 때 수피 타워형 2m 비교해보니",
-        "컬러멀티탭 바닥에 굴러다니는 흰색 대신 세워두는 수피 바이올렛 6구 멀티탭"
+        "멀티탭5M 말고 2m로 충분한 자리, 수피 타워형 6구 개별스위치 멀티탭",
+        "멀티탭5M 신혼집 거실에 6구면 몇 구 남는지 세어보니 수피 타워형 4000W",
+        "멀티탭5M 바닥에 안 눕는 수피 타워형 4000W 6구, 벽 하나뿐인 방에 세워보세요"
       ],
       "slug": "n배송-n배송-수피-비비드-컬러-디자인-타워형-고용량-멀티탭-집들이선물-2m-바이올렛-6구-1개",
       "templateId": "llm-claude-opus",
@@ -368,7 +368,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/12148340448"
+      "productUrl": "https://smartstore.naver.com/main/products/12148340448",
+      "targetKeyword": {
+        "keyword": "멀티탭5M",
+        "volume": 2680,
+        "was": {
+          "keyword": "멀티탭5M",
+          "volume": 2680
+        },
+        "changed": false,
+        "reason": "상품은 2m·6구라 5m/10m·구수 지정 후보들은 길이가 안 맞는 데다 전부 검색량 0회여서, 통과 후보가 없으니 현재 키워드를 유지한다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -608,9 +619,9 @@
         }
       ],
       "titleCandidates": [
-        "세차압축분무기 2L면 한 대가 될까, 벤딕트 압축분무기 충전식 폼건",
-        "충전식분무기 2L랑 5L 중에 뭘 살지 벤딕트 압축분무기로 따져보니",
-        "전동압축분무기 41% 내려간 벤딕트 압축분무기 2L 충전식 세차폼건"
+        "고압분무기 벤딕트 충전식 세차 한 대 거품 다 올리는 2L 전동분무기",
+        "고압분무기 5L 말고 2L여도 되나, 벤딕트 충전식 세차분무기 확인해보니",
+        "고압분무기 펌프질에 압 죽는 게 싫다면 벤딕트 2L 충전식 세차분무기"
       ],
       "slug": "벤딕트-벤딕트-압축분무기-전동-고압-충전식-분무기-자동-세차-폼건-거품-2l-새츄라",
       "templateId": "llm-claude-opus",
@@ -758,7 +769,18 @@
           "avgTitleLength": 31
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/13693948251"
+      "productUrl": "https://smartstore.naver.com/main/products/13693948251",
+      "targetKeyword": {
+        "keyword": "고압분무기",
+        "volume": 4240,
+        "was": {
+          "keyword": "세차압축분무기",
+          "volume": 2070
+        },
+        "changed": true,
+        "reason": "농약분무기는 용도가 다른 물건이고, 카톤·마로렉스는 남의 브랜드라 탈락이라 남은 것 중 검색량이 가장 큰 고압분무기가 이 상품(전동 고압 충전식 분무기)의 의도에 맞습니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -986,9 +1008,9 @@
         }
       ],
       "titleCandidates": [
-        "미니안마기 목이냐 허리냐부터 정하면 답 나옵니다, 등허리 안마기 쿠션 마사지기 비교해보니",
-        "안마기추천 목록에 다 나오는 안마의자 말고, 추석 선물로 등허리 안마기 쿠션형 고르는 기준",
-        "휴대용안마기 부모님 댁 소파에 그대로 얹는 등허리 안마기 쇼핑백 포함 선물세트"
+        "허리마사지기 추석선물로 등부터 허리까지 대는 풀리오 쿠션 안마기",
+        "허리마사지기 목이냐 허리냐부터 정하고 고르는 풀리오 등허리 쿠션 안마기",
+        "허리마사지기 쓰던 소파 그대로 쓰는 풀리오 등허리 쿠션형 안마기"
       ],
       "slug": "등허리-등허리-쿠션-마사지기-쇼핑백l",
       "templateId": "llm-claude-opus",
@@ -1123,7 +1145,18 @@
           "avgTitleLength": 53
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/11471394078"
+      "productUrl": "https://smartstore.naver.com/main/products/11471394078",
+      "targetKeyword": {
+        "keyword": "허리마사지기",
+        "volume": 10650,
+        "was": {
+          "keyword": "안마기브랜드",
+          "volume": 790
+        },
+        "changed": true,
+        "reason": "등허리 쿠션 — 허리 쪽 수요",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -1361,9 +1394,9 @@
         }
       ],
       "titleCandidates": [
-        "목디스크견인기 부모님 추석 선물로 고민된다면, 가정용 목보호대 CS500G2 경추견인기",
-        "견인치료 병원 말고 집에서 받아도 되나, 가정용 목보호대 CS500G2 목견인기 따져보니",
-        "목디스크보호대 목만 잡아주는 걸로 부족했다면 가정용 목보호대 CS500G2 경추 견인치료 의료기기"
+        "경추 견인기 목보호대랑 뭐가 다른지 15% 할인 디스크닥터 경추견인치료기",
+        "경추 견인기 아버지 병원 왕복 두 시간 줄여드리는 디스크닥터 CS500G2",
+        "경추 견인기 사기 전에 확인할 3가지 디스크닥터 CS500G2 의료기기 목디스크견인기"
       ],
       "slug": "가정용-가정용-목견인기-cs500g2-목디스크-경추-견인치료-의료기기",
       "templateId": "llm-claude-opus",
@@ -1474,7 +1507,18 @@
           "avgTitleLength": 49
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/100615329"
+      "productUrl": "https://smartstore.naver.com/main/products/100615329",
+      "targetKeyword": {
+        "keyword": "경추 견인기",
+        "volume": 1540,
+        "was": {
+          "keyword": "목디스크견인기",
+          "volume": 1340
+        },
+        "changed": true,
+        "reason": "메디니스는 타사 브랜드라 탈락이고, 남은 의도 일치 키워드 중 검색량이 가장 큰 것(1,540회)이라 현재 키워드보다 낫습니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -1698,9 +1742,9 @@
         }
       ],
       "titleCandidates": [
-        "가죽코팅제 이염된 자리 볼 때마다 넘겼다면, 레더쉴드 50ml 자동차가죽코팅제",
-        "자동차가죽클리너 닦고 끝낼지 코팅까지 갈지, 레더쉴드 50ml 실내세정제 비교해보니",
-        "자동차실내세정제 청바지 물든 가죽시트에 쓰는 레더쉴드 50ml 가죽코팅제"
+        "가죽시트 클리너로 지운 뒤 청바지 이염 막는 기온쿼츠 레더쉴드 가죽코팅제",
+        "가죽시트 클리너 말고 덮는 코팅제가 필요하다면, 기온쿼츠 레더쉴드 가죽코팅제",
+        "가죽시트 클리너 다음에 뭘 발라야 하나, 기온쿼츠 레더쉴드 50ml 가죽코팅제"
       ],
       "slug": "레더쉴드-레더쉴드-50ml-자동차-가죽-코팅제-가죽시트코팅-관리제-가죽-클리너-보호제-기온쿼츠",
       "templateId": "llm-claude-opus",
@@ -1831,7 +1875,18 @@
           "avgTitleLength": 34
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/4943114035"
+      "productUrl": "https://smartstore.naver.com/main/products/4943114035",
+      "targetKeyword": {
+        "keyword": "가죽시트 클리너",
+        "volume": 1020,
+        "was": {
+          "keyword": "자동차실내세정제",
+          "volume": 1840
+        },
+        "changed": true,
+        "reason": "기온쿼츠는 남의 브랜드명 단독이라 탈락이고, 자동차실내세정제·실내세정티슈류는 가죽 코팅제가 아닌 다른 물건을 찾는 의도라 탈락이라, 통과한 것 중 검색량이 가장 큰 가죽시트 클리너(1,020회)를 골랐어.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2072,9 +2127,9 @@
         }
       ],
       "titleCandidates": [
-        "압축팩 패딩 옷장에 우겨넣었다가 문 안 닫힌 적 있다면, 브랜든 압축팩 아우터 압축 파우치 M L 세트",
-        "압축팩 M이랑 L 뭐가 다른지 브랜든 압축팩 아우터 압축 파우치 세트로 비교해보니",
-        "압축파우치 44% 할인받고 넣어요, 브랜든 압축팩 겨울 아우터 M과 L 두 장 세트"
+        "압축팩 M과 L 두 장으로 나눠 담는 브랜든 아우터 압축 파우치",
+        "압축팩 패딩 네 벌 몰아넣으면 선반에 안 들어갑니다 브랜든 아우터 파우치",
+        "압축팩 이불용 말고 아우터용 필요한 사람이 고르는 브랜든 M L 세트"
       ],
       "slug": "브랜든-브랜든-아우터-압축-파우치-ml-세트",
       "templateId": "llm-claude-opus",
@@ -2220,7 +2275,18 @@
           "avgTitleLength": 36
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/12022749622"
+      "productUrl": "https://smartstore.naver.com/main/products/12022749622",
+      "targetKeyword": {
+        "keyword": "압축팩",
+        "volume": 5340,
+        "was": {
+          "keyword": "압축팩",
+          "volume": 5340
+        },
+        "changed": false,
+        "reason": "의도가 상품과 맞고(옷 부피 줄이는 압축 파우치) 타 브랜드명도 없어 기준을 통과하는 후보 중 검색량이 가장 큼 — 지금 키워드 유지.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2458,9 +2524,9 @@
         }
       ],
       "titleCandidates": [
-        "보청기지원금 못 받는 70세 미만이면 어떻게 하나, 피스넷 히어링 식약처 인증 보청기 찾아보니",
-        "보청기추천 추석에 부모님 드릴 거라면 피스넷 히어링, 식약처 인증받은 2026년형 보청기",
-        "보청기가격 350000원에서 42% 내려간 피스넷 히어링, 식약처 인증받은 2026년형 보청기"
+        "보청기지원금 못 받는 나이라면 피스넷 히어링 식약처 인증 충전식 보청기",
+        "보청기지원금 대상 아닐 때 고르는 기준 3가지 피스넷 히어링 2026년형",
+        "보청기지원금 없이도 부모님 귀 챙기는 피스넷 히어링 식약처 인증 보청기"
       ],
       "slug": "한국-한국-식약처-의료기기-인증-완료-믿을수-있는-보청기-깨끗하게-잘-들리는-피스넷-히어링-보청기-2026년",
       "templateId": "llm-claude-opus",
@@ -2575,7 +2641,18 @@
           "avgTitleLength": 37
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/11205205772"
+      "productUrl": "https://smartstore.naver.com/main/products/11205205772",
+      "targetKeyword": {
+        "keyword": "보청기지원금",
+        "volume": 2340,
+        "was": {
+          "keyword": "보청기지원금",
+          "volume": 2340
+        },
+        "changed": false,
+        "reason": "보청기 구매 지원금을 찾는 의도라 이 상품과 맞고, 타 브랜드명도 없으며 통과 후보 중 검색량이 가장 크다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2795,9 +2872,9 @@
         }
       ],
       "titleCandidates": [
-        "생리대중형 라엘 유기농이랑 무표백이랑 뭐가 다른데? 8팩 순면커버 비교해보니",
-        "생리대중형 매달 사러 나가지 말고 라엘 유기농 순면커버 8팩으로 채워두세요",
-        "생리대중형 유기농 쓰는 사람이 라엘에서 순면커버부터 보는 이유"
+        "생리대중형 순면커버 라엘 유기농 8팩 예민한 날 덜 쓸린 면",
+        "생리대중형 라엘 유기농이랑 무표백 뭐가 다른지 순면커버 8팩 비교해보니",
+        "생리대중형 한 사이즈만 쟁여둘 사람이 고르는 라엘 유기농 순면커버 생리대"
       ],
       "slug": "라엘-라엘-유기농-순면커버-생리대-중형-8팩",
       "templateId": "llm-claude-opus",
@@ -2940,7 +3017,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/2893948394"
+      "productUrl": "https://smartstore.naver.com/main/products/2893948394",
+      "targetKeyword": {
+        "keyword": "생리대중형",
+        "volume": 2400,
+        "was": {
+          "keyword": "생리대중형",
+          "volume": 2400
+        },
+        "changed": false,
+        "reason": "입는·오버나이트는 다른 형태의 제품이고 나머지는 타 브랜드명이 들어가 탈락이라, 통과하는 후보 중 검색량이 가장 큰 현재 키워드를 유지.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -3168,9 +3256,9 @@
         }
       ],
       "titleCandidates": [
-        "안마기추천 부모님 손목 시큰거린다는 말 들었다면 풀리오 손 마사지기 V2 파우치까지 든 선물세트",
-        "손마사지기 설거지에 걸레질까지 손목 쓰신 어머니께 드리는 풀리오 V2 쇼핑백 포함 추석 안마용품",
-        "휴대용 안마기 추석에 빈손으로 못 가는 자식이 고르는 풀리오 손 마사지기 V2 파우치 쇼핑백 선물세트"
+        "손마사지기 안마기추천에서 손목까지 덮는지 보는 풀리오 V2 선물세트",
+        "손마사지기 추석 선물로 포장 고민 없는 풀리오 V2 파우치 쇼핑백 안마기추천",
+        "손마사지기 어머니가 먼저 안 사는 물건, 풀리오 V2 40% 할인 선물세트"
       ],
       "slug": "손-손-마사지기-v2-파우치-쇼핑백m",
       "templateId": "llm-claude-opus",
@@ -3304,7 +3392,18 @@
           "avgTitleLength": 53
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/12825771644"
+      "productUrl": "https://smartstore.naver.com/main/products/12825771644",
+      "targetKeyword": {
+        "keyword": "손마사지기",
+        "volume": 15500,
+        "was": {
+          "keyword": "안마기브랜드",
+          "volume": 790
+        },
+        "changed": true,
+        "reason": "손 안마기 — 그대로 맞는 말",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -3523,9 +3622,9 @@
         }
       ],
       "titleCandidates": [
-        "타이어공기압주입기 경고등 뜨고도 그냥 다니셨다면, 벤딕트 휴대용 공기압 주입기",
-        "자동차타이어공기압주입기 주유소 안 가고 트렁크에서 넣는 벤딕트 공기주입기, NANO와 뭐가 다른지 비교해보니",
-        "타이어공기압체크 겨울 오기 전에 꼭 할 일, 벤딕트 공기압측정기 겸용 휴대용 주입기"
+        "타이어 공기주입기 트렁크에 두고 쓰는 벤딕트 휴대용 공기압측정기",
+        "타이어 공기주입기 35% 할인 벤딕트 화물차까지 넣는 차량용 공기압주입기",
+        "타이어 공기주입기 벤딕트 NANO랑 뭐가 다른지 비교해보니"
       ],
       "slug": "벤딕트-벤딕트-타이어-공기압-주입기-공기주입기-공기-바람-자동차-차량용-바퀴-휴대용-체크",
       "templateId": "llm-claude-opus",
@@ -3640,7 +3739,18 @@
           "avgTitleLength": 54
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/8495867871"
+      "productUrl": "https://smartstore.naver.com/main/products/8495867871",
+      "targetKeyword": {
+        "keyword": "타이어 공기주입기",
+        "volume": 4510,
+        "was": {
+          "keyword": "자동차타이어공기압주입기",
+          "volume": 610
+        },
+        "changed": true,
+        "reason": "이 상품 자체를 찾는 의도와 정확히 맞으면서 후보 중 검색량이 가장 큰 키워드(4,510회)이고, 브랜드명도 들어있지 않다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": false,

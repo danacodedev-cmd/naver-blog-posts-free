@@ -241,9 +241,9 @@
         }
       ],
       "titleCandidates": [
-        "강아지덴탈껌 스케일링 비용 보고 나서야 찾게 되는 포켄스 개껌 840g 에코팩",
-        "개껌 하루 하나씩 넉 달 가는 포켄스 카누들 840g 그레인프리 덴탈껌",
-        "강아지개껌 카누들 170g이랑 840g 에코팩 뭐가 다른지 따져보니"
+        "개껌 소형견 넉 달치 포켄스 카누들 그레인프리 840g 덴탈껌",
+        "개껌 170g 말고 에코팩 사야 하는 이유, 포켄스 카누들 840g 덴탈껌",
+        "개껌 매일 안 주면 치석 쌓입니다 포켄스 카누들 그레인프리 840g"
       ],
       "slug": "포켄스-포켄스-카누들-에코팩-840g-강아지-덴탈껌-치석-입냄새-제거-개껌-그레인프리",
       "templateId": "llm-claude-opus",
@@ -362,7 +362,18 @@
           "avgTitleLength": 46
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/7800346344"
+      "productUrl": "https://smartstore.naver.com/main/products/7800346344",
+      "targetKeyword": {
+        "keyword": "개껌",
+        "volume": 6550,
+        "was": {
+          "keyword": "개껌",
+          "volume": 6550
+        },
+        "changed": false,
+        "reason": "브랜드가 든 \"개껌 브리젠 굿나잇츄\"는 탈락이고, 남은 후보들은 모두 통과하지만 검색량이 6,550회로 가장 큰 \"개껌\"이 이 상품과 의도도 정확히 맞는다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -607,9 +618,9 @@
         }
       ],
       "titleCandidates": [
-        "식기세척기세제추천 찾다 멈춘 사람이 보는 에코버 제로 무향 올인원 75개입 식기세척기세제",
-        "업소용식기세척기세제 말고 집에서 쓸 거라면, 에코버 제로 무향 올인원 식기세척기세제 3개 묶음 따져보니",
-        "에코버제로 식세기 세제 향 남는 게 싫어서 무향 찾는다면 이 올인원 타블렛 써보세요"
+        "에코버 식세기 세제 무향이라 젖병까지 같이 돌리는 올인원타블렛 75개입",
+        "에코버 식세기 세제 37% 할인, 향 안 남는 무향 올인원 식기세척기세제",
+        "에코버 식세기 세제 아이 식판에 향 밸까 걱정된다면 무향 75개입 타블렛"
       ],
       "slug": "에코버-에코버-제로-올인원-식기세척기세제-무향-25개입-3개",
       "templateId": "llm-claude-opus",
@@ -696,7 +707,18 @@
           "avgTitleLength": 35
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/2455635647"
+      "productUrl": "https://smartstore.naver.com/main/products/2455635647",
+      "targetKeyword": {
+        "keyword": "에코버 식세기 세제",
+        "volume": 3610,
+        "was": {
+          "keyword": "업소용식기세척기세제",
+          "volume": 1230
+        },
+        "changed": true,
+        "reason": "자기 브랜드 + 찾는 물건(식세기 세제)이 다 들어간 의도 일치 키워드이고, 통과한 후보 중 검색량이 가장 큽니다(3,610회). \"업소용식기세척기세제\"는 가정용 25개입 상품과 의도가 다르고, \"에코버\"는 브랜드만 있어 탈락입니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -932,9 +954,9 @@
         }
       ],
       "titleCandidates": [
-        "칫솔추천 검색하다 왕타칫솔 베이직 10개입까지 온 사람이 확인해보니",
-        "칫솔세트 왕타칫솔 8개입과 10개입 중에 뭘 살지 못 정했다면 비교해보니",
-        "칫솔 10개입 한 번에 갈아두면 편한 왕타칫솔 베이직, 대왕 칫솔 고르는 기준"
+        "휴대용칫솔세트 말고 쟁여두는 왕타칫솔 어금니까지 훑는 대왕헤드 10개입",
+        "휴대용칫솔세트 찾다 헤드 크기 놓치면 후회하는 왕타 베이직 칫솔 10개입",
+        "휴대용칫솔세트 8개입과 값이 같은 왕타칫솔 두 식구 1년 쓰는 10개입 칫솔"
       ],
       "slug": "왕타칫솔-왕타칫솔-베이직10개입-네이버-1등-칫솔",
       "templateId": "llm-claude-opus",
@@ -1062,7 +1084,18 @@
           "avgTitleLength": 33
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/747260037"
+      "productUrl": "https://smartstore.naver.com/main/products/747260037",
+      "targetKeyword": {
+        "keyword": "휴대용칫솔세트",
+        "volume": 2040,
+        "was": {
+          "keyword": "휴대용칫솔세트",
+          "volume": 2040
+        },
+        "changed": false,
+        "reason": "타사 브랜드명(오스템·닥터레이·뷰센)과 치약이 포함된 세트를 찾는 치약칫솔세트를 걸러내면 남는 후보 중 검색량이 가장 큽니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -1277,9 +1310,9 @@
         }
       ],
       "titleCandidates": [
-        "3M 테이프클리너 털갈이철 허리 안 굽히고 미는 스카치브라이트 롱핸들 돌돌이 세트",
-        "스카치브라이트돌돌이 리필만 사면 되는 거 아닌가, 3M 테이프클리너 롱핸들 세트 따져보니",
-        "테이프클리너리필 5개면 몇 달 쓰나, 3M 스카치브라이트 클린컷 대형 돌돌이로 확인해보니"
+        "돌돌이 테이프 밀대 뜯을 때 끝선 안 붙는 3M 클린컷 테이프클리너",
+        "돌돌이 테이프 카펫 털 미는 3M 스카치브라이트 롱핸들 리필 5입 밀대클리너",
+        "돌돌이 테이프 리필값까지 따져보니 3M 클린컷 대형 롱핸들 세트"
       ],
       "slug": "3m-3m-스카치브라이트-돌돌이-테이프클리너-롤크리너-대형-클린컷-체리블라썸-롱핸들-밀대-세트롱핸들-1개리필",
       "templateId": "llm-claude-opus",
@@ -1396,7 +1429,18 @@
           "avgTitleLength": 43
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/8290495054"
+      "productUrl": "https://smartstore.naver.com/main/products/8290495054",
+      "targetKeyword": {
+        "keyword": "돌돌이 테이프",
+        "volume": 3690,
+        "was": {
+          "keyword": "스카치브라이트돌돌이",
+          "volume": 670
+        },
+        "changed": true,
+        "reason": "고로고로 계열은 타 브랜드명이라 탈락이고, 남은 일반명 중 이 상품(테이프식 돌돌이 클리너)과 의도가 맞으면서 검색량이 가장 큰 키워드입니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -1625,9 +1669,9 @@
         }
       ],
       "titleCandidates": [
-        "멀티탭5M 미루다 미지근해진 그 멀티탭, 아직 바꾸지 않으셨나요 버티탭 멀티탭 PD65W 4000W 타워형 멀티탭",
-        "고용량멀티탭4구 에어컨까지 꽂아도 되는 4000W, 버티탭 멀티탭 PD65W 충전기 없이 쓰는 타워 멀티탭",
-        "휴대용멀티탭 캠핑 갈 때 어댑터 몇 개나 챙기세요? 버티탭 멀티탭 PD65W 4000W 벨크로스트랩 세트 따져보니"
+        "멀티콘센트 4000W라 에어컨도 같이 꽂는 버티탭 타워형 멀티탭",
+        "멀티콘센트 어댑터에 옆칸 죽는 게 싫다면 버티탭 PD65W 타워멀티탭",
+        "멀티콘센트 노트북 충전기까지 빼는 버티탭 PD65W 4000W 타워형 멀티탭"
       ],
       "slug": "버티탭-버티탭-멀티탭-고용량-4000w-pd65w-타워-멀티탭-큐브-여행-콘센트-캠핑-멀티어댑터-디자인-벨크",
       "templateId": "llm-claude-opus",
@@ -1746,7 +1790,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/11389365407"
+      "productUrl": "https://smartstore.naver.com/main/products/11389365407",
+      "targetKeyword": {
+        "keyword": "멀티콘센트",
+        "volume": 10160,
+        "was": {
+          "keyword": "멀티탭5M",
+          "volume": 2680
+        },
+        "changed": true,
+        "reason": "멀티탭/콘센트를 찾는 의도가 이 상품과 정확히 맞고 브랜드명도 없으면서, 통과 후보 중 검색량이 10,160회로 가장 크다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -1973,9 +2028,9 @@
         }
       ],
       "titleCandidates": [
-        "미니 에어건 배터리 큰 것만 보고 골랐다가 후회합니다, 벤딕트 에어건 써지 750W 무선에어건",
-        "휴대용 에어건 벤딕트 마하1 마하2 써지 뭐가 다른지 비교해보니",
-        "캠핑 에어건 텐트 모래 털다 손 시린 계절 오기 전에 벤딕트 써지 750W 무선 블로우건 써보세요"
+        "무선에어건 마하1 마하2 써지 뭘 살지 못 정했다면 벤딕트 750W 에어건",
+        "무선에어건 벤딕트 써지 세차장 물기 한 번에 미는 750W 미니 에어건",
+        "무선에어건 배터리보다 출력부터 봐야 하는 이유, 벤딕트 써지 750W 따져보니"
       ],
       "slug": "벤딕트-벤딕트-에어건-무선-미니-초강력-750w-에어-블로우건-세차-캠핑-콤프레샤-청소-써지",
       "templateId": "llm-claude-opus",
@@ -2104,7 +2159,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/12231577351"
+      "productUrl": "https://smartstore.naver.com/main/products/12231577351",
+      "targetKeyword": {
+        "keyword": "무선에어건",
+        "volume": 8550,
+        "was": {
+          "keyword": "미니에어건",
+          "volume": 1120
+        },
+        "changed": true,
+        "reason": "이 상품이 바로 무선 미니 에어건이라 검색 의도가 정확히 맞고, 남의 브랜드도 안 끼어 있으면서 통과 후보 중 검색량이 가장 큽니다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2356,9 +2422,9 @@
         }
       ],
       "titleCandidates": [
-        "발목찜질팩 뛰고 나서 얼음팩 흘러내려 다시 잡던 사람이 고르는 셀버린 찜질팩 발목밴드",
-        "찜질팩 사이즈 SM이랑 LXL 뭐가 다른지, 셀버린 발목밴드 2개입 비교해보니",
-        "발목밴드 냉온 둘 다 되는데 2개입, 셀버린 찜질팩 25% 할인받고 러닝 후 아이싱까지"
+        "찜질팩 냉온 한쪽만 되는 거 사면 결국 또 삽니다 셀버린 발목 아이싱밴드",
+        "찜질팩 뛰고 온 날 양쪽 발목 같이 올려두는 셀버린 발목밴드 2개 구성",
+        "찜질팩 복사뼈에서 흘러내리지 않는 셀버린 발목밴드, 감아서 고정하는 냉온겸용"
       ],
       "slug": "셀버린-셀버린-발목-밴드-스포츠-아이싱-냉찜질팩-온찜질팩-마라톤-러닝-크로스핏-smlxl-2개",
       "templateId": "llm-claude-opus",
@@ -2528,7 +2594,18 @@
           "avgTitleLength": 41
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/12962867279"
+      "productUrl": "https://smartstore.naver.com/main/products/12962867279",
+      "targetKeyword": {
+        "keyword": "찜질팩",
+        "volume": 12220,
+        "was": {
+          "keyword": "찜질팩",
+          "volume": 12220
+        },
+        "changed": false,
+        "reason": "세 후보 모두 상품 의도에 맞고 타 브랜드명도 없어, 통과한 것 중 검색량이 가장 큰 \"찜질팩\"이 유지된다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -2751,9 +2828,9 @@
         }
       ],
       "titleCandidates": [
-        "무릎찜질팩 러닝 오래 한 사람이 냉과 온을 하나로 쓰는 셀버린 젤 슬리브 2세트",
-        "찜질팩 다이소 말고 전기도 아닌 세 번째 선택지가 있나, 셀버린 무릎 엘보 슬리브 비교해보니",
-        "무릎찜질팩 뛰고 나서 무릎 시릴 때 감고 앉아 있어봐요, 셀버린 젤 슬리브 냉온찜질팩 2세트"
+        "무릎 아이싱 양쪽 동시에 하고 싶다면 셀버린 젤 슬리브 2세트 냉온찜질팩",
+        "무릎 아이싱 다이소 젤팩과 전기찜질기 뭐가 다른지 따져보니, 셀버린 젤 슬리브 2세트",
+        "무릎 아이싱 러닝 후 붓는 쪽에 감는, 셀버린 젤 슬리브 곡면에 붙는 무릎엘보 찜질팩"
       ],
       "slug": "셀버린-셀버린-젤-슬리브-무릎-엘보-냉찜질팩-온찜질팩-2세트-마라톤-러닝-크로스핏-아이싱",
       "templateId": "llm-claude-opus",
@@ -2852,7 +2929,18 @@
           "avgTitleLength": 51
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/9901298581"
+      "productUrl": "https://smartstore.naver.com/main/products/9901298581",
+      "targetKeyword": {
+        "keyword": "무릎 아이싱",
+        "volume": 1710,
+        "was": {
+          "keyword": "무릎찜질팩",
+          "volume": 1530
+        },
+        "changed": true,
+        "reason": "검색량이 가장 크고(1,710회) 남의 브랜드명 없이 무릎 냉찜질 용도를 정확히 가리켜 이 상품을 찾던 의도와 맞는다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -3140,9 +3228,9 @@
         }
       ],
       "titleCandidates": [
-        "발마사지기계 부모님 다리 주무르다 말고 찾아본 닥터웰 다리 발마사지기 DR 5900 6구 종아리안마기",
-        "다리공기압마사지기 6구면 충분한가 따져보니, 닥터웰 다리 발마사지기 DR 5900 종아리발마사지기",
-        "종아리안마기 추석 선물로 고를 때 확인할 것 3가지, 닥터웰 다리 발마사지기 DR 5900 6구 다리공기압마사지기"
+        "종아리마사지기 추석 선물로 보낼 때 다리만인지 팔허리까지인지 따져보니",
+        "종아리마사지기 닥터웰 에어핏 6구 보관함까지 오는 다리공기압마사지기",
+        "종아리마사지기 부모님 다리 주물러드리다 손목 아픈 사람이 고르는 6구 공기압마사지기"
       ],
       "slug": "닥터웰-닥터웰-공기압마사지기-6구-종아리-발-안마기-에어핏-dr-5900-본체다리-보관함포함",
       "templateId": "llm-claude-opus",
@@ -3269,7 +3357,18 @@
           "avgTitleLength": 28
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/7138211554"
+      "productUrl": "https://smartstore.naver.com/main/products/7138211554",
+      "targetKeyword": {
+        "keyword": "종아리마사지기",
+        "volume": 29150,
+        "was": {
+          "keyword": "발마사지기계",
+          "volume": 2050
+        },
+        "changed": true,
+        "reason": "6구 에어핏 — 종아리 중심 구성",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": true,
@@ -3503,9 +3602,9 @@
         }
       ],
       "titleCandidates": [
-        "비데자가설치 기사 안 불러도 되나? 노비타 전자식비데 BD SD600 리모컨형 직수 비데 따져보니",
-        "자가설치비데 노즐까지 물로 씻어내는 노비타 전자식비데 BD SD600 리모컨 방수비데",
-        "방수비데 부모님 댁 화장실만 계속 미루고 계셨다면, 노비타 전자식비데 BD SD600 자가설치로 끝내보세요"
+        "방수비데 노비타 BD SD600 노즐까지 물로 씻어내는 직수형 비데",
+        "방수비데 본체에 물 뿌려도 되나, 노비타 직수형 BD SD600 확인해보니",
+        "방수비데 리모컨까지 방수되는 노비타 직수형 자가설치 비데"
       ],
       "slug": "노비타-노비타-리모컨-방수-비데-bd-sd600-직수형-가정용-자가설치",
       "templateId": "llm-claude-opus",
@@ -3652,7 +3751,18 @@
           "avgTitleLength": 44
         }
       },
-      "productUrl": "https://smartstore.naver.com/main/products/2194882014"
+      "productUrl": "https://smartstore.naver.com/main/products/2194882014",
+      "targetKeyword": {
+        "keyword": "방수비데",
+        "volume": 1810,
+        "was": {
+          "keyword": "방수비데",
+          "volume": 1810
+        },
+        "changed": false,
+        "reason": "방수 비데를 찾는 의도가 상품과 정확히 맞고, 타사 브랜드가 든 키워드와 속성이 다른 \"필터없는비데\"를 뺀 통과 후보 중 검색량이 가장 크다.",
+        "decidedAt": "2026-09-18"
+      }
     },
     {
       "ok": false,
