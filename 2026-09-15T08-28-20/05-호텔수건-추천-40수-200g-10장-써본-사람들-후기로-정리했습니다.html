@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>호텔수건 추천, 40수 200g 10장 써본 사람들 후기로 정리했습니다</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="생활/건강" style="background:#edf6f0;color:#1f5f42;border:1.5px solid #bfdfcb;">생활/건강</span></div>
+  <h1 id="titleText" class="visually-hidden">호텔수건 추천, 40수 200g 10장 써본 사람들 후기로 정리했습니다</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">어메니티타올 호텔 수건 40수 200g 10장 데이즈 집들이 자취 이사 선물 답례품 타올</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="호텔수건 추천, 40수 200g 10장 써본 사람들 후기로 정리했습니다"><span class="tp-num">1</span><span class="tp-text">호텔수건 추천, 40수 200g 10장 써본 사람들 후기로 정리했습니다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="집들이 선물 수건 고민이면 이거 하나로 끝, 40수 200g 10장 세트"><span class="tp-num">2</span><span class="tp-text">집들이 선물 수건 고민이면 이거 하나로 끝, 40수 200g 10장 세트</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="자취 수건 교체 타이밍이라면 40수 200g 10장이 답인 이유"><span class="tp-num">3</span><span class="tp-text">자취 수건 교체 타이밍이라면 40수 200g 10장이 답인 이유</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/cutekjs1117/224399871284" target="_blank" rel="noopener noreferrer">수건선물세트 추천 도톰하고 부드러운 솜프레 코마사 호텔수건 40수 10장 세트</a></li>
+      <li><a href="https://blog.naver.com/qjatoddhkd83/224394056819" target="_blank" rel="noopener noreferrer">수건 30수·40수 차이｜150g·170g·200g 호텔수건 고르는 법</a></li>
+      <li><a href="https://blog.naver.com/rich051224/224401337349" target="_blank" rel="noopener noreferrer">호텔수건 40수 고르는법 코튼클라우드 호텔수건 도톰하고 부드러운 고급수건</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">호텔수건을 검색해서 들어오셨다면</p><p style="text-align:center;margin:0;color:#000000;">이미 마음은 정하셨을 겁니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">문제는 어느 걸 사느냐죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">먼저 결론부터 말씀드립니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">40수 200g,</p><p style="text-align:center;margin:0;color:#000000;">40x85cm, 10장 구성.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">리뷰 1,569건에 평점</p><p style="text-align:center;margin:0;color:#000000;">4.88이고,</p><p style="text-align:center;margin:0;color:#000000;">4점 이상 리뷰가 98%입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">호텔수건이라는 말이 붙은</p><p style="text-align:center;margin:0;color:#000000;">제품 중에서 두께와 크기</p><p style="text-align:center;margin:0;color:#000000;">숫자가 명확하게 적혀 있고,</p><p style="text-align:center;margin:0;color:#000000;">그 숫자대로 왔다는 후기가</p><p style="text-align:center;margin:0;color:#000000;">쌓여 있는 쪽을 고르시면 됩니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">40수 200g가 실제로 어떤 느낌인지</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">수건 스펙에서 40수는 실의</p><p style="text-align:center;margin:0;color:#000000;">굵기, 200g은 한 장 무게입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">숫자가 클수록 실이 가늘고,</p><p style="text-align:center;margin:0;color:#000000;">가는 실을 촘촘히 짜면</p><p style="text-align:center;margin:0;color:#000000;">부드러우면서도 밀도가 나옵니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">호텔에서 쓰는 수건이 도톰하면서</p><p style="text-align:center;margin:0;color:#000000;">뻣뻣하지 않은 이유가 여기 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 판매처의 다른 구성을</p><p style="text-align:center;margin:0;color:#000000;">보면 비교가 쉽습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">30수 170g 제품이 따로</p><p style="text-align:center;margin:0;color:#000000;">있는데, 이 제품은 40수</p><p style="text-align:center;margin:0;color:#000000;">200g입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 장당 30g 차이가 손에</p><p style="text-align:center;margin:0;color:#000000;">쥐었을 때 체감되는 부분입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">크기는 40cm x 85cm입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">일반적인 세면타월보다 세로가 긴</p><p style="text-align:center;margin:0;color:#000000;">편인데, 한 구매자는 &quot;크기가</p><p style="text-align:center;margin:0;color:#000000;">기존 수건보다 조금 커서 얼굴,</p><p style="text-align:center;margin:0;color:#000000;">머리, 몸 한 장으로 싹 해결할</p><p style="text-align:center;margin:0;color:#000000;">수 있다&quot;고 적었습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">긴 머리를 가진 다른 구매자는</p><p style="text-align:center;margin:0;color:#000000;">&quot;기존에는 수건 하나 쓰면 다</p><p style="text-align:center;margin:0;color:#000000;">젖어서 드라이할 때 시간이</p><p style="text-align:center;margin:0;color:#000000;">많이 걸렸는데 확실히 드라이</p><p style="text-align:center;margin:0;color:#000000;">시간이 줄었다&quot;고 했고요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">200g은 도톰함을 얻는 대신<br>마르는 시간을 조금 내주는 두께입니다.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 점은 솔직하게</p><p style="text-align:center;margin:0;color:#000000;">말씀드리는 게 맞습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">별점 5점을 준 구매자 중에도</p><p style="text-align:center;margin:0;color:#000000;">&quot;수건을 그날그날 손빨래하는</p><p style="text-align:center;margin:0;color:#000000;">사람은 생각해 볼 필요가 있다,</p><p style="text-align:center;margin:0;color:#000000;">200g 크고 두꺼운 게 쉽지</p><p style="text-align:center;margin:0;color:#000000;">않고 잘 마르지도 않는다&quot;며</p><p style="text-align:center;margin:0;color:#000000;">겨울용으로 두고 얇은 150g을</p><p style="text-align:center;margin:0;color:#000000;">따로 샀다는 분이 있었습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">세탁기와 건조기를 쓰신다면</p><p style="text-align:center;margin:0;color:#000000;">걸림돌이 아니지만,</p><p style="text-align:center;margin:0;color:#000000;">손빨래 위주라면 이건 미리</p><p style="text-align:center;margin:0;color:#000000;">아셔야 합니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">구매자들이 공통으로 짚은 것 세 가지</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">리뷰 1,569건을</p><p style="text-align:center;margin:0;color:#000000;">관통하는 말이 몇 개 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">첫째는 색입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">스위밍플라워, 버터그린,</p><p style="text-align:center;margin:0;color:#000000;">그린체스, 피치버터, 피치라인,</p><p style="text-align:center;margin:0;color:#000000;">버터라인, 버터체스,</p><p style="text-align:center;margin:0;color:#000000;">그린라인 같은 이름으로 나오고,</p><p style="text-align:center;margin:0;color:#000000;">10장을 색상 두 개로 5장씩</p><p style="text-align:center;margin:0;color:#000000;">나눠 담는 방식입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">&quot;색깔이 통일되지 않아서 욕실이</p><p style="text-align:center;margin:0;color:#000000;">익숙한 듯 친근한 느낌이었다면</p><p style="text-align:center;margin:0;color:#000000;">이제는 상큼하고 기분 좋은 욕실로</p><p style="text-align:center;margin:0;color:#000000;">바뀐 것 같다&quot;는 후기가 이</p><p style="text-align:center;margin:0;color:#000000;">제품의 성격을 잘 보여줍니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">돌잔치, 개업식에서 받아온</p><p style="text-align:center;margin:0;color:#000000;">제각각인 수건들을 한 번에</p><p style="text-align:center;margin:0;color:#000000;">정리하는 용도로 많이들 사시더군요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">둘째는 먼지입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">새 수건에서 먼지 날리는 건</p><p style="text-align:center;margin:0;color:#000000;">어쩔 수 없는 과정인데,</p><p style="text-align:center;margin:0;color:#000000;">구매자들이 남긴</p><p style="text-align:center;margin:0;color:#000000;">대처법이 구체적입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">&quot;세탁망에 넣고 울세탁</p><p style="text-align:center;margin:0;color:#000000;">한 번 하고 건조기</p><p style="text-align:center;margin:0;color:#000000;">먼지털기를 3번 정도</p><p style="text-align:center;margin:0;color:#000000;">돌렸더니 괜찮아졌다&quot;는</p><p style="text-align:center;margin:0;color:#000000;">후기, &quot;처음에 물로만</p><p style="text-align:center;margin:0;color:#000000;">울코스로 세탁하고 건조는</p><p style="text-align:center;margin:0;color:#000000;">살짝만 했다&quot;는 후기가 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저온 세탁에 중성세제를</p><p style="text-align:center;margin:0;color:#000000;">쓰라는 안내를 이번에 처음</p><p style="text-align:center;margin:0;color:#000000;">알았다는 분도 계셨고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">사자마자 삶아버리지만</p><p style="text-align:center;margin:0;color:#000000;">않으면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">셋째는 냄새입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">&quot;새 수건 사면 빨아도 기름</p><p style="text-align:center;margin:0;color:#000000;">냄새 같은 게 있어서</p><p style="text-align:center;margin:0;color:#000000;">불편했는데 이건 개봉해도 그</p><p style="text-align:center;margin:0;color:#000000;">냄새가 아예 없다&quot;는</p><p style="text-align:center;margin:0;color:#000000;">후기가 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">제조사는 주식회사 디오디,</p><p style="text-align:center;margin:0;color:#000000;">원산지는 국산입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">아쉬운 후기도 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">4점을 준 구매자는 &quot;디자인이나</p><p style="text-align:center;margin:0;color:#000000;">소재 느낌은 좋은데 솔직히</p><p style="text-align:center;margin:0;color:#000000;">흡수력이 좀 떨어지는</p><p style="text-align:center;margin:0;color:#000000;">느낌&quot;이라고 적었습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">흡수가 잘 된다는 후기가</p><p style="text-align:center;margin:0;color:#000000;">압도적으로 많지만 모두가 같은</p><p style="text-align:center;margin:0;color:#000000;">경험을 한 건 아니라는</p><p style="text-align:center;margin:0;color:#000000;">점은 남겨둡니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">색상 조합 남아 있을 때 확인해 보세요</span></b><cite style="display:block;margin-top:14px;font-style:normal;font-size:13px;color:#8a8f96;line-height:1.6;">어메니티타올 호텔 수건 40수 200g 10장 데이즈 집들이 자취 이사 선물 답례품 타올<br>⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</cite></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xTyXZAIE</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">집들이, 답례품으로 살 거라면</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품을 선물용으로 사는</p><p style="text-align:center;margin:0;color:#000000;">분들이 많습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이유는 단순합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">수건은 누구 집에나</p><p style="text-align:center;margin:0;color:#000000;">필요하고, 취향을 크게 타지</p><p style="text-align:center;margin:0;color:#000000;">않으면서, 받는 사람이 안</p><p style="text-align:center;margin:0;color:#000000;">쓰고 넣어둘 일이 없습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 선물로 줄 때 값어치가</p><p style="text-align:center;margin:0;color:#000000;">보여야 하는데,</p><p style="text-align:center;margin:0;color:#000000;">이 제품은 그게</p><p style="text-align:center;margin:0;color:#000000;">스펙으로 설명됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">40수 200g이라는 숫자와,</p><p style="text-align:center;margin:0;color:#000000;">한 장씩 따로 사면</p><p style="text-align:center;margin:0;color:#000000;">11,000원인 제품이라는</p><p style="text-align:center;margin:0;color:#000000;">사실이 그 역할을 합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 구매자는 &quot;집들이나 신혼집</p><p style="text-align:center;margin:0;color:#000000;">수건을 고민하는 분에게,</p><p style="text-align:center;margin:0;color:#000000;">이건 진짜 선물용으로 실패가</p><p style="text-align:center;margin:0;color:#000000;">없다고 자부한다&quot;고 적었습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">10장 한 세트를 그대로</p><p style="text-align:center;margin:0;color:#000000;">드려도 되고,</p><p style="text-align:center;margin:0;color:#000000;">색상을 5장씩 나눠 두 집에</p><p style="text-align:center;margin:0;color:#000000;">나눠 드리는 것도 가능합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">태어날 아기와 첫째가 쓸</p><p style="text-align:center;margin:0;color:#000000;">수건으로 골랐다는 후기도</p><p style="text-align:center;margin:0;color:#000000;">있으니, 출산 선물 쪽으로도</p><p style="text-align:center;margin:0;color:#000000;">쓰이는 제품입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">자취나 이사로 본인이 쓰실</p><p style="text-align:center;margin:0;color:#000000;">거라면 계산이 더 단순합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">10장이면 혼자 사는 집</p><p style="text-align:center;margin:0;color:#000000;">기준으로 수건장 한 칸이</p><p style="text-align:center;margin:0;color:#000000;">다 채워집니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">&quot;총 10개 세트라 칸이 좀</p><p style="text-align:center;margin:0;color:#000000;">남아서 조만간 재구매해서</p><p style="text-align:center;margin:0;color:#000000;">깔맞춤 싹 다 해주려고</p><p style="text-align:center;margin:0;color:#000000;">한다&quot;는 후기처럼,</p><p style="text-align:center;margin:0;color:#000000;">한 번에 전부 바꾸고 싶은</p><p style="text-align:center;margin:0;color:#000000;">분들이 두 세트를 사기도 합니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#d0d4d9;">───────────</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">값 얘기를 정리하면 이렇습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정가 149,000원,</p><p style="text-align:center;margin:0;color:#000000;">판매가 73,000원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">51% 할인이고,</p><p style="text-align:center;margin:0;color:#000000;">10장이니까 한 장에</p><p style="text-align:center;margin:0;color:#000000;">7,300원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 제품 1장짜리가 정가</p><p style="text-align:center;margin:0;color:#000000;">11,000원이라는 걸</p><p style="text-align:center;margin:0;color:#000000;">감안하면 낱장으로 살 때보다</p><p style="text-align:center;margin:0;color:#000000;">확실히 낮은 단가입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">5장 세트가</p><p style="text-align:center;margin:0;color:#000000;">39,800원이니,</p><p style="text-align:center;margin:0;color:#000000;">10장 세트가 장당으로는</p><p style="text-align:center;margin:0;color:#000000;">더 저렴합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">배송비는 무료입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">쿠폰을 적용하면</p><p style="text-align:center;margin:0;color:#000000;">64,600원까지 내려갑니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">장당 6,460원이 되는 셈입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">구매자들 후기에 &quot;세일할 때</p><p style="text-align:center;margin:0;color:#000000;">쿠폰 받고 구매하면 정말</p><p style="text-align:center;margin:0;color:#000000;">꿀&quot;이라는 말이 반복해서</p><p style="text-align:center;margin:0;color:#000000;">나오는데, 반대로 &quot;구매하고</p><p style="text-align:center;margin:0;color:#000000;">나서 할인을 해서 아쉽다&quot;는</p><p style="text-align:center;margin:0;color:#000000;">후기도 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">쿠폰 확인은 받고 담으시는</p><p style="text-align:center;margin:0;color:#000000;">편이 낫습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">수건은 매일 손에 닿고,</p><p style="text-align:center;margin:0;color:#000000;">한 번 사면 몇 년을 씁니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그 몇 년 동안 볼 때마다</p><p style="text-align:center;margin:0;color:#000000;">기분이 괜찮은 쪽으로</p><p style="text-align:center;margin:0;color:#000000;">고르시는 게 남는 선택입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">수건은 한 번 바꾸면 3~4년은 쓰는 물건입니다.<br>오늘 구성과 남은 색상은 아래에서 바로 확인하실 수 있어요.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xTyXZAIE</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#호텔수건 #호텔타월 #40수수건 #답례품수건 #집들이선물 #수건세트 #디자인수건 #수건답례품 #호텔타올 #수건선물세트 #자취수건 #신혼수건</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">호텔수건을 검색해서 들어오셨다면
+이미 마음은 정하셨을 겁니다.
+
+
+문제는 어느 걸 사느냐죠.
+
+
+먼저 결론부터 말씀드립니다.
+
+
+40수 200g,
+40x85cm, 10장 구성.
+
+
+리뷰 1,569건에 평점
+4.88이고,
+4점 이상 리뷰가 98%입니다.
+
+
+호텔수건이라는 말이 붙은
+제품 중에서 두께와 크기
+숫자가 명확하게 적혀 있고,
+그 숫자대로 왔다는 후기가
+쌓여 있는 쪽을 고르시면 됩니다.
+
+
+40수 200g가 실제로 어떤 느낌인지
+
+
+수건 스펙에서 40수는 실의
+굵기, 200g은 한 장 무게입니다.
+
+
+숫자가 클수록 실이 가늘고,
+가는 실을 촘촘히 짜면
+부드러우면서도 밀도가 나옵니다.
+
+
+호텔에서 쓰는 수건이 도톰하면서
+뻣뻣하지 않은 이유가 여기 있습니다.
+
+
+같은 판매처의 다른 구성을
+보면 비교가 쉽습니다.
+
+
+30수 170g 제품이 따로
+있는데, 이 제품은 40수
+200g입니다.
+
+
+한 장당 30g 차이가 손에
+쥐었을 때 체감되는 부분입니다.
+
+
+크기는 40cm x 85cm입니다.
+
+
+일반적인 세면타월보다 세로가 긴
+편인데, 한 구매자는 &quot;크기가
+기존 수건보다 조금 커서 얼굴,
+머리, 몸 한 장으로 싹 해결할
+수 있다&quot;고 적었습니다.
+
+
+긴 머리를 가진 다른 구매자는
+&quot;기존에는 수건 하나 쓰면 다
+젖어서 드라이할 때 시간이
+많이 걸렸는데 확실히 드라이
+시간이 줄었다&quot;고 했고요.
+
+
+200g은 도톰함을 얻는 대신
+마르는 시간을 조금 내주는 두께입니다.
+
+
+이 점은 솔직하게
+말씀드리는 게 맞습니다.
+
+
+별점 5점을 준 구매자 중에도
+&quot;수건을 그날그날 손빨래하는
+사람은 생각해 볼 필요가 있다,
+200g 크고 두꺼운 게 쉽지
+않고 잘 마르지도 않는다&quot;며
+겨울용으로 두고 얇은 150g을
+따로 샀다는 분이 있었습니다.
+
+
+세탁기와 건조기를 쓰신다면
+걸림돌이 아니지만,
+손빨래 위주라면 이건 미리
+아셔야 합니다.
+
+
+구매자들이 공통으로 짚은 것 세 가지
+
+
+리뷰 1,569건을
+관통하는 말이 몇 개 있습니다.
+
+
+첫째는 색입니다.
+
+
+스위밍플라워, 버터그린,
+그린체스, 피치버터, 피치라인,
+버터라인, 버터체스,
+그린라인 같은 이름으로 나오고,
+10장을 색상 두 개로 5장씩
+나눠 담는 방식입니다.
+
+
+&quot;색깔이 통일되지 않아서 욕실이
+익숙한 듯 친근한 느낌이었다면
+이제는 상큼하고 기분 좋은 욕실로
+바뀐 것 같다&quot;는 후기가 이
+제품의 성격을 잘 보여줍니다.
+
+
+돌잔치, 개업식에서 받아온
+제각각인 수건들을 한 번에
+정리하는 용도로 많이들 사시더군요.
+
+
+둘째는 먼지입니다.
+
+
+새 수건에서 먼지 날리는 건
+어쩔 수 없는 과정인데,
+구매자들이 남긴
+대처법이 구체적입니다.
+
+
+&quot;세탁망에 넣고 울세탁
+한 번 하고 건조기
+먼지털기를 3번 정도
+돌렸더니 괜찮아졌다&quot;는
+후기, &quot;처음에 물로만
+울코스로 세탁하고 건조는
+살짝만 했다&quot;는 후기가 있습니다.
+
+
+저온 세탁에 중성세제를
+쓰라는 안내를 이번에 처음
+알았다는 분도 계셨고요.
+
+
+사자마자 삶아버리지만
+않으면 됩니다.
+
+
+셋째는 냄새입니다.
+
+
+&quot;새 수건 사면 빨아도 기름
+냄새 같은 게 있어서
+불편했는데 이건 개봉해도 그
+냄새가 아예 없다&quot;는
+후기가 있습니다.
+
+
+제조사는 주식회사 디오디,
+원산지는 국산입니다.
+
+
+아쉬운 후기도 있습니다.
+
+
+4점을 준 구매자는 &quot;디자인이나
+소재 느낌은 좋은데 솔직히
+흡수력이 좀 떨어지는
+느낌&quot;이라고 적었습니다.
+
+
+흡수가 잘 된다는 후기가
+압도적으로 많지만 모두가 같은
+경험을 한 건 아니라는
+점은 남겨둡니다.
+
+
+색상 조합 남아 있을 때 확인해 보세요
+
+https://naver.me/xTyXZAIE
+
+
+집들이, 답례품으로 살 거라면
+
+
+이 제품을 선물용으로 사는
+분들이 많습니다.
+
+
+이유는 단순합니다.
+
+
+수건은 누구 집에나
+필요하고, 취향을 크게 타지
+않으면서, 받는 사람이 안
+쓰고 넣어둘 일이 없습니다.
+
+
+다만 선물로 줄 때 값어치가
+보여야 하는데,
+이 제품은 그게
+스펙으로 설명됩니다.
+
+
+40수 200g이라는 숫자와,
+한 장씩 따로 사면
+11,000원인 제품이라는
+사실이 그 역할을 합니다.
+
+
+한 구매자는 &quot;집들이나 신혼집
+수건을 고민하는 분에게,
+이건 진짜 선물용으로 실패가
+없다고 자부한다&quot;고 적었습니다.
+
+
+10장 한 세트를 그대로
+드려도 되고,
+색상을 5장씩 나눠 두 집에
+나눠 드리는 것도 가능합니다.
+
+
+태어날 아기와 첫째가 쓸
+수건으로 골랐다는 후기도
+있으니, 출산 선물 쪽으로도
+쓰이는 제품입니다.
+
+
+자취나 이사로 본인이 쓰실
+거라면 계산이 더 단순합니다.
+
+
+10장이면 혼자 사는 집
+기준으로 수건장 한 칸이
+다 채워집니다.
+
+
+&quot;총 10개 세트라 칸이 좀
+남아서 조만간 재구매해서
+깔맞춤 싹 다 해주려고
+한다&quot;는 후기처럼,
+한 번에 전부 바꾸고 싶은
+분들이 두 세트를 사기도 합니다.
+
+
+───────────
+
+
+값 얘기를 정리하면 이렇습니다.
+
+
+정가 149,000원,
+판매가 73,000원입니다.
+
+
+51% 할인이고,
+10장이니까 한 장에
+7,300원입니다.
+
+
+같은 제품 1장짜리가 정가
+11,000원이라는 걸
+감안하면 낱장으로 살 때보다
+확실히 낮은 단가입니다.
+
+
+5장 세트가
+39,800원이니,
+10장 세트가 장당으로는
+더 저렴합니다.
+
+
+배송비는 무료입니다.
+
+
+쿠폰을 적용하면
+64,600원까지 내려갑니다.
+
+
+장당 6,460원이 되는 셈입니다.
+
+
+구매자들 후기에 &quot;세일할 때
+쿠폰 받고 구매하면 정말
+꿀&quot;이라는 말이 반복해서
+나오는데, 반대로 &quot;구매하고
+나서 할인을 해서 아쉽다&quot;는
+후기도 있습니다.
+
+
+쿠폰 확인은 받고 담으시는
+편이 낫습니다.
+
+
+수건은 매일 손에 닿고,
+한 번 사면 몇 년을 씁니다.
+
+
+그 몇 년 동안 볼 때마다
+기분이 괜찮은 쪽으로
+고르시는 게 남는 선택입니다.
+
+
+수건은 한 번 바꾸면 3~4년은 쓰는 물건입니다.
+오늘 구성과 남은 색상은 아래에서 바로 확인하실 수 있어요.
+
+https://naver.me/xTyXZAIE
+
+
+#호텔수건 #호텔타월 #40수수건 #답례품수건 #집들이선물 #수건세트 #디자인수건 #수건답례품 #호텔타올 #수건선물세트 #자취수건 #신혼수건</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
+      sayWithCategory
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+})();
+</script>
+</body>
+</html>
