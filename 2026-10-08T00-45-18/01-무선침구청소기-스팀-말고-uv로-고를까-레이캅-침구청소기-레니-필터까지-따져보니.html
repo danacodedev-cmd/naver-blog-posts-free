@@ -708,10 +708,13 @@ https://naver.me/GEdzMmJB
   var autoBtn = document.getElementById('autoDraftBtn');
   if (autoBtn) {
     autoBtn.addEventListener('click', function () {
-      var m = location.pathname.match(//([^/]+)/(d{2})-[^/]*.html$/);
-      if (!m) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
-      var folder = m[1];
-      var idx = parseInt(m[2], 10) - 1;
+      // 템플릿 리터럴 안에서는 정규식의 백슬래시가 살아남지 못하므로(\d 가 그냥 d 로
+      // 찍힘), 정규식 대신 문자열을 직접 잘라 폴더·순번을 읽습니다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
       autoBtn.disabled = true;
       autoBtn.textContent = '여는 중…';
       fetch(
