@@ -1,0 +1,23 @@
+{
+ "generatedAt": "2026-10-08T00:03:08.426Z",
+ "results": [
+  {
+   "ok": false,
+   "error": "Claude Code 로그인이 만료됐습니다. 터미널에서 claude 를 실행해 로그인한 뒤 다시 시도하세요.",
+   "warnings": [
+    "혜택 링크로 실제 스토어 주소를 1회 확인해 저장했습니다. 다음부터는 재접속하지 않습니다."
+   ],
+   "productUrl": "https://smartstore.naver.com/main/products/12083322438"
+  },
+  {
+   "ok": false,
+   "skipped": true,
+   "error": "앞의 후보로 채워져 사용하지 않았습니다."
+  },
+  {
+   "ok": false,
+   "skipped": true,
+   "error": "앞의 후보로 채워져 사용하지 않았습니다."
+  }
+ ]
+}
