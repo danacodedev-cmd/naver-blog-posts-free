@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>듀플렉스 써큘레이터 스탠드 DPK-55CF, 3만 원대에 타이머까지 될까?</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="디지털/가전" style="background:#eef3fc;color:#23477e;border:1.5px solid #c3d4f2;">디지털/가전</span></div>
+  <h1 id="titleText" class="visually-hidden">듀플렉스 써큘레이터 스탠드 DPK-55CF, 3만 원대에 타이머까지 될까?</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">듀플렉스 써큘레이터 스탠드 에어서큘레이터 선풍기 DPK-55CF</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="듀플렉스 써큘레이터 스탠드 DPK-55CF, 3만 원대에 타이머까지 될까?"><span class="tp-num">1</span><span class="tp-text">듀플렉스 써큘레이터 스탠드 DPK-55CF, 3만 원대에 타이머까지 될까?</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="듀플렉스 서큘레이터 DPK-55CF, 날개 청소하려면 분해부터 확인하세요"><span class="tp-num">2</span><span class="tp-text">듀플렉스 서큘레이터 DPK-55CF, 날개 청소하려면 분해부터 확인하세요</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="듀플렉스 스탠드선풍기 DPK-55CF, 음성인식 모델과 무엇이 다를까?"><span class="tp-num">3</span><span class="tp-text">듀플렉스 스탠드선풍기 DPK-55CF, 음성인식 모델과 무엇이 다를까?</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
+</div>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/xiel0113/224428651464" target="_blank" rel="noopener noreferrer">무선 선풍기 추천 BLDC 가정용 무선 써큘레이터 벤딕트 빈다르 게일 솔직 후기</a></li>
+      <li><a href="https://blog.naver.com/nyangtube/224365441171" target="_blank" rel="noopener noreferrer">전참시 김규원 선풍기 오아 라운드 프로 무선 써큘레이터 추천</a></li>
+      <li><a href="https://blog.naver.com/love_jjoono/224364731256" target="_blank" rel="noopener noreferrer">듀플렉스 써큘레이터 스탠드 선풍기 거실 냉기가 달라지는 이유</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 3장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-1.jpg" alt="듀플렉스 서큘레이터 배터리 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-2.jpg" alt="듀플렉스 서큘레이터 제품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-3.jpg" alt="듀플렉스 서큘레이터 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 3</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-3.jpg" data-n="3">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">자기 전에 틀어 둔 선풍기,</p><p style="text-align:center;margin:0;color:#000000;">새벽에 끄려고</p><p style="text-align:center;margin:0;color:#000000;">다시 일어나는 거</p><p style="text-align:center;margin:0;color:#000000;">은근 귀찮지 않나요?</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이불 덮고 누웠는데</p><p style="text-align:center;margin:0;color:#000000;">그것 하나 때문에</p><p style="text-align:center;margin:0;color:#000000;">몸을 또 일으키게 되죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그런데 정해 둔 시간에</p><p style="text-align:center;margin:0;color:#000000;">알아서 꺼진다면</p><p style="text-align:center;margin:0;color:#000000;">어떨까요?</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">듀플렉스 DPK-55CF는</p><p style="text-align:center;margin:0;color:#000000;">타이머가 달린</p><p style="text-align:center;margin:0;color:#000000;">써큘레이터 스탠드예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">좌우로 고개를 돌리고,</p><p style="text-align:center;margin:0;color:#000000;">기둥 높이도</p><p style="text-align:center;margin:0;color:#000000;">올리고 내릴 수 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 코드를 꽂아 쓰는 유선이라</p><p style="text-align:center;margin:0;color:#000000;">콘센트 가까이 두셔야 해요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-1.jpg" alt="듀플렉스 서큘레이터 배터리 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지금 확인한 판매가는</p><p style="text-align:center;margin:0;color:#000000;">39,800원입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">타이머를 돌려 두면</span><br><span style="font-style:normal;">끄러 일어날 일이 없습니다</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">사기 전에 남는 질문은</p><p style="text-align:center;margin:0;color:#000000;">청소와 AS예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">날개를 닦을 때</p><p style="text-align:center;margin:0;color:#000000;">어떤 부품을 풀게 되는지,</p><p style="text-align:center;margin:0;color:#000000;">고장 나면 어디에 묻는지요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">침대 옆에 둔다면 86cm까지 올라갑니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">책상에 올리는 작은 제품과 달리</p><p style="text-align:center;margin:0;color:#000000;">바닥에 세워 쓰는</p><p style="text-align:center;margin:0;color:#000000;">써큘레이터 스탠드입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">기둥 높이는</p><p style="text-align:center;margin:0;color:#000000;">66cm에서 86cm까지 조절돼요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">낮게 두면 바닥에 앉은 사람에게,</p><p style="text-align:center;margin:0;color:#000000;">높이 올리면</p><p style="text-align:center;margin:0;color:#000000;">소파나 침대 위로 바람을 보내죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">방 한쪽에 세워 두고</p><p style="text-align:center;margin:0;color:#000000;">높이만 바꿔 쓰면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">좌우 회전을 켜면</p><p style="text-align:center;margin:0;color:#000000;">고개가 양옆으로 돌아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">거실에 둘이 떨어져 앉아도</p><p style="text-align:center;margin:0;color:#000000;">한 대로 번갈아</p><p style="text-align:center;margin:0;color:#000000;">바람을 보낼 수 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">바람 세기는 3단이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">잠들 때는 약하게,</p><p style="text-align:center;margin:0;color:#000000;">환기할 때는 세게.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-2.jpg" alt="듀플렉스 서큘레이터 제품 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">높이와 방향을 맞춰 두면</span><br><span style="font-style:normal;">몸체를 들고 옮길 일이 줄어요</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">서큘레이터는 계절과 상관없이</p><p style="text-align:center;margin:0;color:#000000;">실내 공기를 돌리는 데</p><p style="text-align:center;margin:0;color:#000000;">쓰는 편이라,</p><p style="text-align:center;margin:0;color:#000000;">창문을 여는 요즘에도</p><p style="text-align:center;margin:0;color:#000000;">꺼낼 일이 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">서큘레이터 분해와 AS,</span></b></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">부품을 낱개로 팝니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">써큘레이터 스탠드는</p><p style="text-align:center;margin:0;color:#000000;">오래 쓰면 날개와 망 사이에</p><p style="text-align:center;margin:0;color:#000000;">먼지가 쌓이는 편이죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">날개는 4엽이라</p><p style="text-align:center;margin:0;color:#000000;">한 번 열면 네 장을 닦게 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">듀플렉스 공식몰에서는</p><p style="text-align:center;margin:0;color:#000000;">이 모델의 부품을</p><p style="text-align:center;margin:0;color:#000000;">하나씩 따로 팔아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">앞 안전망과 뒤 안전망,</p><p style="text-align:center;margin:0;color:#000000;">날개를 잡아 주는 잠금너트,</p><p style="text-align:center;margin:0;color:#000000;">망고정나사세트가</p><p style="text-align:center;margin:0;color:#000000;">목록에 올라 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-09T13-32-43/img/05-3.jpg" alt="듀플렉스 서큘레이터 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">날개 너트 하나까지</span><br><span style="font-style:normal;">부품을 따로 팝니다</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">청소하다 너트를 잃어버려도</p><p style="text-align:center;margin:0;color:#000000;">그 부품만 다시 구하면 돼요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 지금은 품절 상태이고,</p><p style="text-align:center;margin:0;color:#000000;">가격은 기본가 5,500원에서</p><p style="text-align:center;margin:0;color:#000000;">부품마다 달라집니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">분해 순서는</p><p style="text-align:center;margin:0;color:#000000;">구매 전 상세페이지에서 확인하세요.</p><p style="text-align:center;margin:0;color:#000000;">날개를 직접 닦으실 생각이라면</p><p style="text-align:center;margin:0;color:#000000;">그게 가장 먼저 볼 정보입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">작동이 이상하거나</p><p style="text-align:center;margin:0;color:#000000;">고장이 나면</p><p style="text-align:center;margin:0;color:#000000;">바로 사용을 멈추고</p><p style="text-align:center;margin:0;color:#000000;">소비자상담실(031-352-0888)에</p><p style="text-align:center;margin:0;color:#000000;">문의하도록</p><p style="text-align:center;margin:0;color:#000000;">안내하고 있어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">3만 원대 서큘레이터,</span></b></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">음성인식 모델과 뭐가 다를까요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">듀플렉스에는</p><p style="text-align:center;margin:0;color:#000000;">음성인식 기능을 단</p><p style="text-align:center;margin:0;color:#000000;">DP-CA08VR도 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">✔ DPK-55CF — 39,800원</p><p style="text-align:center;margin:0;color:#000000;">✔ DP-CA08VR — 89,000원</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">DP-CA08VR은 이름 그대로</p><p style="text-align:center;margin:0;color:#000000;">말로 조작하는 기능이</p><p style="text-align:center;margin:0;color:#000000;">붙은 모델입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">DPK-55CF는</p><p style="text-align:center;margin:0;color:#000000;">노브를 돌려</p><p style="text-align:center;margin:0;color:#000000;">타이머를 맞추고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">자기 전에 미리 돌려 두면</p><p style="text-align:center;margin:0;color:#000000;">누워서 말로 끌 일이</p><p style="text-align:center;margin:0;color:#000000;">거의 생기지 않습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">3만 원대 써큘레이터 스탠드인데</p><p style="text-align:center;margin:0;color:#000000;">높이 조절,</p><p style="text-align:center;margin:0;color:#000000;">좌우 회전,</p><p style="text-align:center;margin:0;color:#000000;">3단 바람, 타이머가</p><p style="text-align:center;margin:0;color:#000000;">다 들어 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">음성 조작이 꼭 필요한 게 아니라면</p><p style="text-align:center;margin:0;color:#000000;">그 차액이 그대로 남습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">거실 한 대,</p><p style="text-align:center;margin:0;color:#000000;">침실 한 대처럼</p><p style="text-align:center;margin:0;color:#000000;">여러 대를 둘 계획이면</p><p style="text-align:center;margin:0;color:#000000;">차이는 더 커지죠.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">자기 전에 노브만 돌려 두고<br>그대로 잠드세요,<br>적립까지 붙은 값은 링크<br>열면 바로 압니다.</span></b><cite style="display:block;margin-top:14px;font-style:normal;font-size:13px;color:#8a8f96;line-height:1.6;">듀플렉스 써큘레이터 스탠드 에어서큘레이터 선풍기 DPK-55CF<br>⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</cite></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GKIapzGw</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">듀플렉스 써큘레이터 스탠드</p><p style="text-align:center;margin:0;color:#000000;">DPK-55CF가 잘 맞는 분은</p><p style="text-align:center;margin:0;color:#000000;">이렇습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">✔ 자기 전 타이머를 맞춰 두려는 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 침대 높이로 바람을 올리려는 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 음성 조작 없이 노브면 되는 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 망·너트를 따로 구해 쓰려는 분</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">놓을 곳에 가로 22.3cm,</p><p style="text-align:center;margin:0;color:#000000;">깊이 32cm가 들어가고</p><p style="text-align:center;margin:0;color:#000000;">콘센트가 가까이 있다면,</p><p style="text-align:center;margin:0;color:#000000;">3만 원대 써큘레이터스탠드로</p><p style="text-align:center;margin:0;color:#000000;">기본 기능은 다 갖춥니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#d0d4d9;">───────────</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">DPK-55CF는 지금</p><p style="text-align:center;margin:0;color:#000000;">39,800원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정가 78,800원에서 내려온 값이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">적립 포인트도 최대</p><p style="text-align:center;margin:0;color:#000000;">7,620원까지 따로 붙습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">👇 타이머 맞추고 그대로 잠드세요<br>듀플렉스 DPK-55CF 가격 확인!<br>구성과 쿠폰 조건에 따라<br>최종 결제 금액이 달라질 수 있어요.<br>현재 판매가와 혜택을 함께 확인해 보세요.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GKIapzGw</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">듀플렉스 써큘레이터 스탠드</p><p style="text-align:center;margin:0;color:#000000;">에어서큘레이터 선풍기</p><p style="text-align:center;margin:0;color:#000000;">DPK-55CF</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#듀플렉스 #서큘레이터 #선풍기 #시원한바람 #공기순환 #N도착보장 #가정용선풍기 #가성비좋은 #서큘레이터추천 #듀플렉스서큘레이터</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">자기 전에 틀어 둔 선풍기,
+새벽에 끄려고
+다시 일어나는 거
+은근 귀찮지 않나요?
+
+
+이불 덮고 누웠는데
+그것 하나 때문에
+몸을 또 일으키게 되죠.
+
+
+그런데 정해 둔 시간에
+알아서 꺼진다면
+어떨까요?
+
+
+듀플렉스 DPK-55CF는
+타이머가 달린
+써큘레이터 스탠드예요.
+
+
+좌우로 고개를 돌리고,
+기둥 높이도
+올리고 내릴 수 있습니다.
+
+
+다만 코드를 꽂아 쓰는 유선이라
+콘센트 가까이 두셔야 해요.
+
+
+사진1
+
+
+지금 확인한 판매가는
+39,800원입니다.
+
+
+타이머를 돌려 두면
+끄러 일어날 일이 없습니다
+
+
+사기 전에 남는 질문은
+청소와 AS예요.
+
+
+날개를 닦을 때
+어떤 부품을 풀게 되는지,
+고장 나면 어디에 묻는지요.
+
+
+침대 옆에 둔다면 86cm까지 올라갑니다
+
+
+책상에 올리는 작은 제품과 달리
+바닥에 세워 쓰는
+써큘레이터 스탠드입니다.
+
+
+기둥 높이는
+66cm에서 86cm까지 조절돼요.
+
+
+낮게 두면 바닥에 앉은 사람에게,
+높이 올리면
+소파나 침대 위로 바람을 보내죠.
+
+
+방 한쪽에 세워 두고
+높이만 바꿔 쓰면 됩니다.
+
+
+좌우 회전을 켜면
+고개가 양옆으로 돌아요.
+
+
+거실에 둘이 떨어져 앉아도
+한 대로 번갈아
+바람을 보낼 수 있습니다.
+
+
+바람 세기는 3단이에요.
+
+
+잠들 때는 약하게,
+환기할 때는 세게.
+
+
+사진2
+
+
+높이와 방향을 맞춰 두면
+몸체를 들고 옮길 일이 줄어요
+
+
+서큘레이터는 계절과 상관없이
+실내 공기를 돌리는 데
+쓰는 편이라,
+창문을 여는 요즘에도
+꺼낼 일이 있습니다.
+
+
+서큘레이터 분해와 AS, 부품을 낱개로 팝니다
+
+
+써큘레이터 스탠드는
+오래 쓰면 날개와 망 사이에
+먼지가 쌓이는 편이죠.
+
+
+날개는 4엽이라
+한 번 열면 네 장을 닦게 됩니다.
+
+
+듀플렉스 공식몰에서는
+이 모델의 부품을
+하나씩 따로 팔아요.
+
+
+앞 안전망과 뒤 안전망,
+날개를 잡아 주는 잠금너트,
+망고정나사세트가
+목록에 올라 있습니다.
+
+
+사진3
+
+
+날개 너트 하나까지
+부품을 따로 팝니다
+
+
+청소하다 너트를 잃어버려도
+그 부품만 다시 구하면 돼요.
+
+
+다만 지금은 품절 상태이고,
+가격은 기본가 5,500원에서
+부품마다 달라집니다.
+
+
+분해 순서는
+구매 전 상세페이지에서 확인하세요.
+날개를 직접 닦으실 생각이라면
+그게 가장 먼저 볼 정보입니다.
+
+
+작동이 이상하거나
+고장이 나면
+바로 사용을 멈추고
+소비자상담실(031-352-0888)에
+문의하도록
+안내하고 있어요.
+
+
+3만 원대 서큘레이터, 음성인식 모델과 뭐가 다를까요
+
+
+듀플렉스에는
+음성인식 기능을 단
+DP-CA08VR도 있어요.
+
+
+✔ DPK-55CF — 39,800원
+✔ DP-CA08VR — 89,000원
+
+
+DP-CA08VR은 이름 그대로
+말로 조작하는 기능이
+붙은 모델입니다.
+
+
+DPK-55CF는
+노브를 돌려
+타이머를 맞추고요.
+
+
+자기 전에 미리 돌려 두면
+누워서 말로 끌 일이
+거의 생기지 않습니다.
+
+
+3만 원대 써큘레이터 스탠드인데
+높이 조절,
+좌우 회전,
+3단 바람, 타이머가
+다 들어 있어요.
+
+
+음성 조작이 꼭 필요한 게 아니라면
+그 차액이 그대로 남습니다.
+
+
+거실 한 대,
+침실 한 대처럼
+여러 대를 둘 계획이면
+차이는 더 커지죠.
+
+
+자기 전에 노브만 돌려 두고
+그대로 잠드세요,
+적립까지 붙은 값은 링크
+열면 바로 압니다.
+
+https://naver.me/GKIapzGw
+
+
+듀플렉스 써큘레이터 스탠드
+DPK-55CF가 잘 맞는 분은
+이렇습니다.
+
+
+✔ 자기 전 타이머를 맞춰 두려는 분
+✔ 침대 높이로 바람을 올리려는 분
+✔ 음성 조작 없이 노브면 되는 분
+✔ 망·너트를 따로 구해 쓰려는 분
+
+
+놓을 곳에 가로 22.3cm,
+깊이 32cm가 들어가고
+콘센트가 가까이 있다면,
+3만 원대 써큘레이터스탠드로
+기본 기능은 다 갖춥니다.
+
+
+───────────
+
+
+DPK-55CF는 지금
+39,800원입니다.
+
+
+정가 78,800원에서 내려온 값이에요.
+
+
+적립 포인트도 최대
+7,620원까지 따로 붙습니다.
+
+
+👇 타이머 맞추고 그대로 잠드세요
+듀플렉스 DPK-55CF 가격 확인!
+구성과 쿠폰 조건에 따라
+최종 결제 금액이 달라질 수 있어요.
+현재 판매가와 혜택을 함께 확인해 보세요.
+
+https://naver.me/GKIapzGw
+
+
+듀플렉스 써큘레이터 스탠드
+에어서큘레이터 선풍기
+DPK-55CF
+
+
+#듀플렉스 #서큘레이터 #선풍기 #시원한바람 #공기순환 #N도착보장 #가정용선풍기 #가성비좋은 #서큘레이터추천 #듀플렉스서큘레이터</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
+      sayWithCategory
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+
+  // 이 페이지의 주소에서 배치 폴더와 이 글의 순번을 읽습니다 — resultsArchive.js 가
+  // 파일을 "<폴더>/01-제목.html" 로 저장하므로, 서버에 다시 물어볼 필요 없이 주소만으로
+  // 압니다. 이 Mac에서 로컬 서버(3100)가 켜져 있어야 동작합니다 — 그 서버만
+  // 네이버 창을 띄울 수 있습니다.
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // 템플릿 리터럴 안에서는 정규식의 백슬래시가 살아남지 못하므로(\d 가 그냥 d 로
+      // 찍힘), 정규식 대신 문자열을 직접 잘라 폴더·순번을 읽습니다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      // https 페이지에서 http://localhost 로의 fetch 는 믹스드 콘텐츠로 막힙니다.
+      // 새 탭으로 직접 여는 탐색(navigation)은 그 제한을 받지 않습니다 — 서버가 응답으로
+      // 주는 페이지 자체가 "여는 중" 안내이고, 실제 결과는 거기 로그에서 확인합니다.
+      window.open(
+        'http://localhost:3100/api/publish-draft?folder=' + encodeURIComponent(folder) + '&index=' + idx,
+        '_blank'
+      );
+      say('새 탭에서 네이버 작성 창을 엽니다 — 이 Mac에서 서버(node server.js)가 켜져 있어야 동작합니다.');
+    });
+  }
+})();
+</script>
+</body>
+</html>
