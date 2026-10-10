@@ -753,7 +753,7 @@ https://naver.me/GVVznv55
       Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById('titleText').textContent = btn.getAttribute('data-title');
-      say('이 제목으로 복사됩니다.');
+      say('이 제목으로 복사·자동 작성됩니다.');
     });
   });
 
@@ -802,8 +802,11 @@ https://naver.me/GVVznv55
       // https 페이지에서 http://localhost 로의 fetch 는 믹스드 콘텐츠로 막힙니다.
       // 새 탭으로 직접 여는 탐색(navigation)은 그 제한을 받지 않습니다 — 서버가 응답으로
       // 주는 페이지 자체가 "여는 중" 안내이고, 실제 결과는 거기 로그에서 확인합니다.
+      // 위에서 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
       window.open(
-        'http://localhost:3100/api/publish-draft?folder=' + encodeURIComponent(folder) + '&index=' + idx,
+        'http://localhost:3100/api/publish-draft?folder=' + encodeURIComponent(folder) + '&index=' + idx +
+          (chosenTitle ? '&title=' + encodeURIComponent(chosenTitle.trim()) : ''),
         '_blank'
       );
       say('새 탭에서 네이버 작성 창을 엽니다 — 이 Mac에서 서버(node server.js)가 켜져 있어야 동작합니다.');
