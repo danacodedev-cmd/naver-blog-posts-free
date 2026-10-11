@@ -28,6 +28,14 @@
     padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
   #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
   #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  /* 자동 작성 버튼은 스타일 없이 붙어서 회색 기본 버튼(여백 1px)으로 찌그러져 보였습니다. */
+  #autoDraftBtn { background: #111827; color: #fff; padding: 12px 18px; flex-shrink: 0; white-space: nowrap; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  @media (max-width: 480px) {
+    .actionbar { flex-wrap: wrap; }
+    #copyBtn { flex-basis: 100%; }
+    #copyProductNameBtn, #autoDraftBtn { flex: 1; padding: 11px 10px; }
+  }
   #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
     padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
   #msg.show { display: block; }
@@ -682,7 +690,7 @@ https://naver.me/GEdzMmJB
       Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById('titleText').textContent = btn.getAttribute('data-title');
-      say('이 제목으로 복사됩니다.');
+      say('이 제목으로 복사·자동 작성됩니다.');
     });
   });
 
@@ -728,15 +736,48 @@ https://naver.me/GEdzMmJB
       var folder = decodeURIComponent(parts[parts.length - 2] || '');
       var idx = parseInt(file.slice(0, 2), 10) - 1;
       if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
-      // https 페이지에서 http://localhost 로의 fetch 는 믹스드 콘텐츠로 막힙니다.
-      // 새 탭으로 직접 여는 탐색(navigation)은 그 제한을 받지 않습니다 — 서버가 응답으로
-      // 주는 페이지 자체가 "여는 중" 안내이고, 실제 결과는 거기 로그에서 확인합니다.
-      window.open(
-        'http://localhost:3100/api/publish-draft?folder=' + encodeURIComponent(folder) + '&index=' + idx,
-        '_blank'
-      );
-      say('새 탭에서 네이버 작성 창을 엽니다 — 이 Mac에서 서버(node server.js)가 켜져 있어야 동작합니다.');
+      // 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      var draftUrl = 'http://localhost:3100/api/publish-draft?folder=' + encodeURIComponent(folder) + '&index=' + idx +
+        (chosenTitle ? '&title=' + encodeURIComponent(chosenTitle.trim()) : '');
+      // 페이지를 떠나지 않고 이 자리에서 서버를 부릅니다(json=1). 크롬은 처음 한 번
+      // "이 사이트가 이 기기의 다른 앱에 접근" 허용을 묻습니다 — 허용하면 다음부터는 묻지 않습니다.
+      // 브라우저가 막으면(사파리 등) 그때만 예전처럼 작은 창으로 엽니다.
+      if (autoBtn.disabled) return;
+      autoBtn.disabled = true;
+      say('네이버 자동 작성을 요청하는 중… (크롬이 접근 허용을 물으면 "허용"을 눌러주세요)');
+      fetch(draftUrl + '&json=1').then(function (r) { return r.json(); }).then(function (j) {
+        if (!j || !j.ok) throw new Error((j && j.error) || '서버 응답이 이상합니다');
+        say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
+        pollDraft(j.stem, 0);
+      }).catch(function () {
+        autoBtn.disabled = false;
+        var w = window.open(draftUrl + '&popup=1', 'naverAutoDraft',
+          'width=380,height=220,left=' + Math.max(0, (screen.width - 380) / 2) + ',top=120');
+        if (w) {
+          say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
+        } else {
+          say('브라우저가 이 페이지에서 내 컴퓨터 서버를 부르는 걸 막았어요. 서버(node server.js)가 켜져 있는지 확인하고 다시 눌러주세요.');
+        }
+      });
     });
+  }
+
+  // 작성이 어디까지 왔는지 몇 초마다 물어 버튼 아래에 보여줍니다. 끝나거나 실패하면 멈춥니다.
+  function pollDraft(stem, n) {
+    if (n > 200) { autoBtn.disabled = false; return; }
+    setTimeout(function () {
+      fetch('http://localhost:3100/api/publish-draft-status?stem=' + encodeURIComponent(stem))
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.state === 'done') { autoBtn.disabled = false; say('✅ ' + j.message); return; }
+          if (j.state === 'failed') { autoBtn.disabled = false; say('작성 실패: ' + j.message); return; }
+          if (j.state === 'login') say(j.message);
+          else say('네이버 창에 작성하는 중… ' + (j.message || ''));
+          pollDraft(stem, n + 1);
+        })
+        .catch(function () { pollDraft(stem, n + 1); });
+    }, 3000);
   }
 })();
 </script>
