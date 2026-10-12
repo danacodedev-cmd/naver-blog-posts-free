@@ -775,63 +775,63 @@ https://naver.me/IDk9CgRS
       if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
       // 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
       var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
-      var draftUrl = 'http://localhost:3100/api/publish-draft?folder=' + encodeURIComponent(folder) + '&index=' + idx +
-        (chosenTitle ? '&title=' + encodeURIComponent(chosenTitle.trim()) : '');
-      // 페이지를 떠나지 않고 이 자리에서 서버를 부릅니다(json=1). 새 창·새 탭은 열지 않습니다 —
-      // 뜨는 창은 네이버 글쓰기 창 하나뿐입니다. 크롬은 처음 한 번 "이 기기의 다른 앱 및
-      // 서비스에 접근" 허용을 묻습니다. 허용하면 다음부터는 묻지 않습니다.
+      // 페이지를 떠나지 않고, 새 창도 열지 않습니다. 이 Mac 의 localhost 를 직접 부르면 크롬이
+      // 로컬 네트워크 권한을 요구해서, 공개 중계(ntfy.sh)에 요청을 놓고 이 Mac 서버가 그걸 받아
+      // 네이버 글쓰기 창을 엽니다(src/draftRelay.js). 진행 상황도 같은 중계로 돌아옵니다.
       if (autoBtn.disabled) return;
       autoBtn.disabled = true;
-      loopbackPermission().then(function (state) {
-        if (state === 'denied') { autoBtn.disabled = false; say(PERMISSION_HELP); return; }
-        say(state === 'granted' ? '네이버 자동 작성을 요청하는 중…'
-          : '크롬이 "이 기기의 다른 앱 및 서비스에 접근"을 물으면 "허용"을 눌러주세요 — 처음 한 번만 묻습니다.');
-        fetch(draftUrl + '&json=1').then(function (r) { return r.json(); }).then(function (j) {
-          if (!j || !j.ok) throw new Error((j && j.error) || '서버 응답이 이상합니다');
-          say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
-          pollDraft(j.stem, 0);
-        }).catch(function (e) {
-          autoBtn.disabled = false;
-          loopbackPermission().then(function (after) {
-            if (after === 'denied') say(PERMISSION_HELP);
-            else if (after === 'prompt') say('허용을 누르지 않아 시작하지 못했어요. 다시 누르고 "허용"을 눌러주세요.');
-            else say('이 Mac의 서버에 연결하지 못했어요 — 터미널에서 node server.js 가 켜져 있는지 확인해 주세요. (' + (e && e.message || '') + ')');
-          });
-        });
+      var reqId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      var since = Math.floor(Date.now() / 1000) - 5;
+      say('이 Mac에 자동 작성을 요청하는 중…');
+      fetch(RELAY + '/' + RELAY_TOPIC, {
+        method: 'POST',
+        body: JSON.stringify({ req: reqId, folder: folder, index: idx, title: chosenTitle.trim() })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('중계 응답 ' + r.status);
+        followDraft(reqId, since, Date.now(), false);
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        say('요청을 보내지 못했어요 — 인터넷 연결을 확인하고 다시 눌러주세요. (' + (e && e.message || '') + ')');
       });
     });
   }
 
-  var PERMISSION_HELP = '크롬이 이 사이트의 내 컴퓨터 접근을 막아 두었어요. 주소창 왼쪽 아이콘 → 사이트 설정 → ' +
-    '"로컬 네트워크 액세스"(또는 "이 기기의 다른 앱 및 서비스")를 "허용"으로 바꾸고 다시 눌러주세요.';
-  // 크롬의 내 컴퓨터(localhost) 접근 권한: granted / prompt / denied. 이름이 버전마다 달라서
-  // 차례로 물어봅니다. 권한 개념이 없는 브라우저면 'unknown'.
-  function loopbackPermission() {
-    var names = ['loopback-network', 'local-network-access'];
-    if (!navigator.permissions || !navigator.permissions.query) return Promise.resolve('unknown');
-    function next(i) {
-      if (i >= names.length) return Promise.resolve('unknown');
-      return navigator.permissions.query({ name: names[i] }).then(function (st) { return st.state; },
-        function () { return next(i + 1); });
-    }
-    return next(0);
-  }
-
-  // 작성이 어디까지 왔는지 몇 초마다 물어 버튼 아래에 보여줍니다. 끝나거나 실패하면 멈춥니다.
-  function pollDraft(stem, n) {
-    if (n > 200) { autoBtn.disabled = false; return; }
+  var RELAY = 'https://ntfy.sh';
+  var RELAY_TOPIC = 'nbsdraft-ac5ccd953fdff173423c';
+  // 이 요청(reqId)에 대한 이 Mac 서버의 답을 몇 초마다 읽어 버튼 아래에 보여줍니다.
+  function followDraft(reqId, since, t0, heard) {
     setTimeout(function () {
-      fetch('http://localhost:3100/api/publish-draft-status?stem=' + encodeURIComponent(stem))
-        .then(function (r) { return r.json(); })
-        .then(function (j) {
-          if (j.state === 'done') { autoBtn.disabled = false; say('✅ ' + j.message); return; }
-          if (j.state === 'failed') { autoBtn.disabled = false; say('작성 실패: ' + j.message); return; }
-          if (j.state === 'login') say(j.message);
-          else say('네이버 창에 작성하는 중… ' + (j.message || ''));
-          pollDraft(stem, n + 1);
+      fetch(RELAY + '/' + RELAY_TOPIC + '-status/json?poll=1&since=' + since, { cache: 'no-store' })
+        .then(function (r) { return r.text(); })
+        .then(function (text) {
+          var latest = null;
+          text.split(String.fromCharCode(10)).forEach(function (line) {
+            if (!line) return;
+            try {
+              var ev = JSON.parse(line);
+              var m = JSON.parse(ev.message || '{}');
+              if (m.req === reqId) latest = m;
+            } catch (e) {}
+          });
+          if (!latest) {
+            if (!heard && Date.now() - t0 > 25000) {
+              autoBtn.disabled = false;
+              say('이 Mac의 서버가 답이 없어요 — 터미널에서 node server.js 가 켜져 있는지 확인하고 다시 눌러주세요.');
+              return;
+            }
+            if (!heard) say('이 Mac에 자동 작성을 요청하는 중…');
+            return followDraft(reqId, since, t0, heard);
+          }
+          if (latest.state === 'done') { autoBtn.disabled = false; say('✅ ' + latest.message); return; }
+          if (latest.state === 'failed') { autoBtn.disabled = false; say('작성 실패: ' + latest.message); return; }
+          if (latest.state === 'login') say(latest.message);
+          else if (latest.state === 'started') say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
+          else say('네이버 창에 작성하는 중… ' + (latest.message || ''));
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          followDraft(reqId, since, t0, true);
         })
-        .catch(function () { pollDraft(stem, n + 1); });
-    }, 3000);
+        .catch(function () { followDraft(reqId, since, t0, heard); });
+    }, 1500);
   }
 })();
 </script>
