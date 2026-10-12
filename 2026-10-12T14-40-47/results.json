@@ -400,7 +400,8 @@
      "avgTitleLength": 32
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/4872989552"
+   "productUrl": "https://smartstore.naver.com/main/products/4872989552",
+   "scheduledAt": "2026-10-18T16:00:00+09:00"
   },
   {
    "ok": true,
@@ -811,7 +812,8 @@
      "avgTitleLength": 25
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/453744143"
+   "productUrl": "https://smartstore.naver.com/main/products/453744143",
+   "scheduledAt": "2026-10-18T18:40:00+09:00"
   },
   {
    "ok": true,
@@ -1266,7 +1268,8 @@
      "avgTitleLength": 35
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/10274479049"
+   "productUrl": "https://smartstore.naver.com/main/products/10274479049",
+   "scheduledAt": "2026-10-18T21:20:00+09:00"
   },
   {
    "ok": true,
@@ -1665,7 +1668,8 @@
      "avgTitleLength": 29
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/7800346344"
+   "productUrl": "https://smartstore.naver.com/main/products/7800346344",
+   "scheduledAt": "2026-10-19T08:10:00+09:00"
   },
   {
    "ok": true,
@@ -2056,7 +2060,8 @@
      "avgTitleLength": 44
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/8290495054"
+   "productUrl": "https://smartstore.naver.com/main/products/8290495054",
+   "scheduledAt": "2026-10-19T10:30:00+09:00"
   },
   {
    "ok": true,
@@ -2487,7 +2492,8 @@
      "avgTitleLength": 45
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/11389365407"
+   "productUrl": "https://smartstore.naver.com/main/products/11389365407",
+   "scheduledAt": "2026-10-19T13:00:00+09:00"
   },
   {
    "ok": true,
@@ -2900,7 +2906,8 @@
      "avgTitleLength": 36
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/12231577351"
+   "productUrl": "https://smartstore.naver.com/main/products/12231577351",
+   "scheduledAt": "2026-10-19T15:40:00+09:00"
   },
   {
    "ok": true,
@@ -3277,7 +3284,8 @@
      "avgTitleLength": 37
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/12962867279"
+   "productUrl": "https://smartstore.naver.com/main/products/12962867279",
+   "scheduledAt": "2026-10-19T18:20:00+09:00"
   },
   {
    "ok": true,
@@ -3702,7 +3710,8 @@
      "avgTitleLength": 41
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/9901298581"
+   "productUrl": "https://smartstore.naver.com/main/products/9901298581",
+   "scheduledAt": "2026-10-19T21:00:00+09:00"
   },
   {
    "ok": true,
@@ -4127,7 +4136,8 @@
      "avgTitleLength": 38
     }
    },
-   "productUrl": "https://smartstore.naver.com/main/products/2113241809"
+   "productUrl": "https://smartstore.naver.com/main/products/2113241809",
+   "scheduledAt": "2026-10-20T08:20:00+09:00"
   },
   {
    "ok": false,
