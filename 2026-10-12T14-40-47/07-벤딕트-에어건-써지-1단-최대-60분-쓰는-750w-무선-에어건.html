@@ -20,8 +20,11 @@
   button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
   .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
     font-weight: 700; text-decoration: none; display: inline-block; }
-  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
-  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* 발행 여부. 목록 페이지의 체크박스와 같은 저장소(localStorage)를 써서 어느 쪽에서 체크해도 같이 바뀝니다. */
+  .pub-check-label { display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 13px;
+    font-weight: 700; color: #6b7280; cursor: pointer; user-select: none; -webkit-user-select: none; }
+  .pub-check-label input { width: 17px; height: 17px; margin: 0; cursor: pointer; accent-color: #03c75a; }
+  .pub-check-label.published { color: #03a353; }
   /* The action row: primary copy takes the width it needs to be the obvious tap target,
      the secondary sits beside it rather than wrapping onto its own line. */
   .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
@@ -134,17 +137,17 @@
 <div class="topbar">
   <div class="topbar-nav">
     <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
-    <button id="publishToggle" type="button">발행 전</button>
   </div>
   <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="생활/건강" style="background:#edf6f0;color:#1f5f42;border:1.5px solid #bfdfcb;">생활/건강</span></div>
   <h1 id="titleText" class="visually-hidden">벤딕트 에어건 써지, 1단 최대 60분 쓰는 750W 무선 에어건</h1>
   <div class="product-name">엑셀 상품명: <span id="productNameText">벤딕트 에어건 무선 미니 초강력 750W 에어 블로우건 세차 캠핑 콤프레샤 청소 써지</span></div>
   <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
-<div id="titlePicker"><button type="button" class="title-opt active" data-title="벤딕트 에어건 써지, 1단 최대 60분 쓰는 750W 무선 에어건"><span class="tp-num">1</span><span class="tp-text">벤딕트 에어건 써지, 1단 최대 60분 쓰는 750W 무선 에어건</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="벤딕트 에어건 써지, 87.7Wh 배터리를 넣은 940g 캠핑 에어건"><span class="tp-num">2</span><span class="tp-text">벤딕트 에어건 써지, 87.7Wh 배터리를 넣은 940g 캠핑 에어건</span><span class="tp-mark">사용 중</span></button></div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="벤딕트 에어건 써지, 1단 최대 60분 쓰는 750W 무선 에어건"><span class="tp-num">1</span><span class="tp-text">벤딕트 에어건 써지, 1단 최대 60분 쓰는 750W 무선 에어건</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="벤딕트 에어건 써지, 87.7Wh 배터리를 넣은 940g 캠핑 에어건"><span class="tp-num">2</span><span class="tp-text">벤딕트 에어건 써지, 87.7Wh 배터리를 넣은 940g 캠핑 에어건</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="벤딕트 에어건 써지, 세차 물기 제거에도 쓸 수 있을까?"><span class="tp-num">3</span><span class="tp-text">벤딕트 에어건 써지, 세차 물기 제거에도 쓸 수 있을까?</span><span class="tp-mark">사용 중</span></button></div>
 </div>
 <div class="actionbar">
   <button id="copyBtn" type="button">본문 복사</button>
-  <div class="sched-box"><span class="sched-label">예약 발행</span><span class="sched sched-big" style="border-color:#c2410c" title="네이버 예약 발행 10월 19일(월) 15:40"><span class="sched-date" style="background:#ffedd5;color:#c2410c">10/19(월)</span><span class="sched-time" style="color:#c2410c">15:40</span></span></div>
+  <div class="sched-box"><span class="sched-label">예약 발행</span><span class="sched sched-big" style="border-color:#c2410c" title="네이버 예약 발행 10월 19일(월) 15:40"><span class="sched-date" style="background:#ffedd5;color:#c2410c">10/19(월)</span><span class="sched-time" style="color:#c2410c">15:40</span></span>
+    <label class="pub-check-label"><input type="checkbox" id="publishCheck"> 발행 완료</label></div>
   <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
 </div>
 <div id="msg"></div>
@@ -741,7 +744,7 @@ https://naver.me/5qL1yVMy
     });
   });
 
-  var publishBtn = document.getElementById('publishToggle');
+  var publishCheck = document.getElementById('publishCheck');
   var publishKey = 'nbp_published_' + location.pathname;
   // The spreadsheet's value is the starting point; once this browser records a choice, that
   // choice wins — the person tapping the button is looking at the post right now.
@@ -752,16 +755,11 @@ https://naver.me/5qL1yVMy
       var stored = localStorage.getItem(publishKey);
       if (stored !== null) done = stored === '1';
     } catch (e) {}
-    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
-    publishBtn.classList.toggle('published', done);
+    publishCheck.checked = done;
+    publishCheck.parentNode.classList.toggle('published', done);
   }
-  publishBtn.addEventListener('click', function () {
-    var done = sheetPublished;
-    try {
-      var stored = localStorage.getItem(publishKey);
-      if (stored !== null) done = stored === '1';
-    } catch (e) {}
-    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+  publishCheck.addEventListener('change', function () {
+    try { localStorage.setItem(publishKey, publishCheck.checked ? '1' : '0'); } catch (e) {}
     renderPublishState();
   });
   renderPublishState();
