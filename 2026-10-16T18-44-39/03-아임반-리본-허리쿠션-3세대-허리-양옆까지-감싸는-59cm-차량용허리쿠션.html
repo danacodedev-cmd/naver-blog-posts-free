@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>아임반 리본 허리쿠션 3세대, 허리 양옆까지 감싸는 59cm 차량용허리쿠션</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  /* 작업 줄: [예약 날짜] [발행 완료] [네이버에 자동 작성]. 본문 복사는 자동 작성으로 대신해서
+     뺐습니다(2026-10-13). 세 칸 높이를 48px 로 맞추고, 주 버튼이 남는 폭을 다 씁니다. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 12px 16px; display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: stretch; }
+  .sched-card { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-height: 48px;
+    padding: 5px 16px; border: 1.5px solid; border-radius: 12px; box-sizing: border-box; white-space: nowrap; }
+  .sched-card.none { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+  .sched-card-label { font-size: 11px; font-weight: 700; opacity: .75; letter-spacing: .2px; }
+  .sched-card-when { font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+  .sched-card-time { margin-left: 8px; padding-left: 8px; border-left: 1.5px solid currentColor; }
+  .pub-toggle { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; box-sizing: border-box;
+    border: 1.5px solid #d1d5db; border-radius: 12px; background: #fff; color: #4b5563; font-size: 14px; font-weight: 700;
+    cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap; }
+  .pub-toggle input { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 0; flex-shrink: 0;
+    border: 2px solid #c4c9d0; border-radius: 6px; background: #fff; display: grid; place-content: center; cursor: pointer; }
+  .pub-toggle input:checked { background: #03c75a; border-color: #03c75a; }
+  .pub-toggle input:checked::after { content: ''; width: 5px; height: 10px; margin-top: -2px;
+    border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+  .pub-toggle.published { background: #ecfbf2; border-color: #03c75a; color: #03a353; }
+  #autoDraftBtn { min-height: 48px; padding: 0 20px; border-radius: 12px; background: #03c75a; color: #fff;
+    font-size: 16px; font-weight: 800; white-space: nowrap; }
+  #autoDraftBtn:hover { background: #02b351; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  @media (max-width: 480px) {
+    .actionbar { grid-template-columns: 1fr auto; }
+    .sched-card-when { font-size: 15px; }
+    #autoDraftBtn { grid-column: 1 / -1; }
+  }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  
+  .sched { display: inline-flex; align-items: stretch; border: 1.5px solid; border-radius: 7px; overflow: hidden;
+    font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; vertical-align: middle; }
+  .sched-date { padding: 4px 6px; }
+  .sched-time { padding: 4px 6px; background: #fff; }
+  .sched-big { font-size: 16px; border-radius: 9px; }
+  .sched-big .sched-date, .sched-big .sched-time { padding: 8px 10px; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="생활/건강" style="background:#edf6f0;color:#1f5f42;border:1.5px solid #bfdfcb;">생활/건강</span></div>
+  <h1 id="titleText" class="visually-hidden">아임반 리본 허리쿠션 3세대, 허리 양옆까지 감싸는 59cm 차량용허리쿠션</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">아임반 자동차 리본 허리쿠션 3세대 차량용 등받이 시트 요추 등쿠션</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="아임반 리본 허리쿠션 3세대, 허리 양옆까지 감싸는 59cm 차량용허리쿠션"><span class="tp-num">1</span><span class="tp-text">아임반 리본 허리쿠션 3세대, 허리 양옆까지 감싸는 59cm 차량용허리쿠션</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="아임반 리본 허리쿠션 3세대, 전차종 공용과 테슬라용 무엇을 살까"><span class="tp-num">2</span><span class="tp-text">아임반 리본 허리쿠션 3세대, 전차종 공용과 테슬라용 무엇을 살까</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="아임반 리본 허리쿠션 3세대, 3cm 우레탄폼으로 얇게 덧대는 등쿠션"><span class="tp-num">3</span><span class="tp-text">아임반 리본 허리쿠션 3세대, 3cm 우레탄폼으로 얇게 덧대는 등쿠션</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <div class="sched-card" style="background:#fee2e2;color:#b91c1c;border-color:#b91c1c33"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">10월 25일 (일)<span class="sched-card-time">08:10</span></span></div>
+  <label class="pub-toggle"><input type="checkbox" id="publishCheck"><span>발행 완료</span></label>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
+</div>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/iikkii0201/224435445919" target="_blank" rel="noopener noreferrer">퇴근길 허리 통증 끝! 아임반 차량용 마사지 허리쿠션으로 차 안에서 누리는 스트레칭</a></li>
+      <li><a href="https://blog.naver.com/hongsi_car/224435034768" target="_blank" rel="noopener noreferrer">아임반 차량용 마사지 허리쿠션 사용 후기! - 장거리 운전할 때 필수입니다!</a></li>
+      <li><a href="https://blog.naver.com/2jori/224437409680" target="_blank" rel="noopener noreferrer">운전석 허리받침 : GEF 차량용 목쿠션 요추쿠션 세트 : 자동차 목쿠션 헤드레스트 머리받침</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 3장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-1.jpg" alt="아임반 차량용등쿠션 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-2.jpg" alt="아임반 차량용등쿠션 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-3.jpg" alt="아임반 차량용등쿠션 사용 예시 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 3</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-3.jpg" data-n="3">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">운전석 허리 뒤에</p><p style="text-align:center;margin:0;color:#000000;">수건을 말아 끼우거나</p><p style="text-align:center;margin:0;color:#000000;">싼 차량용 허리쿠션을 대봐도</p><p style="text-align:center;margin:0;color:#000000;">몇 번 타고 내리면</p><p style="text-align:center;margin:0;color:#000000;">아래로 흘러내려 있지 않나요?</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가운데만 볼록하게 밀어주니</p><p style="text-align:center;margin:0;color:#000000;">옆구리 쪽은</p><p style="text-align:center;margin:0;color:#000000;">그대로 떠 있고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">곧 가을 캠핑이나 차박으로</p><p style="text-align:center;margin:0;color:#000000;">몇 시간씩 달릴 일이 늘어나는데,</p><p style="text-align:center;margin:0;color:#000000;">그때마다 쿠션을</p><p style="text-align:center;margin:0;color:#000000;">다시 끼우게 되죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그런데 허리 가운데가 아니라</p><p style="text-align:center;margin:0;color:#000000;">양옆까지 한 번에</p><p style="text-align:center;margin:0;color:#000000;">받쳐준다면</p><p style="text-align:center;margin:0;color:#000000;">어떨까요?</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">아임반 리본 허리쿠션 3세대는</p><p style="text-align:center;margin:0;color:#000000;">가로 59cm 폭으로</p><p style="text-align:center;margin:0;color:#000000;">허리 양옆까지 감싸는</p><p style="text-align:center;margin:0;color:#000000;">차량용허리쿠션이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밴드로 시트에</p><p style="text-align:center;margin:0;color:#000000;">묶어 두는 방식이고,</p><p style="text-align:center;margin:0;color:#000000;">전원은 쓰지 않습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">물론 마사지나</p><p style="text-align:center;margin:0;color:#000000;">진동 기능은 없어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-1.jpg" alt="아임반 차량용등쿠션 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지금 판매가는 59,900원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">안전벨트가 시트에 붙어 나오는 차라면</p><p style="text-align:center;margin:0;color:#000000;">사기 전에 따져볼 것이</p><p style="text-align:center;margin:0;color:#000000;">하나 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">59cm 폭으로 허리 양옆까지 받치는 쿠션</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">흔한 등쿠션은</p><p style="text-align:center;margin:0;color:#000000;">허리 가운데 한 곳을</p><p style="text-align:center;margin:0;color:#000000;">앞으로 밀어주는 모양입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 가로 59cm로 넓게 퍼져서</p><p style="text-align:center;margin:0;color:#000000;">허리 뒤뿐 아니라</p><p style="text-align:center;margin:0;color:#000000;">양옆까지 걸쳐져요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">제조사는 이 모양을</p><p style="text-align:center;margin:0;color:#000000;">슬림 사이드 버킷 구조라고 부르고,</p><p style="text-align:center;margin:0;color:#000000;">허리가 닿는 각도는</p><p style="text-align:center;margin:0;color:#000000;">26.4°로 잡았다고</p><p style="text-align:center;margin:0;color:#000000;">밝힙니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-2.jpg" alt="아임반 차량용등쿠션 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">가운데만 미는 게 아니라</span><br><span style="font-style:normal;">허리 둘레를 넓게 받칩니다</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">막히는 퇴근길에</p><p style="text-align:center;margin:0;color:#000000;">등받이에 기대 앉으면</p><p style="text-align:center;margin:0;color:#000000;">등 가운데뿐 아니라</p><p style="text-align:center;margin:0;color:#000000;">옆구리까지 쿠션에 닿아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">두께는 3cm입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">등과 시트 사이에</p><p style="text-align:center;margin:0;color:#000000;">두툼한 덩어리를 끼우기보다</p><p style="text-align:center;margin:0;color:#000000;">얇게 한 겹 덧대는 두께죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">차량용 허리쿠션 메모리폼을</p><p style="text-align:center;margin:0;color:#000000;">찾다가 오셨다면,</p><p style="text-align:center;margin:0;color:#000000;">이 제품 충전재는</p><p style="text-align:center;margin:0;color:#000000;">고탄성 우레탄폼이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">제조사는 노면 충격과</p><p style="text-align:center;margin:0;color:#000000;">진동을 흡수하도록</p><p style="text-align:center;margin:0;color:#000000;">이 폼을 넣었다고</p><p style="text-align:center;margin:0;color:#000000;">안내합니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">밴드로 5초 설치, 벨트 일체형 시트는 예외</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">설치는 밴드로</p><p style="text-align:center;margin:0;color:#000000;">시트에 고정하는 방식이고,</p><p style="text-align:center;margin:0;color:#000000;">제조사 안내로는</p><p style="text-align:center;margin:0;color:#000000;">약 5초면 끝납니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">전원을 쓰지 않아서</p><p style="text-align:center;margin:0;color:#000000;">충전하거나 시거잭에</p><p style="text-align:center;margin:0;color:#000000;">선을 꽂을 일이 없어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">차량용허리쿠션 비교 글에</p><p style="text-align:center;margin:0;color:#000000;">자주 나오는 공기압·진동 마사지는</p><p style="text-align:center;margin:0;color:#000000;">이 제품에 들어 있지 않습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">사이즈는 전차종 공용</p><p style="text-align:center;margin:0;color:#000000;">단일 사이즈예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 안전벨트가</p><p style="text-align:center;margin:0;color:#000000;">시트 등받이에서 나오는</p><p style="text-align:center;margin:0;color:#000000;">일체형 시트에서는</p><p style="text-align:center;margin:0;color:#000000;">정상적으로 쓰기 어려울 수 있다고</p><p style="text-align:center;margin:0;color:#000000;">제조사가 안내합니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T18-44-39/img/03-3.jpg" alt="아임반 차량용등쿠션 사용 예시 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">벨트 일체형 시트라면</span><br><span style="font-style:normal;">달기 전에 따져봐야 합니다</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">처음 달면 살짝 들떠 보일 수 있는데,</p><p style="text-align:center;margin:0;color:#000000;">쓰면서 시트 모양에 맞춰진다고</p><p style="text-align:center;margin:0;color:#000000;">제조사는 설명해요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">겉감은 인조가죽이라</p><p style="text-align:center;margin:0;color:#000000;">오염된 곳은 부드러운 천으로</p><p style="text-align:center;margin:0;color:#000000;">닦아내면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">구성품은 허리쿠션 1개입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">제조 결함은 구매 후</p><p style="text-align:center;margin:0;color:#000000;">6개월 동안 무상 수리를 받을 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">의료기기는 아니라서</p><p style="text-align:center;margin:0;color:#000000;">통증 치료용으로 고르는 물건은</p><p style="text-align:center;margin:0;color:#000000;">아닙니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">59,900원,</span></b></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">공용과 테슬라용 중 무엇을 살까?</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 3세대 리본 허리쿠션이</p><p style="text-align:center;margin:0;color:#000000;">테슬라용으로도</p><p style="text-align:center;margin:0;color:#000000;">따로 나와 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">✔ 전차종 공용 — 59,900원</p><p style="text-align:center;margin:0;color:#000000;">✔ 테슬라 모델 Y·YL·3용 — 59,900원</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">값이 같으니</p><p style="text-align:center;margin:0;color:#000000;">둘 중에서는 내 차종을 보고</p><p style="text-align:center;margin:0;color:#000000;">고르면 돼요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">테슬라 모델 Y·YL·3를 타면</p><p style="text-align:center;margin:0;color:#000000;">전용 제품을,</p><p style="text-align:center;margin:0;color:#000000;">그 밖의 차라면</p><p style="text-align:center;margin:0;color:#000000;">공용 사이즈인 이 제품을 고르면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">수건 한 장보다는 분명 큰돈이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">허리 양옆까지 넓게 받치고</p><p style="text-align:center;margin:0;color:#000000;">밴드로 시트에 묶어 두는</p><p style="text-align:center;margin:0;color:#000000;">쿠션을 찾는다면</p><p style="text-align:center;margin:0;color:#000000;">그 구조에 값을 내는 셈입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">색상은 모노블랙·네이비블루·</p><p style="text-align:center;margin:0;color:#000000;">카멜·버건디 등</p><p style="text-align:center;margin:0;color:#000000;">차량 순정 계열로 여러 가지라,</p><p style="text-align:center;margin:0;color:#000000;">시트 색에 맞춰 고를 수 있어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">시트 색에 맞추면</span><br><span style="font-style:normal;">원래 있던 것처럼 붙어 있습니다</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">내 차 시트 색에 맞는 색을<br>골라, 원래 있던 것처럼 달아 두세요</span></b><cite style="display:block;margin-top:14px;font-style:normal;font-size:13px;color:#8a8f96;line-height:1.6;">아임반 자동차 리본 허리쿠션 3세대 차량용 등받이 시트 요추 등쿠션<br>⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</cite></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FIcPymro</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이런 운전 습관이 있다면</p><p style="text-align:center;margin:0;color:#000000;">아임반 리본 허리쿠션 3세대가</p><p style="text-align:center;margin:0;color:#000000;">잘 맞습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">✔ 장거리 운전이 잦은 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 허리 옆까지 받칠 쿠션을 찾는 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 충전할 일 없는 쿠션을 원하는 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 시트 색에 맞춰 달고 싶은 분</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">안전벨트가 시트 밖에서 내려오는 차이고,</p><p style="text-align:center;margin:0;color:#000000;">마사지 기능 없이 허리 둘레를</p><p style="text-align:center;margin:0;color:#000000;">넓게 받칠 차량용허리쿠션을</p><p style="text-align:center;margin:0;color:#000000;">6만 원 안쪽에서 찾는다면</p><p style="text-align:center;margin:0;color:#000000;">살 만합니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#d0d4d9;">───────────</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">아임반 리본 허리쿠션 3세대는</p><p style="text-align:center;margin:0;color:#000000;">지금 59,900원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정가 70,500원에서 내려온 값이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">적립 포인트도 최대</p><p style="text-align:center;margin:0;color:#000000;">8,790원까지 따로 붙습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">👇 가을 운전길, 허리 옆까지 받쳐 두세요<br>아임반 리본 허리쿠션 3세대 가격 확인!</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FIcPymro</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#아임반 #차량용등쿠션 #인테리어용품 #차량용쿠션 #자동차쿠션 #자동차등받이쿠션 #차량용등받이쿠션 #자동차등받이 #차량용등쿠션추천 #차량용등받이 #허리쿠션 #자동차허리쿠션</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">운전석 허리 뒤에
+수건을 말아 끼우거나
+싼 차량용 허리쿠션을 대봐도
+몇 번 타고 내리면
+아래로 흘러내려 있지 않나요?
+
+
+가운데만 볼록하게 밀어주니
+옆구리 쪽은
+그대로 떠 있고요.
+
+
+곧 가을 캠핑이나 차박으로
+몇 시간씩 달릴 일이 늘어나는데,
+그때마다 쿠션을
+다시 끼우게 되죠.
+
+
+그런데 허리 가운데가 아니라
+양옆까지 한 번에
+받쳐준다면
+어떨까요?
+
+
+아임반 리본 허리쿠션 3세대는
+가로 59cm 폭으로
+허리 양옆까지 감싸는
+차량용허리쿠션이에요.
+
+
+밴드로 시트에
+묶어 두는 방식이고,
+전원은 쓰지 않습니다.
+
+
+물론 마사지나
+진동 기능은 없어요.
+
+
+사진1
+
+
+지금 판매가는 59,900원입니다.
+
+
+안전벨트가 시트에 붙어 나오는 차라면
+사기 전에 따져볼 것이
+하나 있습니다.
+
+
+59cm 폭으로 허리 양옆까지 받치는 쿠션
+
+
+흔한 등쿠션은
+허리 가운데 한 곳을
+앞으로 밀어주는 모양입니다.
+
+
+이 제품은 가로 59cm로 넓게 퍼져서
+허리 뒤뿐 아니라
+양옆까지 걸쳐져요.
+
+
+제조사는 이 모양을
+슬림 사이드 버킷 구조라고 부르고,
+허리가 닿는 각도는
+26.4°로 잡았다고
+밝힙니다.
+
+
+사진2
+
+
+가운데만 미는 게 아니라
+허리 둘레를 넓게 받칩니다
+
+
+막히는 퇴근길에
+등받이에 기대 앉으면
+등 가운데뿐 아니라
+옆구리까지 쿠션에 닿아요.
+
+
+두께는 3cm입니다.
+
+
+등과 시트 사이에
+두툼한 덩어리를 끼우기보다
+얇게 한 겹 덧대는 두께죠.
+
+
+차량용 허리쿠션 메모리폼을
+찾다가 오셨다면,
+이 제품 충전재는
+고탄성 우레탄폼이에요.
+
+
+제조사는 노면 충격과
+진동을 흡수하도록
+이 폼을 넣었다고
+안내합니다.
+
+
+밴드로 5초 설치, 벨트 일체형 시트는 예외
+
+
+설치는 밴드로
+시트에 고정하는 방식이고,
+제조사 안내로는
+약 5초면 끝납니다.
+
+
+전원을 쓰지 않아서
+충전하거나 시거잭에
+선을 꽂을 일이 없어요.
+
+
+차량용허리쿠션 비교 글에
+자주 나오는 공기압·진동 마사지는
+이 제품에 들어 있지 않습니다.
+
+
+사이즈는 전차종 공용
+단일 사이즈예요.
+
+
+다만 안전벨트가
+시트 등받이에서 나오는
+일체형 시트에서는
+정상적으로 쓰기 어려울 수 있다고
+제조사가 안내합니다.
+
+
+사진3
+
+
+벨트 일체형 시트라면
+달기 전에 따져봐야 합니다
+
+
+처음 달면 살짝 들떠 보일 수 있는데,
+쓰면서 시트 모양에 맞춰진다고
+제조사는 설명해요.
+
+
+겉감은 인조가죽이라
+오염된 곳은 부드러운 천으로
+닦아내면 됩니다.
+
+
+구성품은 허리쿠션 1개입니다.
+
+
+제조 결함은 구매 후
+6개월 동안 무상 수리를 받을 수 있어요.
+
+
+의료기기는 아니라서
+통증 치료용으로 고르는 물건은
+아닙니다.
+
+
+59,900원, 공용과 테슬라용 중 무엇을 살까?
+
+
+같은 3세대 리본 허리쿠션이
+테슬라용으로도
+따로 나와 있습니다.
+
+
+✔ 전차종 공용 — 59,900원
+✔ 테슬라 모델 Y·YL·3용 — 59,900원
+
+
+값이 같으니
+둘 중에서는 내 차종을 보고
+고르면 돼요.
+
+
+테슬라 모델 Y·YL·3를 타면
+전용 제품을,
+그 밖의 차라면
+공용 사이즈인 이 제품을 고르면 됩니다.
+
+
+수건 한 장보다는 분명 큰돈이에요.
+
+
+허리 양옆까지 넓게 받치고
+밴드로 시트에 묶어 두는
+쿠션을 찾는다면
+그 구조에 값을 내는 셈입니다.
+
+
+색상은 모노블랙·네이비블루·
+카멜·버건디 등
+차량 순정 계열로 여러 가지라,
+시트 색에 맞춰 고를 수 있어요.
+
+
+시트 색에 맞추면
+원래 있던 것처럼 붙어 있습니다
+
+
+내 차 시트 색에 맞는 색을
+골라, 원래 있던 것처럼 달아 두세요
+
+https://naver.me/FIcPymro
+
+
+이런 운전 습관이 있다면
+아임반 리본 허리쿠션 3세대가
+잘 맞습니다.
+
+
+✔ 장거리 운전이 잦은 분
+✔ 허리 옆까지 받칠 쿠션을 찾는 분
+✔ 충전할 일 없는 쿠션을 원하는 분
+✔ 시트 색에 맞춰 달고 싶은 분
+
+
+안전벨트가 시트 밖에서 내려오는 차이고,
+마사지 기능 없이 허리 둘레를
+넓게 받칠 차량용허리쿠션을
+6만 원 안쪽에서 찾는다면
+살 만합니다.
+
+
+───────────
+
+
+아임반 리본 허리쿠션 3세대는
+지금 59,900원입니다.
+
+
+정가 70,500원에서 내려온 값이에요.
+
+
+적립 포인트도 최대
+8,790원까지 따로 붙습니다.
+
+
+👇 가을 운전길, 허리 옆까지 받쳐 두세요
+아임반 리본 허리쿠션 3세대 가격 확인!
+
+https://naver.me/FIcPymro
+
+
+#아임반 #차량용등쿠션 #인테리어용품 #차량용쿠션 #자동차쿠션 #자동차등받이쿠션 #차량용등받이쿠션 #자동차등받이 #차량용등쿠션추천 #차량용등받이 #허리쿠션 #자동차허리쿠션</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  // 본문 복사 버튼은 2026-10-13 에 뺐습니다 — 글은 "네이버에 자동 작성"으로 옮깁니다.
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사·자동 작성됩니다.');
+    });
+  });
+
+  var publishCheck = document.getElementById('publishCheck');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishCheck.checked = done;
+    publishCheck.parentNode.classList.toggle('published', done);
+  }
+  publishCheck.addEventListener('change', function () {
+    try { localStorage.setItem(publishKey, publishCheck.checked ? '1' : '0'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+
+  // 이 페이지의 주소에서 배치 폴더와 이 글의 순번을 읽습니다 — resultsArchive.js 가
+  // 파일을 "<폴더>/01-제목.html" 로 저장하므로, 서버에 다시 물어볼 필요 없이 주소만으로
+  // 압니다. 이 Mac에서 로컬 서버(3100)가 켜져 있어야 동작합니다 — 그 서버만
+  // 네이버 창을 띄울 수 있습니다.
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // 템플릿 리터럴 안에서는 정규식의 백슬래시가 살아남지 못하므로(\d 가 그냥 d 로
+      // 찍힘), 정규식 대신 문자열을 직접 잘라 폴더·순번을 읽습니다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      // 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      // 페이지를 떠나지 않고, 새 창도 열지 않습니다. 이 Mac 의 localhost 를 직접 부르면 크롬이
+      // 로컬 네트워크 권한을 요구해서, 공개 중계(ntfy.sh)에 요청을 놓고 이 Mac 서버가 그걸 받아
+      // 네이버 글쓰기 창을 엽니다(src/draftRelay.js). 진행 상황도 같은 중계로 돌아옵니다.
+      if (autoBtn.disabled) return;
+      autoBtn.disabled = true;
+      var reqId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      var since = Math.floor(Date.now() / 1000) - 5;
+      say('이 Mac에 자동 작성을 요청하는 중…');
+      fetch(RELAY + '/' + RELAY_TOPIC, {
+        method: 'POST',
+        body: JSON.stringify({ req: reqId, folder: folder, index: idx, title: chosenTitle.trim() })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('중계 응답 ' + r.status);
+        followDraft(reqId, since, Date.now(), false);
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        say('요청을 보내지 못했어요 — 인터넷 연결을 확인하고 다시 눌러주세요. (' + (e && e.message || '') + ')');
+      });
+    });
+  }
+
+  var RELAY = 'https://ntfy.sh';
+  var RELAY_TOPIC = 'nbsdraft-ac5ccd953fdff173423c';
+  // 이 요청(reqId)에 대한 이 Mac 서버의 답을 몇 초마다 읽어 버튼 아래에 보여줍니다.
+  function followDraft(reqId, since, t0, heard) {
+    setTimeout(function () {
+      fetch(RELAY + '/' + RELAY_TOPIC + '-status/json?poll=1&since=' + since, { cache: 'no-store' })
+        .then(function (r) { return r.text(); })
+        .then(function (text) {
+          var latest = null;
+          text.split(String.fromCharCode(10)).forEach(function (line) {
+            if (!line) return;
+            try {
+              var ev = JSON.parse(line);
+              var m = JSON.parse(ev.message || '{}');
+              if (m.req === reqId) latest = m;
+            } catch (e) {}
+          });
+          if (!latest) {
+            if (!heard && Date.now() - t0 > 25000) {
+              autoBtn.disabled = false;
+              say('이 Mac의 서버가 답이 없어요 — 터미널에서 node server.js 가 켜져 있는지 확인하고 다시 눌러주세요.');
+              return;
+            }
+            if (!heard) say('이 Mac에 자동 작성을 요청하는 중…');
+            return followDraft(reqId, since, t0, heard);
+          }
+          if (latest.state === 'done') { autoBtn.disabled = false; say('✅ ' + latest.message); return; }
+          if (latest.state === 'failed') { autoBtn.disabled = false; say('작성 실패: ' + latest.message); return; }
+          if (latest.state === 'login') say(latest.message);
+          else if (latest.state === 'started') say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
+          else say('네이버 창에 작성하는 중… ' + (latest.message || ''));
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          followDraft(reqId, since, t0, true);
+        })
+        .catch(function () { followDraft(reqId, since, t0, heard); });
+    }, 1500);
+  }
+})();
+</script>
+</body>
+</html>
