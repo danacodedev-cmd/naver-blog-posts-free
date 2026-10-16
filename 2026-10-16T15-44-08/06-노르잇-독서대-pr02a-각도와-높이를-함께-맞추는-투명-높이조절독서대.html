@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>노르잇 독서대 PR02A, 각도와 높이를 함께 맞추는 투명 높이조절독서대</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  /* 작업 줄: [예약 날짜] [발행 완료] [네이버에 자동 작성]. 본문 복사는 자동 작성으로 대신해서
+     뺐습니다(2026-10-13). 세 칸 높이를 48px 로 맞추고, 주 버튼이 남는 폭을 다 씁니다. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 12px 16px; display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: stretch; }
+  .sched-card { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-height: 48px;
+    padding: 5px 16px; border: 1.5px solid; border-radius: 12px; box-sizing: border-box; white-space: nowrap; }
+  .sched-card.none { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+  .sched-card-label { font-size: 11px; font-weight: 700; opacity: .75; letter-spacing: .2px; }
+  .sched-card-when { font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+  .sched-card-time { margin-left: 8px; padding-left: 8px; border-left: 1.5px solid currentColor; }
+  .pub-toggle { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; box-sizing: border-box;
+    border: 1.5px solid #d1d5db; border-radius: 12px; background: #fff; color: #4b5563; font-size: 14px; font-weight: 700;
+    cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap; }
+  .pub-toggle input { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 0; flex-shrink: 0;
+    border: 2px solid #c4c9d0; border-radius: 6px; background: #fff; display: grid; place-content: center; cursor: pointer; }
+  .pub-toggle input:checked { background: #03c75a; border-color: #03c75a; }
+  .pub-toggle input:checked::after { content: ''; width: 5px; height: 10px; margin-top: -2px;
+    border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+  .pub-toggle.published { background: #ecfbf2; border-color: #03c75a; color: #03a353; }
+  #autoDraftBtn { min-height: 48px; padding: 0 20px; border-radius: 12px; background: #03c75a; color: #fff;
+    font-size: 16px; font-weight: 800; white-space: nowrap; }
+  #autoDraftBtn:hover { background: #02b351; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  @media (max-width: 480px) {
+    .actionbar { grid-template-columns: 1fr auto; }
+    .sched-card-when { font-size: 15px; }
+    #autoDraftBtn { grid-column: 1 / -1; }
+  }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  
+  .sched { display: inline-flex; align-items: stretch; border: 1.5px solid; border-radius: 7px; overflow: hidden;
+    font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; vertical-align: middle; }
+  .sched-date { padding: 4px 6px; }
+  .sched-time { padding: 4px 6px; background: #fff; }
+  .sched-big { font-size: 16px; border-radius: 9px; }
+  .sched-big .sched-date, .sched-big .sched-time { padding: 8px 10px; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="가구/인테리어" style="background:#f6f2ec;color:#6b543a;border:1.5px solid #e0d3c0;">가구/인테리어</span></div>
+  <h1 id="titleText" class="visually-hidden">노르잇 독서대 PR02A, 각도와 높이를 함께 맞추는 투명 높이조절독서대</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">노르잇 투명독서대 높이조절 아크릴 책받침대 북스탠드 PR02A</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="노르잇 독서대 PR02A, 각도와 높이를 함께 맞추는 투명 높이조절독서대"><span class="tp-num">1</span><span class="tp-text">노르잇 독서대 PR02A, 각도와 높이를 함께 맞추는 투명 높이조절독서대</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="노르잇 독서대 PR02A, 아이와 어른이 번갈아 쓰는 높이조절독서대"><span class="tp-num">2</span><span class="tp-text">노르잇 독서대 PR02A, 아이와 어른이 번갈아 쓰는 높이조절독서대</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="노르잇 독서대 PR02A 무게 1.06kg, 책상에 두고 쓰는 아크릴독서대"><span class="tp-num">3</span><span class="tp-text">노르잇 독서대 PR02A 무게 1.06kg, 책상에 두고 쓰는 아크릴독서대</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <div class="sched-card" style="background:#cffafe;color:#0e7490;border-color:#0e749033"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">10월 22일 (목)<span class="sched-card-time">18:20</span></span></div>
+  <label class="pub-toggle"><input type="checkbox" id="publishCheck"><span>발행 완료</span></label>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
+</div>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/ozoo2/224425050052" target="_blank" rel="noopener noreferrer">높이조절 독서대 노르잇 PR02A 2주 사용 후기 8세 6세 아이들과 온가족이 함께</a></li>
+      <li><a href="https://blog.naver.com/malifo/224388949699" target="_blank" rel="noopener noreferrer">독서대추천 책 크기와 자세에 따라 고르는 기준</a></li>
+      <li><a href="https://blog.naver.com/dewsweet/224407841027" target="_blank" rel="noopener noreferrer">북스탠드 추천 노르잇 노블우드 원목 독서대 책거치대 사용후기</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 1장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진1</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T15-44-08/img/06-1.jpg" alt="노르잇 독서대 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T15-44-08/img/06-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">책상에 책을 펴두고 읽다 보면</p><p style="text-align:center;margin:0;color:#000000;">고개가 점점 아래로 내려가잖아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그래서 책을 손으로 들어 올렸다가,</p><p style="text-align:center;margin:0;color:#000000;">팔이 무거워지면</p><p style="text-align:center;margin:0;color:#000000;">내려놓고,</p><p style="text-align:center;margin:0;color:#000000;">다시 들고.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그런데 책이 알아서</p><p style="text-align:center;margin:0;color:#000000;">원하는 높이에 서 있다면요?</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">노르잇 독서대 PR02A는</p><p style="text-align:center;margin:0;color:#000000;">각도와 높이를 둘 다 조절하는</p><p style="text-align:center;margin:0;color:#000000;">투명 아크릴 높이조절독서대예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">책을 올려 세워두면</p><p style="text-align:center;margin:0;color:#000000;">손은 페이지 넘길 때만 쓰면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 판이 36x27cm라</p><p style="text-align:center;margin:0;color:#000000;">작은 책상에서는 꽤 넓게 차지해요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-16T15-44-08/img/06-1.jpg" alt="노르잇 독서대 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지금 확인한 판매가는 54,800원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 라인에 31x22cm 옵션도 있어서</p><p style="text-align:center;margin:0;color:#000000;">크기를 먼저 정해야 고르기가 쉬워져요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">책 높이와 각도를 함께 맞추는 듀얼힌지</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">각도만 조절되는 독서대는</p><p style="text-align:center;margin:0;color:#000000;">책을 기울일 수는 있어도</p><p style="text-align:center;margin:0;color:#000000;">높이는 책상 근처에 머무는 편입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">PR02A는 각도에 더해</p><p style="text-align:center;margin:0;color:#000000;">높이까지 조절돼요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">공식몰은 이 구조를</p><p style="text-align:center;margin:0;color:#000000;">프리미엄 듀얼힌지라고</p><p style="text-align:center;margin:0;color:#000000;">소개합니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">책을 기울이는 것과</span><br><span style="font-style:normal;">올리는 것은 다른 일이에요.</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">아이가 쓸 때는 낮게,</p><p style="text-align:center;margin:0;color:#000000;">어른이 앉으면</p><p style="text-align:center;margin:0;color:#000000;">다시 높게.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">의자 높이와 앉은키가 달라도</p><p style="text-align:center;margin:0;color:#000000;">책 위치를 그 사람에게 맞춰 쓸 수 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">판은 투명이라</p><p style="text-align:center;margin:0;color:#000000;">책상 위가 그대로 비쳐 보여요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">커다란 판이 책상 앞을 막고 있어도</p><p style="text-align:center;margin:0;color:#000000;">눈앞이 덜 답답해 보이죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">색은 실버와 투명 두 가지입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다 읽고 나면 접어서</p><p style="text-align:center;margin:0;color:#000000;">정리할 수 있어서,</p><p style="text-align:center;margin:0;color:#000000;">식탁처럼 같이 쓰는 책상에 두기에도 편합니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">36x27cm에 1.06kg,</span></b></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">책상 폭부터 보세요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">PR02A의 판은 36x27cm로</p><p style="text-align:center;margin:0;color:#000000;">A4 용지보다 한 뼘 정도 큰 크기예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다나와 사양표에는</p><p style="text-align:center;margin:0;color:#000000;">360x370mm로도 적혀 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">판이 크면 큰 책도</span><br><span style="font-style:normal;">가장자리까지 기대어 섭니다.</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">대신 책상에서 차지하는 면적도</p><p style="text-align:center;margin:0;color:#000000;">그만큼 넓어져요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">더 작은 판이 필요하면</p><p style="text-align:center;margin:0;color:#000000;">31x22cm인 PR02B가 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">책상 위에서 방향을 돌려 쓰고 싶다면</p><p style="text-align:center;margin:0;color:#000000;">노르잇 독서대 회전형 옵션도 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">크기별로 하나씩,</p><p style="text-align:center;margin:0;color:#000000;">PR02AR과 PR02BR이</p><p style="text-align:center;margin:0;color:#000000;">무소음회전형으로 나와 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">노르잇 독서대 무게는</p><p style="text-align:center;margin:0;color:#000000;">다나와 기준 1.06kg이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가방에 넣어 다닐 휴대용독서대를 찾는다면</p><p style="text-align:center;margin:0;color:#000000;">이 판 크기와 무게는 부담이 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">재질은 공식몰이 아크릴로,</p><p style="text-align:center;margin:0;color:#000000;">다나와는 플라스틱으로 표기해요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">아크릴은 표면에</p><p style="text-align:center;margin:0;color:#000000;">잔기스가 생기기 쉬운 편이라,</p><p style="text-align:center;margin:0;color:#000000;">보호용 소프트 커버가 따로 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">PR02A용 대형 커버는 3,500원,</p><p style="text-align:center;margin:0;color:#000000;">스프레이 클리너는 3,000원이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">둘 다 기본 구성이 아니라</p><p style="text-align:center;margin:0;color:#000000;">별도로 사는 별매품입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">54,</span></b></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">800원, 아크릴독서대에 낼 만한 값일까요?</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">각도만 바뀌는 접이식 독서대는</p><p style="text-align:center;margin:0;color:#000000;">이보다 낮은 값에도 흔히 보여요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">PR02A가 거기에 더하는 건</p><p style="text-align:center;margin:0;color:#000000;">높이 조절과 A4보다 큰 투명 판입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-size:17px;color:#0f172a;font-style:normal;"><span style="font-style:normal;">높이가 맞아야</span><br><span style="font-style:normal;">책이 눈 쪽으로 올라옵니다.</span></blockquote><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">잠깐 책을 받쳐두는 용도라면</p><p style="text-align:center;margin:0;color:#000000;">각도만 되는 독서대로도 쓸 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">하지만 매일 저녁 책상에서</p><p style="text-align:center;margin:0;color:#000000;">책을 오래 펴두는 사람이라면,</p><p style="text-align:center;margin:0;color:#000000;">높이까지 맞춰지는 독서대가 맞습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여러 사람이 번갈아 앉는 책상이면</p><p style="text-align:center;margin:0;color:#000000;">높이 조절이 하는 일이 더 커져요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">고개 숙여 읽던 저녁,<br>책을 눈 쪽으로 올려두고 읽어 보세요</span></b><cite style="display:block;margin-top:14px;font-style:normal;font-size:13px;color:#8a8f96;line-height:1.6;">노르잇 투명독서대 높이조절 아크릴 책받침대 북스탠드 PR02A<br>⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</cite></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GkItyNWf</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">노르잇 독서대 PR02A가</p><p style="text-align:center;margin:0;color:#000000;">잘 맞는 경우는 이렇습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">✔ 책 높이와 각도를 함께 맞추고 싶은 분</p><p style="text-align:center;margin:0;color:#000000;">✔ A4보다 큰 책을 자주 펼치는 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 가족이 번갈아 같은 책상을 쓰는 분</p><p style="text-align:center;margin:0;color:#000000;">✔ 책상을 덜 가리는 투명 판을 원하는 분</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">책상에 36x27cm 판을 펼쳐둘 여유가 있고,</p><p style="text-align:center;margin:0;color:#000000;">각도와 높이를 둘 다 맞추는</p><p style="text-align:center;margin:0;color:#000000;">높이조절독서대를 찾는다면</p><p style="text-align:center;margin:0;color:#000000;">PR02A가 맞습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">커버까지 함께 받으려면</p><p style="text-align:center;margin:0;color:#000000;">별매 3,500원이 더해져요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#d0d4d9;">───────────</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">PR02A는 지금 54,800원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정가 65,000원에서 내려온 값이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">적립 포인트도 최대</p><p style="text-align:center;margin:0;color:#000000;">7,706원까지 따로 붙습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">👇 책 높이부터 맞춰 보세요<br>노르잇 PR02A 가격 확인!</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GkItyNWf</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#노르잇 #독서대 #독서용품 #독서대추천 #투명독서대 #높이조절독서대 #아크릴독서대 #노르잇독서대 #책받침대독서대 #북스탠드독서대 #노르잇높이조절 #노르잇아크릴</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">책상에 책을 펴두고 읽다 보면
+고개가 점점 아래로 내려가잖아요.
+
+
+그래서 책을 손으로 들어 올렸다가,
+팔이 무거워지면
+내려놓고,
+다시 들고.
+
+
+그런데 책이 알아서
+원하는 높이에 서 있다면요?
+
+
+노르잇 독서대 PR02A는
+각도와 높이를 둘 다 조절하는
+투명 아크릴 높이조절독서대예요.
+
+
+책을 올려 세워두면
+손은 페이지 넘길 때만 쓰면 됩니다.
+
+
+다만 판이 36x27cm라
+작은 책상에서는 꽤 넓게 차지해요.
+
+
+사진1
+
+
+지금 확인한 판매가는 54,800원입니다.
+
+
+같은 라인에 31x22cm 옵션도 있어서
+크기를 먼저 정해야 고르기가 쉬워져요.
+
+
+책 높이와 각도를 함께 맞추는 듀얼힌지
+
+
+각도만 조절되는 독서대는
+책을 기울일 수는 있어도
+높이는 책상 근처에 머무는 편입니다.
+
+
+PR02A는 각도에 더해
+높이까지 조절돼요.
+
+
+공식몰은 이 구조를
+프리미엄 듀얼힌지라고
+소개합니다.
+
+
+책을 기울이는 것과
+올리는 것은 다른 일이에요.
+
+
+아이가 쓸 때는 낮게,
+어른이 앉으면
+다시 높게.
+
+
+의자 높이와 앉은키가 달라도
+책 위치를 그 사람에게 맞춰 쓸 수 있습니다.
+
+
+판은 투명이라
+책상 위가 그대로 비쳐 보여요.
+
+
+커다란 판이 책상 앞을 막고 있어도
+눈앞이 덜 답답해 보이죠.
+
+
+색은 실버와 투명 두 가지입니다.
+
+
+다 읽고 나면 접어서
+정리할 수 있어서,
+식탁처럼 같이 쓰는 책상에 두기에도 편합니다.
+
+
+36x27cm에 1.06kg, 책상 폭부터 보세요
+
+
+PR02A의 판은 36x27cm로
+A4 용지보다 한 뼘 정도 큰 크기예요.
+
+
+다나와 사양표에는
+360x370mm로도 적혀 있습니다.
+
+
+판이 크면 큰 책도
+가장자리까지 기대어 섭니다.
+
+
+대신 책상에서 차지하는 면적도
+그만큼 넓어져요.
+
+
+더 작은 판이 필요하면
+31x22cm인 PR02B가 있습니다.
+
+
+책상 위에서 방향을 돌려 쓰고 싶다면
+노르잇 독서대 회전형 옵션도 있어요.
+
+
+크기별로 하나씩,
+PR02AR과 PR02BR이
+무소음회전형으로 나와 있습니다.
+
+
+노르잇 독서대 무게는
+다나와 기준 1.06kg이에요.
+
+
+가방에 넣어 다닐 휴대용독서대를 찾는다면
+이 판 크기와 무게는 부담이 됩니다.
+
+
+재질은 공식몰이 아크릴로,
+다나와는 플라스틱으로 표기해요.
+
+
+아크릴은 표면에
+잔기스가 생기기 쉬운 편이라,
+보호용 소프트 커버가 따로 있습니다.
+
+
+PR02A용 대형 커버는 3,500원,
+스프레이 클리너는 3,000원이에요.
+
+
+둘 다 기본 구성이 아니라
+별도로 사는 별매품입니다.
+
+
+54,800원, 아크릴독서대에 낼 만한 값일까요?
+
+
+각도만 바뀌는 접이식 독서대는
+이보다 낮은 값에도 흔히 보여요.
+
+
+PR02A가 거기에 더하는 건
+높이 조절과 A4보다 큰 투명 판입니다.
+
+
+높이가 맞아야
+책이 눈 쪽으로 올라옵니다.
+
+
+잠깐 책을 받쳐두는 용도라면
+각도만 되는 독서대로도 쓸 수 있어요.
+
+
+하지만 매일 저녁 책상에서
+책을 오래 펴두는 사람이라면,
+높이까지 맞춰지는 독서대가 맞습니다.
+
+
+여러 사람이 번갈아 앉는 책상이면
+높이 조절이 하는 일이 더 커져요.
+
+
+고개 숙여 읽던 저녁,
+책을 눈 쪽으로 올려두고 읽어 보세요
+
+https://naver.me/GkItyNWf
+
+
+노르잇 독서대 PR02A가
+잘 맞는 경우는 이렇습니다.
+
+
+✔ 책 높이와 각도를 함께 맞추고 싶은 분
+✔ A4보다 큰 책을 자주 펼치는 분
+✔ 가족이 번갈아 같은 책상을 쓰는 분
+✔ 책상을 덜 가리는 투명 판을 원하는 분
+
+
+책상에 36x27cm 판을 펼쳐둘 여유가 있고,
+각도와 높이를 둘 다 맞추는
+높이조절독서대를 찾는다면
+PR02A가 맞습니다.
+
+
+커버까지 함께 받으려면
+별매 3,500원이 더해져요.
+
+
+───────────
+
+
+PR02A는 지금 54,800원입니다.
+
+
+정가 65,000원에서 내려온 값이에요.
+
+
+적립 포인트도 최대
+7,706원까지 따로 붙습니다.
+
+
+👇 책 높이부터 맞춰 보세요
+노르잇 PR02A 가격 확인!
+
+https://naver.me/GkItyNWf
+
+
+#노르잇 #독서대 #독서용품 #독서대추천 #투명독서대 #높이조절독서대 #아크릴독서대 #노르잇독서대 #책받침대독서대 #북스탠드독서대 #노르잇높이조절 #노르잇아크릴</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  // 본문 복사 버튼은 2026-10-13 에 뺐습니다 — 글은 "네이버에 자동 작성"으로 옮깁니다.
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사·자동 작성됩니다.');
+    });
+  });
+
+  var publishCheck = document.getElementById('publishCheck');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishCheck.checked = done;
+    publishCheck.parentNode.classList.toggle('published', done);
+  }
+  publishCheck.addEventListener('change', function () {
+    try { localStorage.setItem(publishKey, publishCheck.checked ? '1' : '0'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+
+  // 이 페이지의 주소에서 배치 폴더와 이 글의 순번을 읽습니다 — resultsArchive.js 가
+  // 파일을 "<폴더>/01-제목.html" 로 저장하므로, 서버에 다시 물어볼 필요 없이 주소만으로
+  // 압니다. 이 Mac에서 로컬 서버(3100)가 켜져 있어야 동작합니다 — 그 서버만
+  // 네이버 창을 띄울 수 있습니다.
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // 템플릿 리터럴 안에서는 정규식의 백슬래시가 살아남지 못하므로(\d 가 그냥 d 로
+      // 찍힘), 정규식 대신 문자열을 직접 잘라 폴더·순번을 읽습니다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      // 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      // 페이지를 떠나지 않고, 새 창도 열지 않습니다. 이 Mac 의 localhost 를 직접 부르면 크롬이
+      // 로컬 네트워크 권한을 요구해서, 공개 중계(ntfy.sh)에 요청을 놓고 이 Mac 서버가 그걸 받아
+      // 네이버 글쓰기 창을 엽니다(src/draftRelay.js). 진행 상황도 같은 중계로 돌아옵니다.
+      if (autoBtn.disabled) return;
+      autoBtn.disabled = true;
+      var reqId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      var since = Math.floor(Date.now() / 1000) - 5;
+      say('이 Mac에 자동 작성을 요청하는 중…');
+      fetch(RELAY + '/' + RELAY_TOPIC, {
+        method: 'POST',
+        body: JSON.stringify({ req: reqId, folder: folder, index: idx, title: chosenTitle.trim() })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('중계 응답 ' + r.status);
+        followDraft(reqId, since, Date.now(), false);
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        say('요청을 보내지 못했어요 — 인터넷 연결을 확인하고 다시 눌러주세요. (' + (e && e.message || '') + ')');
+      });
+    });
+  }
+
+  var RELAY = 'https://ntfy.sh';
+  var RELAY_TOPIC = 'nbsdraft-ac5ccd953fdff173423c';
+  // 이 요청(reqId)에 대한 이 Mac 서버의 답을 몇 초마다 읽어 버튼 아래에 보여줍니다.
+  function followDraft(reqId, since, t0, heard) {
+    setTimeout(function () {
+      fetch(RELAY + '/' + RELAY_TOPIC + '-status/json?poll=1&since=' + since, { cache: 'no-store' })
+        .then(function (r) { return r.text(); })
+        .then(function (text) {
+          var latest = null;
+          text.split(String.fromCharCode(10)).forEach(function (line) {
+            if (!line) return;
+            try {
+              var ev = JSON.parse(line);
+              var m = JSON.parse(ev.message || '{}');
+              if (m.req === reqId) latest = m;
+            } catch (e) {}
+          });
+          if (!latest) {
+            if (!heard && Date.now() - t0 > 25000) {
+              autoBtn.disabled = false;
+              say('이 Mac의 서버가 답이 없어요 — 터미널에서 node server.js 가 켜져 있는지 확인하고 다시 눌러주세요.');
+              return;
+            }
+            if (!heard) say('이 Mac에 자동 작성을 요청하는 중…');
+            return followDraft(reqId, since, t0, heard);
+          }
+          if (latest.state === 'done') { autoBtn.disabled = false; say('✅ ' + latest.message); return; }
+          if (latest.state === 'failed') { autoBtn.disabled = false; say('작성 실패: ' + latest.message); return; }
+          if (latest.state === 'login') say(latest.message);
+          else if (latest.state === 'started') say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
+          else say('네이버 창에 작성하는 중… ' + (latest.message || ''));
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          followDraft(reqId, since, t0, true);
+        })
+        .catch(function () { followDraft(reqId, since, t0, heard); });
+    }, 1500);
+  }
+})();
+</script>
+</body>
+</html>
