@@ -796,18 +796,15 @@ https://naver.me/5c8OvCo3
       // 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
       var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
       // 페이지를 떠나지 않고, 새 창도 열지 않습니다. 이 Mac 의 localhost 를 직접 부르면 크롬이
-      // 로컬 네트워크 권한을 요구해서, 공개 중계(ntfy.sh)에 요청을 놓고 이 Mac 서버가 그걸 받아
+      // 로컬 네트워크 권한을 요구해서, 공개 중계(ntfy 서버 여러 곳)에 요청을 놓고 이 Mac 서버가 그걸 받아
       // 네이버 글쓰기 창을 엽니다(src/draftRelay.js). 진행 상황도 같은 중계로 돌아옵니다.
       if (autoBtn.disabled) return;
       autoBtn.disabled = true;
       var reqId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
       var since = Math.floor(Date.now() / 1000) - 5;
       say('이 Mac에 자동 작성을 요청하는 중…');
-      fetch(RELAY + '/' + RELAY_TOPIC, {
-        method: 'POST',
-        body: JSON.stringify({ req: reqId, folder: folder, index: idx, title: chosenTitle.trim() })
-      }).then(function (r) {
-        if (!r.ok) throw new Error('중계 응답 ' + r.status);
+      relaySend({ req: reqId, folder: folder, index: idx, title: chosenTitle.trim() }).then(function (ok) {
+        if (!ok) throw new Error('중계 서버에 모두 연결하지 못함');
         followDraft(reqId, since, Date.now(), false);
       }).catch(function (e) {
         autoBtn.disabled = false;
@@ -816,23 +813,61 @@ https://naver.me/5c8OvCo3
     });
   }
 
-  var RELAY = 'https://ntfy.sh';
-  var RELAY_TOPIC = 'nbsdraft-ac5ccd953fdff173423c';
+  var RELAYS = ["https://ntfy.sh","https://ntfy.adminforge.de","https://ntfy.envs.net"], RELAY_TOPIC = "nbsdraft-ac5ccd953fdff173423c";
+var relayDead = {};
+function relayLive() {
+  var now = Date.now(), live = RELAYS.filter(function (h) { return !relayDead[h] || now - relayDead[h] > 60000; });
+  return live.length ? live : RELAYS;
+}
+function relayFetch(h, path, opts) {
+  var ctl = window.AbortController ? new AbortController() : null;
+  var t = ctl ? setTimeout(function () { ctl.abort(); }, 7000) : null;
+  var o = opts || {}; if (ctl) o.signal = ctl.signal;
+  return fetch(h + path, o).then(function (r) { if (t) clearTimeout(t); delete relayDead[h]; return r; },
+    function (e) { if (t) clearTimeout(t); relayDead[h] = Date.now(); throw e; });
+}
+function relaySend(payload) {
+  var body = JSON.stringify(payload), hosts = relayLive(), left = hosts.length;
+  return new Promise(function (resolve) {
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC, { method: "POST", body: body })
+        .then(function (r) { if (r.ok) resolve(true); else if (--left === 0) resolve(false); },
+          function () { if (--left === 0) resolve(false); });
+    });
+  });
+}
+function relayPoll(reqId, since) {
+  var hosts = relayLive(), texts = [], left = hosts.length;
+  return new Promise(function (resolve) {
+    var done = false, grace = null;
+    function finish() {
+      if (done) return; done = true; if (grace) clearTimeout(grace);
+      var best = null, bestSeq = -1;
+      texts.forEach(function (text) {
+        text.split(String.fromCharCode(10)).forEach(function (line) {
+          if (!line) return;
+          try {
+            var ev = JSON.parse(line), m = JSON.parse(ev.message || "{}");
+            var seq = m.seq || ev.time || 0;
+            if (m.req === reqId && seq >= bestSeq) { best = m; bestSeq = seq; }
+          } catch (e) {}
+        });
+      });
+      resolve(best);
+    }
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC + "-status/json?poll=1&since=" + since, { cache: "no-store" })
+        .then(function (r) { return r.text(); })
+        .then(function (t) { texts.push(t); if (!grace) grace = setTimeout(finish, 2000); }, function () {})
+        .then(function () { if (--left === 0) finish(); });
+    });
+  });
+}
   // 이 요청(reqId)에 대한 이 Mac 서버의 답을 몇 초마다 읽어 버튼 아래에 보여줍니다.
   function followDraft(reqId, since, t0, heard) {
     setTimeout(function () {
-      fetch(RELAY + '/' + RELAY_TOPIC + '-status/json?poll=1&since=' + since, { cache: 'no-store' })
-        .then(function (r) { return r.text(); })
-        .then(function (text) {
-          var latest = null;
-          text.split(String.fromCharCode(10)).forEach(function (line) {
-            if (!line) return;
-            try {
-              var ev = JSON.parse(line);
-              var m = JSON.parse(ev.message || '{}');
-              if (m.req === reqId) latest = m;
-            } catch (e) {}
-          });
+      relayPoll(reqId, since)
+        .then(function (latest) {
           if (!latest) {
             if (!heard && Date.now() - t0 > 25000) {
               autoBtn.disabled = false;

@@ -571,29 +571,73 @@
 <script>
 (function () {
   // 작업 파일 열기: 이 페이지는 공개 사이트라 내 Mac 의 파일을 직접 못 엽니다. 자동 작성 버튼과
-  // 같은 중계(ntfy.sh)로 이 Mac 서버에 "열어 줘"를 보내면, 서버가 list.csv 를 기본 앱으로 엽니다.
+  // 같은 중계(ntfy 서버 여러 곳)로 이 Mac 서버에 "열어 줘"를 보내면, 서버가 list.csv 를 기본 앱으로 엽니다.
   var btn = document.getElementById("openSheetBtn");
   var msg = document.getElementById("sheetMsg");
   if (!btn) return;
-  var RELAY = "https://ntfy.sh", TOPIC = "nbsdraft-ac5ccd953fdff173423c";
+  var RELAYS = ["https://ntfy.sh","https://ntfy.adminforge.de","https://ntfy.envs.net"], RELAY_TOPIC = "nbsdraft-ac5ccd953fdff173423c";
+var relayDead = {};
+function relayLive() {
+  var now = Date.now(), live = RELAYS.filter(function (h) { return !relayDead[h] || now - relayDead[h] > 60000; });
+  return live.length ? live : RELAYS;
+}
+function relayFetch(h, path, opts) {
+  var ctl = window.AbortController ? new AbortController() : null;
+  var t = ctl ? setTimeout(function () { ctl.abort(); }, 7000) : null;
+  var o = opts || {}; if (ctl) o.signal = ctl.signal;
+  return fetch(h + path, o).then(function (r) { if (t) clearTimeout(t); delete relayDead[h]; return r; },
+    function (e) { if (t) clearTimeout(t); relayDead[h] = Date.now(); throw e; });
+}
+function relaySend(payload) {
+  var body = JSON.stringify(payload), hosts = relayLive(), left = hosts.length;
+  return new Promise(function (resolve) {
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC, { method: "POST", body: body })
+        .then(function (r) { if (r.ok) resolve(true); else if (--left === 0) resolve(false); },
+          function () { if (--left === 0) resolve(false); });
+    });
+  });
+}
+function relayPoll(reqId, since) {
+  var hosts = relayLive(), texts = [], left = hosts.length;
+  return new Promise(function (resolve) {
+    var done = false, grace = null;
+    function finish() {
+      if (done) return; done = true; if (grace) clearTimeout(grace);
+      var best = null, bestSeq = -1;
+      texts.forEach(function (text) {
+        text.split(String.fromCharCode(10)).forEach(function (line) {
+          if (!line) return;
+          try {
+            var ev = JSON.parse(line), m = JSON.parse(ev.message || "{}");
+            var seq = m.seq || ev.time || 0;
+            if (m.req === reqId && seq >= bestSeq) { best = m; bestSeq = seq; }
+          } catch (e) {}
+        });
+      });
+      resolve(best);
+    }
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC + "-status/json?poll=1&since=" + since, { cache: "no-store" })
+        .then(function (r) { return r.text(); })
+        .then(function (t) { texts.push(t); if (!grace) grace = setTimeout(finish, 2000); }, function () {})
+        .then(function () { if (--left === 0) finish(); });
+    });
+  });
+}
   btn.addEventListener("click", function () {
     if (btn.disabled) return;
     btn.disabled = true;
     var req = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
     var since = Math.floor(Date.now() / 1000) - 5, t0 = Date.now();
     msg.textContent = "이 Mac에서 여는 중…";
-    fetch(RELAY + "/" + TOPIC, { method: "POST", body: JSON.stringify({ req: req, action: "open-list" }) })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); poll(); })
+    relaySend({ req: req, action: "open-list" })
+      .then(function (ok) { if (!ok) throw new Error("relay"); poll(); })
       .catch(function () { btn.disabled = false; msg.textContent = "요청을 보내지 못했어요 — 인터넷 연결을 확인해 주세요."; });
     function poll() {
       setTimeout(function () {
-        fetch(RELAY + "/" + TOPIC + "-status/json?poll=1&since=" + since, { cache: "no-store" })
-          .then(function (r) { return r.text(); })
-          .then(function (text) {
-            var got = null;
-            text.split(String.fromCharCode(10)).forEach(function (line) {
-              try { var m = JSON.parse(JSON.parse(line).message || "{}"); if (m.req === req) got = m; } catch (e) {}
-            });
+        relayPoll(req, since)
+          .then(function (got) {
             if (got) { btn.disabled = false; msg.textContent = (got.state === "done" ? "✅ " : "열지 못했어요: ") + got.message; return; }
             if (Date.now() - t0 > 20000) { btn.disabled = false; msg.textContent = "이 Mac의 서버가 답이 없어요 — node server.js 가 켜져 있는지 확인해 주세요."; return; }
             poll();
