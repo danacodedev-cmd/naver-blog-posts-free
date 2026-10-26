@@ -20,14 +20,34 @@
   button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
   .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
     font-weight: 700; text-decoration: none; display: inline-block; }
-  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
-  #publishToggle.published { background: #e6f8ee; color: #03a353; }
-  /* The action row: primary copy takes the width it needs to be the obvious tap target,
-     the secondary sits beside it rather than wrapping onto its own line. */
+  /* 작업 줄: [예약 날짜] [발행 완료] [네이버에 자동 작성]. 본문 복사는 자동 작성으로 대신해서
+     뺐습니다(2026-10-13). 세 칸 높이를 48px 로 맞추고, 주 버튼이 남는 폭을 다 씁니다. */
   .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
-    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
-  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
-  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+    padding: 12px 16px; display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: stretch; }
+  .sched-card { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-height: 48px;
+    padding: 5px 16px; border: 1.5px solid; border-radius: 12px; box-sizing: border-box; white-space: nowrap; }
+  .sched-card.none { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+  .sched-card-label { font-size: 11px; font-weight: 700; opacity: .75; letter-spacing: .2px; }
+  .sched-card-when { font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+  .sched-card-time { margin-left: 8px; padding-left: 8px; border-left: 1.5px solid currentColor; }
+  .pub-toggle { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; box-sizing: border-box;
+    border: 1.5px solid #d1d5db; border-radius: 12px; background: #fff; color: #4b5563; font-size: 14px; font-weight: 700;
+    cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap; }
+  .pub-toggle input { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 0; flex-shrink: 0;
+    border: 2px solid #c4c9d0; border-radius: 6px; background: #fff; display: grid; place-content: center; cursor: pointer; }
+  .pub-toggle input:checked { background: #03c75a; border-color: #03c75a; }
+  .pub-toggle input:checked::after { content: ''; width: 5px; height: 10px; margin-top: -2px;
+    border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+  .pub-toggle.published { background: #ecfbf2; border-color: #03c75a; color: #03a353; }
+  #autoDraftBtn { min-height: 48px; padding: 0 20px; border-radius: 12px; background: #03c75a; color: #fff;
+    font-size: 16px; font-weight: 800; white-space: nowrap; }
+  #autoDraftBtn:hover { background: #02b351; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  @media (max-width: 480px) {
+    .actionbar { grid-template-columns: 1fr auto; }
+    .sched-card-when { font-size: 15px; }
+    #autoDraftBtn { grid-column: 1 / -1; }
+  }
   #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
     padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
   #msg.show { display: block; }
@@ -54,15 +74,6 @@
   /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
   #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
   #msg.warn .cat-line { font-size: 16.5px; }
-  #keywordResearch { max-width: 700px; margin: 14px auto 0; padding: 16px 18px; background: #fff;
-    border: 1px solid #dbeafe; border-radius: 10px; color: #334155; box-sizing: border-box; }
-  #keywordResearch h2 { margin: 0 0 12px; font-size: 15px; color: #0f172a; }
-  #keywordResearch div + div { margin-top: 12px; }
-  #keywordResearch b { display: block; margin-bottom: 6px; font-size: 12px; color: #64748b; }
-  #keywordResearch p { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
-  #keywordResearch span { display: inline-block; padding: 6px 9px; border-radius: 999px;
-    background: #eff6ff; color: #1d4ed8; font-size: 12.5px; font-weight: 700; }
-  #keywordResearch small { display: block; margin-top: 12px; color: #94a3b8; font-size: 11.5px; }
   #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
   #post img { max-width: 100%; height: auto; }
   #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
@@ -118,6 +129,13 @@
   .cat-wrap { text-align: center; margin: 10px 0 18px; }
   .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
     font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  
+  .sched { display: inline-flex; align-items: stretch; border: 1.5px solid; border-radius: 7px; overflow: hidden;
+    font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; vertical-align: middle; }
+  .sched-date { padding: 4px 6px; }
+  .sched-time { padding: 4px 6px; background: #fff; }
+  .sched-big { font-size: 16px; border-radius: 9px; }
+  .sched-big .sched-date, .sched-big .sched-time { padding: 8px 10px; }
   .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
@@ -126,7 +144,6 @@
 <div class="topbar">
   <div class="topbar-nav">
     <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
-    <button id="publishToggle" type="button">발행 전</button>
   </div>
   <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="화장품/미용" style="background:#fbeff3;color:#8c3757;border:1.5px solid #f0cad8;">화장품/미용</span></div>
   <h1 id="titleText" class="visually-hidden">등드름 바디워시, 씻어도 안 사라질 때 살리실산 성분부터 확인</h1>
@@ -135,15 +152,10 @@
 <div id="titlePicker"><button type="button" class="title-opt active" data-title="등드름 바디워시, 씻어도 안 사라질 때 살리실산 성분부터 확인"><span class="tp-num">1</span><span class="tp-text">등드름 바디워시, 씻어도 안 사라질 때 살리실산 성분부터 확인</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="살리실산 바디워시 고를 때 거품량 향 지속력 후기로 본 체크 포인트"><span class="tp-num">2</span><span class="tp-text">살리실산 바디워시 고를 때 거품량 향 지속력 후기로 본 체크 포인트</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="살리실산 바디워시 올리브영에서 샴푸까지 한 번에 해결하는 올인원 젤클렌저"><span class="tp-num">3</span><span class="tp-text">살리실산 바디워시 올리브영에서 샴푸까지 한 번에 해결하는 올인원 젤클렌저</span><span class="tp-mark">사용 중</span></button></div>
 </div>
 <div class="actionbar">
-  <button id="copyBtn" type="button">본문 복사</button>
-  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+  <div class="sched-card" style="background:#fef3c7;color:#a16207;border-color:#a1620733"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">10월 27일 (화)<span class="sched-card-time">18:40</span></span></div>
+  <label class="pub-toggle"><input type="checkbox" id="publishCheck"><span>발행 완료</span></label>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
 </div>
-<section id="keywordResearch" aria-label="SEO 키워드 선정 근거">
-  <h2>SEO 키워드 선정 근거</h2>
-  <div><b>메인 키워드 3개</b><p><span>바디워시</span><span>등드름</span><span>살리실산 바디워시</span></p></div>
-  <div><b>네이버 자동완성에서 고른 최종 키워드 3개</b><p><span>등드름 바디워시</span><span>살리실산 바디워시</span><span>살리실산 바디워시 올리브영</span></p></div>
-  <small>이 영역은 작성자 확인용이며 본문 복사에는 포함되지 않습니다.</small>
-</section>
 <div id="msg"></div>
 <div id="catPop" hidden>
   <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
@@ -183,7 +195,7 @@
   </ul>
   <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
 </div>
-<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">등드름 바디워시 찾아보시는</p><p style="text-align:center;margin:0;color:#000000;">분들 보면 대부분 얼굴은</p><p style="text-align:center;margin:0;color:#000000;">멀쩡한데 등이나 어깨</p><p style="text-align:center;margin:0;color:#000000;">쪽에만 뭐가 자꾸</p><p style="text-align:center;margin:0;color:#000000;">올라오는 경우더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저도 그랬거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">세안제는 신경 써서 바꿔봐도 등</p><p style="text-align:center;margin:0;color:#000000;">쪽은 그냥 몸 비누로 대충 씻고</p><p style="text-align:center;margin:0;color:#000000;">끝내는 경우가 많아서,</p><p style="text-align:center;margin:0;color:#000000;">사실 등드름은 세정 자체보다</p><p style="text-align:center;margin:0;color:#000000;">어떤 성분으로 씻느냐가 더</p><p style="text-align:center;margin:0;color:#000000;">중요한 부위인 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/11-1.jpg" alt="오프온 바디클렌저 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> 등드름 바디워시, 그냥 씻기만 하면 안 없어지는 이유</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 살리실산 바디워시 성분표 보기 전에 알아야 할 것</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 살리실산 바디워시 올리브영에서 고를 때 봐야 할 기준</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> 500ml 용량 써보고 느낀 점</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">등드름 바디워시, 그냥 씻기만 하면 안 없어지는 이유</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">등은 피지선이 많은데 손이 잘</p><p style="text-align:center;margin:0;color:#000000;">안 닿는 부위라 거품이 고르게</p><p style="text-align:center;margin:0;color:#000000;">안 닿을 때가 많아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그래서 일반 비누 거품으로 휙</p><p style="text-align:center;margin:0;color:#000000;">지나가면 피지랑 노폐물이 모공</p><p style="text-align:center;margin:0;color:#000000;">안에 그대로 남아있는</p><p style="text-align:center;margin:0;color:#000000;">경우가 생기더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여기서 등드름 바디워시를 따로</p><p style="text-align:center;margin:0;color:#000000;">찾게 되는 이유가 나오는 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그냥 세정력보다는 모공 안쪽까지</p><p style="text-align:center;margin:0;color:#000000;">신경 쓴 성분이 들어있는지를</p><p style="text-align:center;margin:0;color:#000000;">보게 되는 거죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 살리실산이</p><p style="text-align:center;margin:0;color:#000000;">들어간 쿨바디워시인데,</p><p style="text-align:center;margin:0;color:#000000;">운동 후 땀 많이 흘리고</p><p style="text-align:center;margin:0;color:#000000;">바로 씻을 때 쓰기 좋더라구요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/11-2.jpg" alt="오프온 바디클렌저 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">살리실산 바디워시 성분표 보기 전에 알아야 할 것</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">살리실산 바디워시를 고를 때 제일</p><p style="text-align:center;margin:0;color:#000000;">먼저 보는 게 살리실산이 실제로</p><p style="text-align:center;margin:0;color:#000000;">들어있는지, 그리고 향이나</p><p style="text-align:center;margin:0;color:#000000;">쿨링감처럼 같이 쓰는 데 거부감</p><p style="text-align:center;margin:0;color:#000000;">없는 제형인지였어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 체취 관리도 같이</p><p style="text-align:center;margin:0;color:#000000;">고민하고 있었는데,</p><p style="text-align:center;margin:0;color:#000000;">이 제품은 퍼퓸샤워 타입이라</p><p style="text-align:center;margin:0;color:#000000;">씻고 나서 향이 남는 느낌이</p><p style="text-align:center;margin:0;color:#000000;">있어서 좋았어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 살리실산이 들어있다고</p><p style="text-align:center;margin:0;color:#000000;">해서 등드름이 바로 사라진다고</p><p style="text-align:center;margin:0;color:#000000;">단정할 수는 없어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">제가 확인한 건 성분이</p><p style="text-align:center;margin:0;color:#000000;">들어있다는 것뿐이지,</p><p style="text-align:center;margin:0;color:#000000;">피부 반응은 사람마다 다르니까요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그래서 저는 일단 꾸준히</p><p style="text-align:center;margin:0;color:#000000;">써보면서 등 상태를</p><p style="text-align:center;margin:0;color:#000000;">지켜보는 쪽으로</p><p style="text-align:center;margin:0;color:#000000;">생각하고 쓰고 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">살리실산 바디워시 특유의</p><p style="text-align:center;margin:0;color:#000000;">쿨링감이 있어서 씻을 때</p><p style="text-align:center;margin:0;color:#000000;">시원한 느낌은 확실히 있더라구요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">그래서 저도 살 때 가격을 좀<br>찾아봤는데요,<br>500ml 용량이라 가격대<br>확인해보고 괜찮으면 같이 쓰는<br>로션이랑도 비교해보세요.</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#8a8f96;">⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</span></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xiLykZnu</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">살리실산 바디워시 올리브영에서 고를 때 봐야 할 기준</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">살리실산 바디워시 올리브영</p><p style="text-align:center;margin:0;color:#000000;">매대 가면 종류가 꽤 많아서</p><p style="text-align:center;margin:0;color:#000000;">고르기 어려운데,</p><p style="text-align:center;margin:0;color:#000000;">저는 올인원으로 쓸 수</p><p style="text-align:center;margin:0;color:#000000;">있는지를 기준으로 봤어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 올인원샴푸</p><p style="text-align:center;margin:0;color:#000000;">겸용이라 바디워시랑 샴푸를</p><p style="text-align:center;margin:0;color:#000000;">따로 안 사도 되는</p><p style="text-align:center;margin:0;color:#000000;">게 편했거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여행 갈 때도 하나만 챙기면</p><p style="text-align:center;margin:0;color:#000000;">되니까 짐이 줄어드는</p><p style="text-align:center;margin:0;color:#000000;">느낌이었어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 가지 아쉬운 점은</p><p style="text-align:center;margin:0;color:#000000;">올인원이다 보니 머릿결 전용</p><p style="text-align:center;margin:0;color:#000000;">샴푸보다는 세정력 위주라는</p><p style="text-align:center;margin:0;color:#000000;">느낌이 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 이건 평소에 머릿결</p><p style="text-align:center;margin:0;color:#000000;">관리를 따로 하는 분이면</p><p style="text-align:center;margin:0;color:#000000;">크게 신경 안 쓰여도</p><p style="text-align:center;margin:0;color:#000000;">될 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 운동 다니고 나서</p><p style="text-align:center;margin:0;color:#000000;">빠르게 씻어야 할 때 주로</p><p style="text-align:center;margin:0;color:#000000;">쓰고, 평소에는 원래 쓰던</p><p style="text-align:center;margin:0;color:#000000;">샴푸를 따로 쓰고 있어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">500ml 용량 써보고 느낀 점</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 500ml 용량이라</p><p style="text-align:center;margin:0;color:#000000;">혼자 쓰면 꽤 오랫동안 쓸</p><p style="text-align:center;margin:0;color:#000000;">수 있더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 거의 매일 쓰는데도</p><p style="text-align:center;margin:0;color:#000000;">한 통으로 한참 버텨서,</p><p style="text-align:center;margin:0;color:#000000;">재구매 주기 생각하면 가성비는</p><p style="text-align:center;margin:0;color:#000000;">괜찮다고 느꼈어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">브랜드 안에 등드름바디워시</p><p style="text-align:center;margin:0;color:#000000;">2입으로 묶인 구성도 있던데,</p><p style="text-align:center;margin:0;color:#000000;">혼자 오래 쓸 거면 500ml</p><p style="text-align:center;margin:0;color:#000000;">하나로도 충분한 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 샤워할 때 양을</p><p style="text-align:center;margin:0;color:#000000;">넉넉하게 쓰는 편이면</p><p style="text-align:center;margin:0;color:#000000;">생각보다 빨리 줄어들 수도</p><p style="text-align:center;margin:0;color:#000000;">있으니, 평소 본인이 거품을</p><p style="text-align:center;margin:0;color:#000000;">많이 내는 편인지 한번</p><p style="text-align:center;margin:0;color:#000000;">생각해보시면 좋을 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">등드름 바디워시 바꾸고 나서</p><p style="text-align:center;margin:0;color:#000000;">가장 크게 느낀 건,</p><p style="text-align:center;margin:0;color:#000000;">씻고 난 뒤 쿨링감이 남아있는</p><p style="text-align:center;margin:0;color:#000000;">느낌이 생각보다 오래 가서</p><p style="text-align:center;margin:0;color:#000000;">여름에 특히 좋았다는 거예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">체취 관리까지 같이 생각하시는</p><p style="text-align:center;margin:0;color:#000000;">분이면 퍼퓸샤워 타입으로 한번</p><p style="text-align:center;margin:0;color:#000000;">써보셔도 괜찮을 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">등드름 바디워시 바꾸기 전에<br>가격이랑 구성 한 번만 더<br>찾아보고 결정하셔도 늦지 않아요.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xiLykZnu</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#오프온 #바디클렌저 #바디케어 #향기좋은바디워시 #향좋은 #노인냄새제거 #대용량 #스크럽워시 #여행용 #쿨링 #등드름바디워시 #살리실산바디워시</span></p></div></div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">등드름 바디워시 찾아보시는</p><p style="text-align:center;margin:0;color:#000000;">분들 보면 대부분 얼굴은</p><p style="text-align:center;margin:0;color:#000000;">멀쩡한데 등이나 어깨</p><p style="text-align:center;margin:0;color:#000000;">쪽에만 뭐가 자꾸</p><p style="text-align:center;margin:0;color:#000000;">올라오는 경우더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저도 그랬거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">세안제는 신경 써서 바꿔봐도 등</p><p style="text-align:center;margin:0;color:#000000;">쪽은 그냥 몸 비누로 대충 씻고</p><p style="text-align:center;margin:0;color:#000000;">끝내는 경우가 많아서,</p><p style="text-align:center;margin:0;color:#000000;">사실 등드름은 세정 자체보다</p><p style="text-align:center;margin:0;color:#000000;">어떤 성분으로 씻느냐가 더</p><p style="text-align:center;margin:0;color:#000000;">중요한 부위인 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/11-1.jpg" alt="오프온 바디클렌저 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> 등드름 바디워시, 그냥 씻기만 하면 안 없어지는 이유</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 살리실산 바디워시 성분표 보기 전에 알아야 할 것</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 살리실산 바디워시 올리브영에서 고를 때 봐야 할 기준</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> 500ml 용량 써보고 느낀 점</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">등드름 바디워시, 그냥 씻기만 하면 안 없어지는 이유</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">등은 피지선이 많은데 손이 잘</p><p style="text-align:center;margin:0;color:#000000;">안 닿는 부위라 거품이 고르게</p><p style="text-align:center;margin:0;color:#000000;">안 닿을 때가 많아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그래서 일반 비누 거품으로 휙</p><p style="text-align:center;margin:0;color:#000000;">지나가면 피지랑 노폐물이 모공</p><p style="text-align:center;margin:0;color:#000000;">안에 그대로 남아있는</p><p style="text-align:center;margin:0;color:#000000;">경우가 생기더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여기서 등드름 바디워시를 따로</p><p style="text-align:center;margin:0;color:#000000;">찾게 되는 이유가 나오는 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그냥 세정력보다는 모공 안쪽까지</p><p style="text-align:center;margin:0;color:#000000;">신경 쓴 성분이 들어있는지를</p><p style="text-align:center;margin:0;color:#000000;">보게 되는 거죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 살리실산이</p><p style="text-align:center;margin:0;color:#000000;">들어간 쿨바디워시인데,</p><p style="text-align:center;margin:0;color:#000000;">운동 후 땀 많이 흘리고</p><p style="text-align:center;margin:0;color:#000000;">바로 씻을 때 쓰기 좋더라구요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/11-2.jpg" alt="오프온 바디클렌저 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">살리실산 바디워시 성분표 보기 전에 알아야 할 것</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">살리실산 바디워시를 고를 때 제일</p><p style="text-align:center;margin:0;color:#000000;">먼저 보는 게 살리실산이 실제로</p><p style="text-align:center;margin:0;color:#000000;">들어있는지, 그리고 향이나</p><p style="text-align:center;margin:0;color:#000000;">쿨링감처럼 같이 쓰는 데 거부감</p><p style="text-align:center;margin:0;color:#000000;">없는 제형인지였어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 체취 관리도 같이</p><p style="text-align:center;margin:0;color:#000000;">고민하고 있었는데,</p><p style="text-align:center;margin:0;color:#000000;">이 제품은 퍼퓸샤워 타입이라</p><p style="text-align:center;margin:0;color:#000000;">씻고 나서 향이 남는 느낌이</p><p style="text-align:center;margin:0;color:#000000;">있어서 좋았어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 살리실산이 들어있다고</p><p style="text-align:center;margin:0;color:#000000;">해서 등드름이 바로 사라진다고</p><p style="text-align:center;margin:0;color:#000000;">단정할 수는 없어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">제가 확인한 건 성분이</p><p style="text-align:center;margin:0;color:#000000;">들어있다는 것뿐이지,</p><p style="text-align:center;margin:0;color:#000000;">피부 반응은 사람마다 다르니까요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그래서 저는 일단 꾸준히</p><p style="text-align:center;margin:0;color:#000000;">써보면서 등 상태를</p><p style="text-align:center;margin:0;color:#000000;">지켜보는 쪽으로</p><p style="text-align:center;margin:0;color:#000000;">생각하고 쓰고 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">살리실산 바디워시 특유의</p><p style="text-align:center;margin:0;color:#000000;">쿨링감이 있어서 씻을 때</p><p style="text-align:center;margin:0;color:#000000;">시원한 느낌은 확실히 있더라구요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">그래서 저도 살 때 가격을 좀<br>찾아봤는데요,<br>500ml 용량이라 가격대<br>확인해보고 괜찮으면 같이 쓰는<br>로션이랑도 비교해보세요.</span></b><cite style="display:block;margin-top:14px;font-style:normal;font-size:13px;color:#8a8f96;line-height:1.6;">오프온 등드름 쿨바디워시 퍼퓸샤워 올인원샴푸 등여드름 남자체취 살리실산 올리브영 젤클렌져<br>⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</cite></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xiLykZnu</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">살리실산 바디워시 올리브영에서 고를 때 봐야 할 기준</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">살리실산 바디워시 올리브영</p><p style="text-align:center;margin:0;color:#000000;">매대 가면 종류가 꽤 많아서</p><p style="text-align:center;margin:0;color:#000000;">고르기 어려운데,</p><p style="text-align:center;margin:0;color:#000000;">저는 올인원으로 쓸 수</p><p style="text-align:center;margin:0;color:#000000;">있는지를 기준으로 봤어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 올인원샴푸</p><p style="text-align:center;margin:0;color:#000000;">겸용이라 바디워시랑 샴푸를</p><p style="text-align:center;margin:0;color:#000000;">따로 안 사도 되는</p><p style="text-align:center;margin:0;color:#000000;">게 편했거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여행 갈 때도 하나만 챙기면</p><p style="text-align:center;margin:0;color:#000000;">되니까 짐이 줄어드는</p><p style="text-align:center;margin:0;color:#000000;">느낌이었어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 가지 아쉬운 점은</p><p style="text-align:center;margin:0;color:#000000;">올인원이다 보니 머릿결 전용</p><p style="text-align:center;margin:0;color:#000000;">샴푸보다는 세정력 위주라는</p><p style="text-align:center;margin:0;color:#000000;">느낌이 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 이건 평소에 머릿결</p><p style="text-align:center;margin:0;color:#000000;">관리를 따로 하는 분이면</p><p style="text-align:center;margin:0;color:#000000;">크게 신경 안 쓰여도</p><p style="text-align:center;margin:0;color:#000000;">될 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 운동 다니고 나서</p><p style="text-align:center;margin:0;color:#000000;">빠르게 씻어야 할 때 주로</p><p style="text-align:center;margin:0;color:#000000;">쓰고, 평소에는 원래 쓰던</p><p style="text-align:center;margin:0;color:#000000;">샴푸를 따로 쓰고 있어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">500ml 용량 써보고 느낀 점</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 500ml 용량이라</p><p style="text-align:center;margin:0;color:#000000;">혼자 쓰면 꽤 오랫동안 쓸</p><p style="text-align:center;margin:0;color:#000000;">수 있더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 거의 매일 쓰는데도</p><p style="text-align:center;margin:0;color:#000000;">한 통으로 한참 버텨서,</p><p style="text-align:center;margin:0;color:#000000;">재구매 주기 생각하면 가성비는</p><p style="text-align:center;margin:0;color:#000000;">괜찮다고 느꼈어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">브랜드 안에 등드름바디워시</p><p style="text-align:center;margin:0;color:#000000;">2입으로 묶인 구성도 있던데,</p><p style="text-align:center;margin:0;color:#000000;">혼자 오래 쓸 거면 500ml</p><p style="text-align:center;margin:0;color:#000000;">하나로도 충분한 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 샤워할 때 양을</p><p style="text-align:center;margin:0;color:#000000;">넉넉하게 쓰는 편이면</p><p style="text-align:center;margin:0;color:#000000;">생각보다 빨리 줄어들 수도</p><p style="text-align:center;margin:0;color:#000000;">있으니, 평소 본인이 거품을</p><p style="text-align:center;margin:0;color:#000000;">많이 내는 편인지 한번</p><p style="text-align:center;margin:0;color:#000000;">생각해보시면 좋을 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">등드름 바디워시 바꾸고 나서</p><p style="text-align:center;margin:0;color:#000000;">가장 크게 느낀 건,</p><p style="text-align:center;margin:0;color:#000000;">씻고 난 뒤 쿨링감이 남아있는</p><p style="text-align:center;margin:0;color:#000000;">느낌이 생각보다 오래 가서</p><p style="text-align:center;margin:0;color:#000000;">여름에 특히 좋았다는 거예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">체취 관리까지 같이 생각하시는</p><p style="text-align:center;margin:0;color:#000000;">분이면 퍼퓸샤워 타입으로 한번</p><p style="text-align:center;margin:0;color:#000000;">써보셔도 괜찮을 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">등드름 바디워시 바꾸기 전에<br>가격이랑 구성 한 번만 더<br>찾아보고 결정하셔도 늦지 않아요.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xiLykZnu</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#오프온 #바디클렌저 #바디케어 #향기좋은바디워시 #향좋은 #노인냄새제거 #대용량 #스크럽워시 #여행용 #쿨링 #등드름바디워시 #살리실산바디워시</span></p></div></div>
 <div id="manualCopyBox" contenteditable="true"></div>
 <!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
      comment for why this has to be the copy source instead of the rendered DOM's text. -->
@@ -561,14 +573,7 @@ https://naver.me/xiLykZnu
     });
   }
 
-  document.getElementById('copyBtn').addEventListener('click', function () {
-    say('');
-    copyBody(
-      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
-      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
-      sayWithCategory
-    );
-  });
+  // 본문 복사 버튼은 2026-10-13 에 뺐습니다 — 글은 "네이버에 자동 작성"으로 옮깁니다.
 
   var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
   if (bodyOnlyBtn) {
@@ -595,13 +600,6 @@ https://naver.me/xiLykZnu
     } else {
       say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
     }
-  }
-
-  var productNameBtn = document.getElementById('copyProductNameBtn');
-  if (productNameBtn) {
-    productNameBtn.addEventListener('click', function () {
-      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
-    });
   }
 
   // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
@@ -712,11 +710,11 @@ https://naver.me/xiLykZnu
       Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById('titleText').textContent = btn.getAttribute('data-title');
-      say('이 제목으로 복사됩니다.');
+      say('이 제목으로 복사·자동 작성됩니다.');
     });
   });
 
-  var publishBtn = document.getElementById('publishToggle');
+  var publishCheck = document.getElementById('publishCheck');
   var publishKey = 'nbp_published_' + location.pathname;
   // The spreadsheet's value is the starting point; once this browser records a choice, that
   // choice wins — the person tapping the button is looking at the post right now.
@@ -727,22 +725,127 @@ https://naver.me/xiLykZnu
       var stored = localStorage.getItem(publishKey);
       if (stored !== null) done = stored === '1';
     } catch (e) {}
-    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
-    publishBtn.classList.toggle('published', done);
+    publishCheck.checked = done;
+    publishCheck.parentNode.classList.toggle('published', done);
   }
-  publishBtn.addEventListener('click', function () {
-    var done = sheetPublished;
-    try {
-      var stored = localStorage.getItem(publishKey);
-      if (stored !== null) done = stored === '1';
-    } catch (e) {}
-    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+  publishCheck.addEventListener('change', function () {
+    try { localStorage.setItem(publishKey, publishCheck.checked ? '1' : '0'); } catch (e) {}
     renderPublishState();
   });
   renderPublishState();
   // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
   // navigation here can otherwise show a stale button until a manual reload.
   window.addEventListener('pageshow', renderPublishState);
+
+  // 이 페이지의 주소에서 배치 폴더와 이 글의 순번을 읽습니다 — resultsArchive.js 가
+  // 파일을 "<폴더>/01-제목.html" 로 저장하므로, 서버에 다시 물어볼 필요 없이 주소만으로
+  // 압니다. 이 Mac에서 로컬 서버(3100)가 켜져 있어야 동작합니다 — 그 서버만
+  // 네이버 창을 띄울 수 있습니다.
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // 템플릿 리터럴 안에서는 정규식의 백슬래시가 살아남지 못하므로(\d 가 그냥 d 로
+      // 찍힘), 정규식 대신 문자열을 직접 잘라 폴더·순번을 읽습니다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      // 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      // 페이지를 떠나지 않고, 새 창도 열지 않습니다. 이 Mac 의 localhost 를 직접 부르면 크롬이
+      // 로컬 네트워크 권한을 요구해서, 공개 중계(ntfy 서버 여러 곳)에 요청을 놓고 이 Mac 서버가 그걸 받아
+      // 네이버 글쓰기 창을 엽니다(src/draftRelay.js). 진행 상황도 같은 중계로 돌아옵니다.
+      if (autoBtn.disabled) return;
+      autoBtn.disabled = true;
+      var reqId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      var since = Math.floor(Date.now() / 1000) - 5;
+      say('이 Mac에 자동 작성을 요청하는 중…');
+      relaySend({ req: reqId, folder: folder, index: idx, title: chosenTitle.trim() }).then(function (ok) {
+        if (!ok) throw new Error('중계 서버에 모두 연결하지 못함');
+        followDraft(reqId, since, Date.now(), false);
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        say('요청을 보내지 못했어요 — 인터넷 연결을 확인하고 다시 눌러주세요. (' + (e && e.message || '') + ')');
+      });
+    });
+  }
+
+  var RELAYS = ["https://ntfy.sh","https://ntfy.adminforge.de","https://ntfy.envs.net"], RELAY_TOPIC = "nbsdraft-ac5ccd953fdff173423c";
+var relayDead = {};
+function relayLive() {
+  var now = Date.now(), live = RELAYS.filter(function (h) { return !relayDead[h] || now - relayDead[h] > 60000; });
+  return live.length ? live : RELAYS;
+}
+function relayFetch(h, path, opts) {
+  var ctl = window.AbortController ? new AbortController() : null;
+  var t = ctl ? setTimeout(function () { ctl.abort(); }, 7000) : null;
+  var o = opts || {}; if (ctl) o.signal = ctl.signal;
+  return fetch(h + path, o).then(function (r) { if (t) clearTimeout(t); delete relayDead[h]; return r; },
+    function (e) { if (t) clearTimeout(t); relayDead[h] = Date.now(); throw e; });
+}
+function relaySend(payload) {
+  var body = JSON.stringify(payload), hosts = relayLive(), left = hosts.length;
+  return new Promise(function (resolve) {
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC, { method: "POST", body: body })
+        .then(function (r) { if (r.ok) resolve(true); else if (--left === 0) resolve(false); },
+          function () { if (--left === 0) resolve(false); });
+    });
+  });
+}
+function relayPoll(reqId, since) {
+  var hosts = relayLive(), texts = [], left = hosts.length;
+  return new Promise(function (resolve) {
+    var done = false, grace = null;
+    function finish() {
+      if (done) return; done = true; if (grace) clearTimeout(grace);
+      var best = null, bestSeq = -1;
+      texts.forEach(function (text) {
+        text.split(String.fromCharCode(10)).forEach(function (line) {
+          if (!line) return;
+          try {
+            var ev = JSON.parse(line), m = JSON.parse(ev.message || "{}");
+            var seq = m.seq || ev.time || 0;
+            if (m.req === reqId && seq >= bestSeq) { best = m; bestSeq = seq; }
+          } catch (e) {}
+        });
+      });
+      resolve(best);
+    }
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC + "-status/json?poll=1&since=" + since, { cache: "no-store" })
+        .then(function (r) { return r.text(); })
+        .then(function (t) { texts.push(t); if (!grace) grace = setTimeout(finish, 2000); }, function () {})
+        .then(function () { if (--left === 0) finish(); });
+    });
+  });
+}
+  // 이 요청(reqId)에 대한 이 Mac 서버의 답을 몇 초마다 읽어 버튼 아래에 보여줍니다.
+  function followDraft(reqId, since, t0, heard) {
+    setTimeout(function () {
+      relayPoll(reqId, since)
+        .then(function (latest) {
+          if (!latest) {
+            if (!heard && Date.now() - t0 > 25000) {
+              autoBtn.disabled = false;
+              say('이 Mac의 서버가 답이 없어요 — 터미널에서 node server.js 가 켜져 있는지 확인하고 다시 눌러주세요.');
+              return;
+            }
+            if (!heard) say('이 Mac에 자동 작성을 요청하는 중…');
+            return followDraft(reqId, since, t0, heard);
+          }
+          if (latest.state === 'done') { autoBtn.disabled = false; say('✅ ' + latest.message); return; }
+          if (latest.state === 'failed') { autoBtn.disabled = false; say('작성 실패: ' + latest.message); return; }
+          if (latest.state === 'login') say(latest.message);
+          else if (latest.state === 'started') say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
+          else say('네이버 창에 작성하는 중… ' + (latest.message || ''));
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          followDraft(reqId, since, t0, true);
+        })
+        .catch(function () { followDraft(reqId, since, t0, heard); });
+    }, 1500);
+  }
 })();
 </script>
 </body>

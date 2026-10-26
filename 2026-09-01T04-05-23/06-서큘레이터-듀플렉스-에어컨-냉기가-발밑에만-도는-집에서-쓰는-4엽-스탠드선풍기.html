@@ -20,11 +20,8 @@
   button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
   .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
     font-weight: 700; text-decoration: none; display: inline-block; }
-  /* 발행 여부. 목록 페이지의 체크박스와 같은 저장소(localStorage)를 써서 어느 쪽에서 체크해도 같이 바뀝니다. */
-  .pub-check-label { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 10px; font-size: 13px;
-    font-weight: 700; color: #6b7280; cursor: pointer; user-select: none; -webkit-user-select: none; flex-shrink: 0; }
-  .pub-check-label input { width: 17px; height: 17px; margin: 0; cursor: pointer; accent-color: #03c75a; }
-  .pub-check-label.published { color: #03a353; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
   /* The action row: primary copy takes the width it needs to be the obvious tap target,
      the secondary sits beside it rather than wrapping onto its own line. */
   .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
@@ -120,6 +117,7 @@
 <div class="topbar">
   <div class="topbar-nav">
     <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
   </div>
   <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="디지털/가전" style="background:#eef3fc;color:#23477e;border:1.5px solid #c3d4f2;">디지털/가전</span></div>
   <h1 id="titleText" class="visually-hidden">서큘레이터 듀플렉스 에어컨 냉기가 발밑에만 도는 집에서 쓰는 4엽 스탠드선풍기</h1>
@@ -129,7 +127,7 @@
 </div>
 <div class="actionbar">
   <button id="copyBtn" type="button">본문 복사</button>
-  <label class="pub-check-label"><input type="checkbox" id="publishCheck"> 발행 완료</label>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
 </div>
 <div id="msg"></div>
 <div id="catPop" hidden>
@@ -697,7 +695,7 @@ https://naver.me/GKIapzGw
     });
   });
 
-  var publishCheck = document.getElementById('publishCheck');
+  var publishBtn = document.getElementById('publishToggle');
   var publishKey = 'nbp_published_' + location.pathname;
   // The spreadsheet's value is the starting point; once this browser records a choice, that
   // choice wins — the person tapping the button is looking at the post right now.
@@ -708,11 +706,16 @@ https://naver.me/GKIapzGw
       var stored = localStorage.getItem(publishKey);
       if (stored !== null) done = stored === '1';
     } catch (e) {}
-    publishCheck.checked = done;
-    publishCheck.parentNode.classList.toggle('published', done);
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
   }
-  publishCheck.addEventListener('change', function () {
-    try { localStorage.setItem(publishKey, publishCheck.checked ? '1' : '0'); } catch (e) {}
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
     renderPublishState();
   });
   renderPublishState();

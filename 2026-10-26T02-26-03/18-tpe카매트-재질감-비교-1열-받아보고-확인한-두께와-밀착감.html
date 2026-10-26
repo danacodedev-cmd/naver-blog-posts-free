@@ -20,14 +20,34 @@
   button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
   .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
     font-weight: 700; text-decoration: none; display: inline-block; }
-  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
-  #publishToggle.published { background: #e6f8ee; color: #03a353; }
-  /* The action row: primary copy takes the width it needs to be the obvious tap target,
-     the secondary sits beside it rather than wrapping onto its own line. */
+  /* 작업 줄: [예약 날짜] [발행 완료] [네이버에 자동 작성]. 본문 복사는 자동 작성으로 대신해서
+     뺐습니다(2026-10-13). 세 칸 높이를 48px 로 맞추고, 주 버튼이 남는 폭을 다 씁니다. */
   .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
-    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
-  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
-  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+    padding: 12px 16px; display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: stretch; }
+  .sched-card { display: flex; flex-direction: column; justify-content: center; gap: 1px; min-height: 48px;
+    padding: 5px 16px; border: 1.5px solid; border-radius: 12px; box-sizing: border-box; white-space: nowrap; }
+  .sched-card.none { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+  .sched-card-label { font-size: 11px; font-weight: 700; opacity: .75; letter-spacing: .2px; }
+  .sched-card-when { font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+  .sched-card-time { margin-left: 8px; padding-left: 8px; border-left: 1.5px solid currentColor; }
+  .pub-toggle { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; box-sizing: border-box;
+    border: 1.5px solid #d1d5db; border-radius: 12px; background: #fff; color: #4b5563; font-size: 14px; font-weight: 700;
+    cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap; }
+  .pub-toggle input { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 0; flex-shrink: 0;
+    border: 2px solid #c4c9d0; border-radius: 6px; background: #fff; display: grid; place-content: center; cursor: pointer; }
+  .pub-toggle input:checked { background: #03c75a; border-color: #03c75a; }
+  .pub-toggle input:checked::after { content: ''; width: 5px; height: 10px; margin-top: -2px;
+    border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); }
+  .pub-toggle.published { background: #ecfbf2; border-color: #03c75a; color: #03a353; }
+  #autoDraftBtn { min-height: 48px; padding: 0 20px; border-radius: 12px; background: #03c75a; color: #fff;
+    font-size: 16px; font-weight: 800; white-space: nowrap; }
+  #autoDraftBtn:hover { background: #02b351; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  @media (max-width: 480px) {
+    .actionbar { grid-template-columns: 1fr auto; }
+    .sched-card-when { font-size: 15px; }
+    #autoDraftBtn { grid-column: 1 / -1; }
+  }
   #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
     padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
   #msg.show { display: block; }
@@ -54,15 +74,6 @@
   /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
   #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
   #msg.warn .cat-line { font-size: 16.5px; }
-  #keywordResearch { max-width: 700px; margin: 14px auto 0; padding: 16px 18px; background: #fff;
-    border: 1px solid #dbeafe; border-radius: 10px; color: #334155; box-sizing: border-box; }
-  #keywordResearch h2 { margin: 0 0 12px; font-size: 15px; color: #0f172a; }
-  #keywordResearch div + div { margin-top: 12px; }
-  #keywordResearch b { display: block; margin-bottom: 6px; font-size: 12px; color: #64748b; }
-  #keywordResearch p { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
-  #keywordResearch span { display: inline-block; padding: 6px 9px; border-radius: 999px;
-    background: #eff6ff; color: #1d4ed8; font-size: 12.5px; font-weight: 700; }
-  #keywordResearch small { display: block; margin-top: 12px; color: #94a3b8; font-size: 11.5px; }
   #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
   #post img { max-width: 100%; height: auto; }
   #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
@@ -118,6 +129,13 @@
   .cat-wrap { text-align: center; margin: 10px 0 18px; }
   .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
     font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  
+  .sched { display: inline-flex; align-items: stretch; border: 1.5px solid; border-radius: 7px; overflow: hidden;
+    font-size: 12px; font-weight: 800; line-height: 1; white-space: nowrap; vertical-align: middle; }
+  .sched-date { padding: 4px 6px; }
+  .sched-time { padding: 4px 6px; background: #fff; }
+  .sched-big { font-size: 16px; border-radius: 9px; }
+  .sched-big .sched-date, .sched-big .sched-time { padding: 8px 10px; }
   .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
@@ -126,7 +144,6 @@
 <div class="topbar">
   <div class="topbar-nav">
     <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
-    <button id="publishToggle" type="button">발행 전</button>
   </div>
   <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="생활/건강" style="background:#edf6f0;color:#1f5f42;border:1.5px solid #bfdfcb;">생활/건강</span></div>
   <h1 id="titleText" class="visually-hidden">tpe카매트 재질감 비교, 1열 받아보고 확인한 두께와 밀착감</h1>
@@ -135,15 +152,10 @@
 <div id="titlePicker"><button type="button" class="title-opt active" data-title="tpe카매트 재질감 비교, 1열 받아보고 확인한 두께와 밀착감"><span class="tp-num">1</span><span class="tp-text">tpe카매트 재질감 비교, 1열 받아보고 확인한 두께와 밀착감</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="카매트 추천 기준에서 자주 빠지는 항목, 1열+2열 에어핏 구성으로 본 결과"><span class="tp-num">2</span><span class="tp-text">카매트 추천 기준에서 자주 빠지는 항목, 1열+2열 에어핏 구성으로 본 결과</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="tpe매트 1열만 깔았을 때와 2열까지 깐 뒤 느낀 차이 3가지"><span class="tp-num">3</span><span class="tp-text">tpe매트 1열만 깔았을 때와 2열까지 깐 뒤 느낀 차이 3가지</span><span class="tp-mark">사용 중</span></button></div>
 </div>
 <div class="actionbar">
-  <button id="copyBtn" type="button">본문 복사</button>
-  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+  <div class="sched-card" style="background:#dcfce7;color:#15803d;border-color:#15803d33"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">10월 28일 (수)<span class="sched-card-time">13:00</span></span></div>
+  <label class="pub-toggle"><input type="checkbox" id="publishCheck"><span>발행 완료</span></label>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
 </div>
-<section id="keywordResearch" aria-label="SEO 키워드 선정 근거">
-  <h2>SEO 키워드 선정 근거</h2>
-  <div><b>메인 키워드 3개</b><p><span>카매트</span><span>발매트</span><span>TPE매트</span></p></div>
-  <div><b>네이버 자동완성에서 고른 최종 키워드 3개</b><p><span>tpe카매트</span><span>카매트 추천</span><span>tpe매트 1열</span></p></div>
-  <small>이 영역은 작성자 확인용이며 본문 복사에는 포함되지 않습니다.</small>
-</section>
 <div id="msg"></div>
 <div id="catPop" hidden>
   <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
@@ -183,7 +195,7 @@
   </ul>
   <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
 </div>
-<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">tpe카매트 바꾸려고 알아보다가</p><p style="text-align:center;margin:0;color:#000000;">생각보다 소재마다 느낌이</p><p style="text-align:center;margin:0;color:#000000;">다르다는 걸 알게 됐어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">차 발매트는 매일 밟는 거라</p><p style="text-align:center;margin:0;color:#000000;">재질감 하나로 만족도가</p><p style="text-align:center;margin:0;color:#000000;">꽤 갈리더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 글에서는 tpe카매트 고를 때</p><p style="text-align:center;margin:0;color:#000000;">재질이랑 1열+2열 구성 보는</p><p style="text-align:center;margin:0;color:#000000;">법을 정리해볼게요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/18-1.jpg" alt="벤딕트 바닥매트 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> TPE 소재 카매트는 뭐가 다를까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 재질감, 직접 써보니 어땠나</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 카매트 추천 기준, 재질 말고 또 뭘 볼까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> tpe매트 1열 vs 1열+2열, 뭘 기준으로 고를까</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">TPE 소재 카매트는 뭐가 다를까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">TPE는 고무랑 플라스틱</p><p style="text-align:center;margin:0;color:#000000;">중간 정도 느낌의 소재예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">딱딱한 플라스틱 매트랑 다르게</p><p style="text-align:center;margin:0;color:#000000;">발을 디뎠을 때 탄성이 있어서</p><p style="text-align:center;margin:0;color:#000000;">덜 뻣뻣하게 느껴지는 편이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저도 처음 받아봤을 때 생각보다</p><p style="text-align:center;margin:0;color:#000000;">탄탄하면서도 너무 딱딱하지</p><p style="text-align:center;margin:0;color:#000000;">않은 느낌이라 괜찮았어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밟았을 때 쑥 꺼지는 느낌보다는</p><p style="text-align:center;margin:0;color:#000000;">어느 정도 받쳐주는 쪽이라</p><p style="text-align:center;margin:0;color:#000000;">발바닥이 피곤한 느낌이 덜하더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 이건 제가 받아본 느낌을</p><p style="text-align:center;margin:0;color:#000000;">말하는 거고, 소재 특성이</p><p style="text-align:center;margin:0;color:#000000;">모든 차종에 똑같이 느껴지는지는</p><p style="text-align:center;margin:0;color:#000000;">직접 밟아보면서 판단하는 게</p><p style="text-align:center;margin:0;color:#000000;">맞는 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/18-2.jpg" alt="벤딕트 바닥매트 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">재질감, 직접 써보니 어땠나</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">tpe매트 1열을</p><p style="text-align:center;margin:0;color:#000000;">먼저 깔아봤는데</p><p style="text-align:center;margin:0;color:#000000;">운전석 쪽은 발을 자주 움직이는</p><p style="text-align:center;margin:0;color:#000000;">곳이라 재질 탄성이 더</p><p style="text-align:center;margin:0;color:#000000;">체감되더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">페달 밟을 때 발끝이 눌리는</p><p style="text-align:center;margin:0;color:#000000;">느낌이 플라스틱 매트보다는</p><p style="text-align:center;margin:0;color:#000000;">부드럽게 받아주는 편이었어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 TPE 소재 특성상 표면이</p><p style="text-align:center;margin:0;color:#000000;">살짝 광택이 있어서, 처음엔</p><p style="text-align:center;margin:0;color:#000000;">좀 미끌거리지 않을까 싶었는데</p><p style="text-align:center;margin:0;color:#000000;">실제로는 신발 밑창이랑 닿는</p><p style="text-align:center;margin:0;color:#000000;">면적이 넓어서 그런지 크게</p><p style="text-align:center;margin:0;color:#000000;">신경 쓰일 정도는 아니었어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 부분은 사용 환경마다</p><p style="text-align:center;margin:0;color:#000000;">다르게 느껴질 수 있어서</p><p style="text-align:center;margin:0;color:#000000;">제 경험 기준으로만 참고하시면</p><p style="text-align:center;margin:0;color:#000000;">좋을 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">그래서 저도 바꾸기 전에<br>가격대부터 한번 찾아봤는데요</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#8a8f96;">⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</span></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FJO03y74</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">카매트 추천 기준, 재질 말고 또 뭘 볼까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">카매트 추천 받을</p><p style="text-align:center;margin:0;color:#000000;">때 재질 말고도</p><p style="text-align:center;margin:0;color:#000000;">1열만 쓸지 2열까지 쓸지가</p><p style="text-align:center;margin:0;color:#000000;">구성을 가르는 기준이더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">뒷좌석을 거의 안 쓰는 차라면</p><p style="text-align:center;margin:0;color:#000000;">1열 tpe매트만으로</p><p style="text-align:center;margin:0;color:#000000;">충분할 수 있고,</p><p style="text-align:center;margin:0;color:#000000;">반대로 아이나 짐 때문에</p><p style="text-align:center;margin:0;color:#000000;">뒷좌석 바닥도 자주 더러워지는</p><p style="text-align:center;margin:0;color:#000000;">경우라면 1열+2열 구성이</p><p style="text-align:center;margin:0;color:#000000;">더 실용적인 선택이 될 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 뒷자리를 종종 쓰는</p><p style="text-align:center;margin:0;color:#000000;">편이라 1열+2열 에어핏 구성으로</p><p style="text-align:center;margin:0;color:#000000;">맞춰봤는데, 앞뒤 재질이</p><p style="text-align:center;margin:0;color:#000000;">통일돼 있어서 밟는 느낌이</p><p style="text-align:center;margin:0;color:#000000;">크게 차이 나지 않았어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">tpe매트 1열 vs 1열+2열, 뭘 기준으로 고를까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">결국 tpe매트 1열로 끝낼지</p><p style="text-align:center;margin:0;color:#000000;">1열+2열로 갈지는 뒷좌석을</p><p style="text-align:center;margin:0;color:#000000;">얼마나 쓰느냐에 달린 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">운전자 혼자 타는 경우가</p><p style="text-align:center;margin:0;color:#000000;">많다면 1열만으로도 재질감은</p><p style="text-align:center;margin:0;color:#000000;">충분히 느낄 수 있고,</p><p style="text-align:center;margin:0;color:#000000;">동승자나 뒷좌석 탑승이</p><p style="text-align:center;margin:0;color:#000000;">잦다면 2열까지 같은 소재로</p><p style="text-align:center;margin:0;color:#000000;">맞추는 게 관리하기도 편하더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">벤딕트에서는 차종별로</p><p style="text-align:center;margin:0;color:#000000;">코일매트 구성도 따로 나와 있어서,</p><p style="text-align:center;margin:0;color:#000000;">TPE 재질 느낌이 궁금하면서</p><p style="text-align:center;margin:0;color:#000000;">동시에 차종에 맞는 확장형</p><p style="text-align:center;margin:0;color:#000000;">구성을 찾는 분들은 그쪽</p><p style="text-align:center;margin:0;color:#000000;">라인업도 같이 비교해볼 만해요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">tpe카매트는 결국 재질감이</p><p style="text-align:center;margin:0;color:#000000;">핵심이라, 받아보고 직접</p><p style="text-align:center;margin:0;color:#000000;">밟아보면서 내 차 바닥에</p><p style="text-align:center;margin:0;color:#000000;">맞는 느낌인지 확인하는 게</p><p style="text-align:center;margin:0;color:#000000;">제일 정확한 방법인 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">사기 전에 재질감이랑 구성까지<br>확인하고 싶으면 아래에서 가격<br>보고 판단하셔도 좋을 것 같아요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FJO03y74</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#벤딕트 #바닥매트 #인테리어용품 #카매트 #TPE카매트 #tpe카매트 #카매트추천 #tpe매트1열 #자동차용품 #자동차용품점 #차량발매트 #자동차용품전문쇼핑몰</span></p></div></div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">tpe카매트 바꾸려고 알아보다가</p><p style="text-align:center;margin:0;color:#000000;">생각보다 소재마다 느낌이</p><p style="text-align:center;margin:0;color:#000000;">다르다는 걸 알게 됐어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">차 발매트는 매일 밟는 거라</p><p style="text-align:center;margin:0;color:#000000;">재질감 하나로 만족도가</p><p style="text-align:center;margin:0;color:#000000;">꽤 갈리더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 글에서는 tpe카매트 고를 때</p><p style="text-align:center;margin:0;color:#000000;">재질이랑 1열+2열 구성 보는</p><p style="text-align:center;margin:0;color:#000000;">법을 정리해볼게요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/18-1.jpg" alt="벤딕트 바닥매트 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> TPE 소재 카매트는 뭐가 다를까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 재질감, 직접 써보니 어땠나</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 카매트 추천 기준, 재질 말고 또 뭘 볼까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> tpe매트 1열 vs 1열+2열, 뭘 기준으로 고를까</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">TPE 소재 카매트는 뭐가 다를까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">TPE는 고무랑 플라스틱</p><p style="text-align:center;margin:0;color:#000000;">중간 정도 느낌의 소재예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">딱딱한 플라스틱 매트랑 다르게</p><p style="text-align:center;margin:0;color:#000000;">발을 디뎠을 때 탄성이 있어서</p><p style="text-align:center;margin:0;color:#000000;">덜 뻣뻣하게 느껴지는 편이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저도 처음 받아봤을 때 생각보다</p><p style="text-align:center;margin:0;color:#000000;">탄탄하면서도 너무 딱딱하지</p><p style="text-align:center;margin:0;color:#000000;">않은 느낌이라 괜찮았어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밟았을 때 쑥 꺼지는 느낌보다는</p><p style="text-align:center;margin:0;color:#000000;">어느 정도 받쳐주는 쪽이라</p><p style="text-align:center;margin:0;color:#000000;">발바닥이 피곤한 느낌이 덜하더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 이건 제가 받아본 느낌을</p><p style="text-align:center;margin:0;color:#000000;">말하는 거고, 소재 특성이</p><p style="text-align:center;margin:0;color:#000000;">모든 차종에 똑같이 느껴지는지는</p><p style="text-align:center;margin:0;color:#000000;">직접 밟아보면서 판단하는 게</p><p style="text-align:center;margin:0;color:#000000;">맞는 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-10-26T02-26-03/img/18-2.jpg" alt="벤딕트 바닥매트 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">재질감, 직접 써보니 어땠나</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">tpe매트 1열을</p><p style="text-align:center;margin:0;color:#000000;">먼저 깔아봤는데</p><p style="text-align:center;margin:0;color:#000000;">운전석 쪽은 발을 자주 움직이는</p><p style="text-align:center;margin:0;color:#000000;">곳이라 재질 탄성이 더</p><p style="text-align:center;margin:0;color:#000000;">체감되더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">페달 밟을 때 발끝이 눌리는</p><p style="text-align:center;margin:0;color:#000000;">느낌이 플라스틱 매트보다는</p><p style="text-align:center;margin:0;color:#000000;">부드럽게 받아주는 편이었어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 TPE 소재 특성상 표면이</p><p style="text-align:center;margin:0;color:#000000;">살짝 광택이 있어서, 처음엔</p><p style="text-align:center;margin:0;color:#000000;">좀 미끌거리지 않을까 싶었는데</p><p style="text-align:center;margin:0;color:#000000;">실제로는 신발 밑창이랑 닿는</p><p style="text-align:center;margin:0;color:#000000;">면적이 넓어서 그런지 크게</p><p style="text-align:center;margin:0;color:#000000;">신경 쓰일 정도는 아니었어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 부분은 사용 환경마다</p><p style="text-align:center;margin:0;color:#000000;">다르게 느껴질 수 있어서</p><p style="text-align:center;margin:0;color:#000000;">제 경험 기준으로만 참고하시면</p><p style="text-align:center;margin:0;color:#000000;">좋을 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">그래서 저도 바꾸기 전에<br>가격대부터 한번 찾아봤는데요</span></b><cite style="display:block;margin-top:14px;font-style:normal;font-size:13px;color:#8a8f96;line-height:1.6;">벤딕트 TPE 카매트 자동차 용품 차량 발매트 바닥 1열+2열 에어핏<br>⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</cite></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FJO03y74</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">카매트 추천 기준, 재질 말고 또 뭘 볼까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">카매트 추천 받을</p><p style="text-align:center;margin:0;color:#000000;">때 재질 말고도</p><p style="text-align:center;margin:0;color:#000000;">1열만 쓸지 2열까지 쓸지가</p><p style="text-align:center;margin:0;color:#000000;">구성을 가르는 기준이더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">뒷좌석을 거의 안 쓰는 차라면</p><p style="text-align:center;margin:0;color:#000000;">1열 tpe매트만으로</p><p style="text-align:center;margin:0;color:#000000;">충분할 수 있고,</p><p style="text-align:center;margin:0;color:#000000;">반대로 아이나 짐 때문에</p><p style="text-align:center;margin:0;color:#000000;">뒷좌석 바닥도 자주 더러워지는</p><p style="text-align:center;margin:0;color:#000000;">경우라면 1열+2열 구성이</p><p style="text-align:center;margin:0;color:#000000;">더 실용적인 선택이 될 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저는 뒷자리를 종종 쓰는</p><p style="text-align:center;margin:0;color:#000000;">편이라 1열+2열 에어핏 구성으로</p><p style="text-align:center;margin:0;color:#000000;">맞춰봤는데, 앞뒤 재질이</p><p style="text-align:center;margin:0;color:#000000;">통일돼 있어서 밟는 느낌이</p><p style="text-align:center;margin:0;color:#000000;">크게 차이 나지 않았어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">tpe매트 1열 vs 1열+2열, 뭘 기준으로 고를까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">결국 tpe매트 1열로 끝낼지</p><p style="text-align:center;margin:0;color:#000000;">1열+2열로 갈지는 뒷좌석을</p><p style="text-align:center;margin:0;color:#000000;">얼마나 쓰느냐에 달린 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">운전자 혼자 타는 경우가</p><p style="text-align:center;margin:0;color:#000000;">많다면 1열만으로도 재질감은</p><p style="text-align:center;margin:0;color:#000000;">충분히 느낄 수 있고,</p><p style="text-align:center;margin:0;color:#000000;">동승자나 뒷좌석 탑승이</p><p style="text-align:center;margin:0;color:#000000;">잦다면 2열까지 같은 소재로</p><p style="text-align:center;margin:0;color:#000000;">맞추는 게 관리하기도 편하더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">벤딕트에서는 차종별로</p><p style="text-align:center;margin:0;color:#000000;">코일매트 구성도 따로 나와 있어서,</p><p style="text-align:center;margin:0;color:#000000;">TPE 재질 느낌이 궁금하면서</p><p style="text-align:center;margin:0;color:#000000;">동시에 차종에 맞는 확장형</p><p style="text-align:center;margin:0;color:#000000;">구성을 찾는 분들은 그쪽</p><p style="text-align:center;margin:0;color:#000000;">라인업도 같이 비교해볼 만해요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">tpe카매트는 결국 재질감이</p><p style="text-align:center;margin:0;color:#000000;">핵심이라, 받아보고 직접</p><p style="text-align:center;margin:0;color:#000000;">밟아보면서 내 차 바닥에</p><p style="text-align:center;margin:0;color:#000000;">맞는 느낌인지 확인하는 게</p><p style="text-align:center;margin:0;color:#000000;">제일 정확한 방법인 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">사기 전에 재질감이랑 구성까지<br>확인하고 싶으면 아래에서 가격<br>보고 판단하셔도 좋을 것 같아요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FJO03y74</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#벤딕트 #바닥매트 #인테리어용품 #카매트 #TPE카매트 #tpe카매트 #카매트추천 #tpe매트1열 #자동차용품 #자동차용품점 #차량발매트 #자동차용품전문쇼핑몰</span></p></div></div>
 <div id="manualCopyBox" contenteditable="true"></div>
 <!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
      comment for why this has to be the copy source instead of the rendered DOM's text. -->
@@ -523,14 +535,7 @@ https://naver.me/FJO03y74
     });
   }
 
-  document.getElementById('copyBtn').addEventListener('click', function () {
-    say('');
-    copyBody(
-      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
-      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
-      sayWithCategory
-    );
-  });
+  // 본문 복사 버튼은 2026-10-13 에 뺐습니다 — 글은 "네이버에 자동 작성"으로 옮깁니다.
 
   var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
   if (bodyOnlyBtn) {
@@ -557,13 +562,6 @@ https://naver.me/FJO03y74
     } else {
       say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
     }
-  }
-
-  var productNameBtn = document.getElementById('copyProductNameBtn');
-  if (productNameBtn) {
-    productNameBtn.addEventListener('click', function () {
-      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
-    });
   }
 
   // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
@@ -674,11 +672,11 @@ https://naver.me/FJO03y74
       Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById('titleText').textContent = btn.getAttribute('data-title');
-      say('이 제목으로 복사됩니다.');
+      say('이 제목으로 복사·자동 작성됩니다.');
     });
   });
 
-  var publishBtn = document.getElementById('publishToggle');
+  var publishCheck = document.getElementById('publishCheck');
   var publishKey = 'nbp_published_' + location.pathname;
   // The spreadsheet's value is the starting point; once this browser records a choice, that
   // choice wins — the person tapping the button is looking at the post right now.
@@ -689,22 +687,127 @@ https://naver.me/FJO03y74
       var stored = localStorage.getItem(publishKey);
       if (stored !== null) done = stored === '1';
     } catch (e) {}
-    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
-    publishBtn.classList.toggle('published', done);
+    publishCheck.checked = done;
+    publishCheck.parentNode.classList.toggle('published', done);
   }
-  publishBtn.addEventListener('click', function () {
-    var done = sheetPublished;
-    try {
-      var stored = localStorage.getItem(publishKey);
-      if (stored !== null) done = stored === '1';
-    } catch (e) {}
-    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+  publishCheck.addEventListener('change', function () {
+    try { localStorage.setItem(publishKey, publishCheck.checked ? '1' : '0'); } catch (e) {}
     renderPublishState();
   });
   renderPublishState();
   // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
   // navigation here can otherwise show a stale button until a manual reload.
   window.addEventListener('pageshow', renderPublishState);
+
+  // 이 페이지의 주소에서 배치 폴더와 이 글의 순번을 읽습니다 — resultsArchive.js 가
+  // 파일을 "<폴더>/01-제목.html" 로 저장하므로, 서버에 다시 물어볼 필요 없이 주소만으로
+  // 압니다. 이 Mac에서 로컬 서버(3100)가 켜져 있어야 동작합니다 — 그 서버만
+  // 네이버 창을 띄울 수 있습니다.
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // 템플릿 리터럴 안에서는 정규식의 백슬래시가 살아남지 못하므로(\d 가 그냥 d 로
+      // 찍힘), 정규식 대신 문자열을 직접 잘라 폴더·순번을 읽습니다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { say('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      // 고른 제목(#titleText)을 같이 보냅니다. 안 보내면 서버는 늘 1번 제목으로 씁니다.
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      // 페이지를 떠나지 않고, 새 창도 열지 않습니다. 이 Mac 의 localhost 를 직접 부르면 크롬이
+      // 로컬 네트워크 권한을 요구해서, 공개 중계(ntfy 서버 여러 곳)에 요청을 놓고 이 Mac 서버가 그걸 받아
+      // 네이버 글쓰기 창을 엽니다(src/draftRelay.js). 진행 상황도 같은 중계로 돌아옵니다.
+      if (autoBtn.disabled) return;
+      autoBtn.disabled = true;
+      var reqId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      var since = Math.floor(Date.now() / 1000) - 5;
+      say('이 Mac에 자동 작성을 요청하는 중…');
+      relaySend({ req: reqId, folder: folder, index: idx, title: chosenTitle.trim() }).then(function (ok) {
+        if (!ok) throw new Error('중계 서버에 모두 연결하지 못함');
+        followDraft(reqId, since, Date.now(), false);
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        say('요청을 보내지 못했어요 — 인터넷 연결을 확인하고 다시 눌러주세요. (' + (e && e.message || '') + ')');
+      });
+    });
+  }
+
+  var RELAYS = ["https://ntfy.sh","https://ntfy.adminforge.de","https://ntfy.envs.net"], RELAY_TOPIC = "nbsdraft-ac5ccd953fdff173423c";
+var relayDead = {};
+function relayLive() {
+  var now = Date.now(), live = RELAYS.filter(function (h) { return !relayDead[h] || now - relayDead[h] > 60000; });
+  return live.length ? live : RELAYS;
+}
+function relayFetch(h, path, opts) {
+  var ctl = window.AbortController ? new AbortController() : null;
+  var t = ctl ? setTimeout(function () { ctl.abort(); }, 7000) : null;
+  var o = opts || {}; if (ctl) o.signal = ctl.signal;
+  return fetch(h + path, o).then(function (r) { if (t) clearTimeout(t); delete relayDead[h]; return r; },
+    function (e) { if (t) clearTimeout(t); relayDead[h] = Date.now(); throw e; });
+}
+function relaySend(payload) {
+  var body = JSON.stringify(payload), hosts = relayLive(), left = hosts.length;
+  return new Promise(function (resolve) {
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC, { method: "POST", body: body })
+        .then(function (r) { if (r.ok) resolve(true); else if (--left === 0) resolve(false); },
+          function () { if (--left === 0) resolve(false); });
+    });
+  });
+}
+function relayPoll(reqId, since) {
+  var hosts = relayLive(), texts = [], left = hosts.length;
+  return new Promise(function (resolve) {
+    var done = false, grace = null;
+    function finish() {
+      if (done) return; done = true; if (grace) clearTimeout(grace);
+      var best = null, bestSeq = -1;
+      texts.forEach(function (text) {
+        text.split(String.fromCharCode(10)).forEach(function (line) {
+          if (!line) return;
+          try {
+            var ev = JSON.parse(line), m = JSON.parse(ev.message || "{}");
+            var seq = m.seq || ev.time || 0;
+            if (m.req === reqId && seq >= bestSeq) { best = m; bestSeq = seq; }
+          } catch (e) {}
+        });
+      });
+      resolve(best);
+    }
+    hosts.forEach(function (h) {
+      relayFetch(h, "/" + RELAY_TOPIC + "-status/json?poll=1&since=" + since, { cache: "no-store" })
+        .then(function (r) { return r.text(); })
+        .then(function (t) { texts.push(t); if (!grace) grace = setTimeout(finish, 2000); }, function () {})
+        .then(function () { if (--left === 0) finish(); });
+    });
+  });
+}
+  // 이 요청(reqId)에 대한 이 Mac 서버의 답을 몇 초마다 읽어 버튼 아래에 보여줍니다.
+  function followDraft(reqId, since, t0, heard) {
+    setTimeout(function () {
+      relayPoll(reqId, since)
+        .then(function (latest) {
+          if (!latest) {
+            if (!heard && Date.now() - t0 > 25000) {
+              autoBtn.disabled = false;
+              say('이 Mac의 서버가 답이 없어요 — 터미널에서 node server.js 가 켜져 있는지 확인하고 다시 눌러주세요.');
+              return;
+            }
+            if (!heard) say('이 Mac에 자동 작성을 요청하는 중…');
+            return followDraft(reqId, since, t0, heard);
+          }
+          if (latest.state === 'done') { autoBtn.disabled = false; say('✅ ' + latest.message); return; }
+          if (latest.state === 'failed') { autoBtn.disabled = false; say('작성 실패: ' + latest.message); return; }
+          if (latest.state === 'login') say(latest.message);
+          else if (latest.state === 'started') say('자동 작성을 시작했어요 — 잠시 뒤 네이버 글쓰기 창이 뜹니다. 이 페이지는 그대로 두면 됩니다.');
+          else say('네이버 창에 작성하는 중… ' + (latest.message || ''));
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          followDraft(reqId, since, t0, true);
+        })
+        .catch(function () { followDraft(reqId, since, t0, heard); });
+    }, 1500);
+  }
 })();
 </script>
 </body>
