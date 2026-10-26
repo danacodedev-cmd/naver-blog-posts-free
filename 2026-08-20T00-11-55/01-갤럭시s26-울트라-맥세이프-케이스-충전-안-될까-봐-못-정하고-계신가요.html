@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>갤럭시S26 울트라 맥세이프 케이스, 충전 안 될까 봐 못 정하고 계신가요</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" style="background:#eef3fc;color:#23477e;border:1.5px solid #c3d4f2;">디지털/가전</span></div>
+  <h1 id="titleText" class="visually-hidden">갤럭시S26 울트라 맥세이프 케이스, 충전 안 될까 봐 못 정하고 계신가요</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">Qi2 25W 인증 갤럭시 맥세이프 케이스 초슬림 카본 에어스킨아라미드 맥핏 갤럭시S26 울트라, 아라미드, 블랙</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="갤럭시S26 울트라 맥세이프 케이스, 충전 안 될까 봐 못 정하고 계신가요"><span class="tp-num">1</span><span class="tp-text">갤럭시S26 울트라 맥세이프 케이스, 충전 안 될까 봐 못 정하고 계신가요</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="갤럭시 맥세이프 케이스 고를 때 아는 사람만 짚는 Qi2 인증 여부"><span class="tp-num">2</span><span class="tp-text">갤럭시 맥세이프 케이스 고를 때 아는 사람만 짚는 Qi2 인증 여부</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="갤럭시S26 울트라 카본 아라미드 케이스, 이 가격에 초슬림까지"><span class="tp-num">3</span><span class="tp-text">갤럭시S26 울트라 카본 아라미드 케이스, 이 가격에 초슬림까지</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<div id="msg"></div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/mkh4539/224377553132" target="_blank" rel="noopener noreferrer">Qi2 25W 15W 차이, 비싼 충전기가 항상 빠를까?</a></li>
+      <li><a href="https://blog.naver.com/zestgo/224347933776" target="_blank" rel="noopener noreferrer">Qi2 25W 무선충전기, 기존 Qi2 15W와 무엇이 다를까</a></li>
+      <li><a href="https://blog.naver.com/byjun_04/224335717663" target="_blank" rel="noopener noreferrer">아트뮤 QW110 Qi2 25W 3in1 폴더블 충전기 리뷰</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 5장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-1.jpg" alt="Qi2 제품 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-2.jpg" alt="Qi2 제품 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-3.jpg" alt="Qi2 제품 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 3</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-3.jpg" data-n="3">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-4.jpg" alt="Qi2 제품 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 4</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-4.jpg" data-n="4">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-5.jpg" alt="Qi2 제품 구성품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 5</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-5.jpg" data-n="5">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">자석 충전대에 폰을 올렸는데</p><p style="text-align:center;margin:0;color:#000000;">아이콘만 뜨고 배터리가 안 늘어난 적,</p><p style="text-align:center;margin:0;color:#000000;">다들 한 번쯤 있으실 거예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">케이스 두께 때문인지,</p><p style="text-align:center;margin:0;color:#000000;">자석 위치가 안 맞아서인지</p><p style="text-align:center;margin:0;color:#000000;">헷갈리다가 결국 케이스 벗기고</p><p style="text-align:center;margin:0;color:#000000;">충전하게 되죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 케이스는 갤럭시S26</p><p style="text-align:center;margin:0;color:#000000;">울트라 전용으로 나온</p><p style="text-align:center;margin:0;color:#000000;">Qi2 25W 인증 맥세이프 케이스입니다.</p><p style="text-align:center;margin:0;color:#000000;">초슬림에 카본 무늬</p><p style="text-align:center;margin:0;color:#000000;">아라미드 소재를 썼고</p><p style="text-align:center;margin:0;color:#000000;">색상은 블랙, 가격은 45,900원입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">폰을 자주 무선 충전대에 올려두는 분,</p><p style="text-align:center;margin:0;color:#000000;">케이스 벗기는 게 귀찮아서 계속 낀 채 쓰는</p><p style="text-align:center;margin:0;color:#000000;">분께 맞습니다.</p><p style="text-align:center;margin:0;color:#000000;">반대로 유선 충전만 쓰거나 얇은</p><p style="text-align:center;margin:0;color:#000000;">케이스는 상관없다는 분에게는</p><p style="text-align:center;margin:0;color:#000000;">굳이 이 가격대를 낼 이유가 크지 않습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-1.jpg" alt="Qi2 제품 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> Qi2 인증이 왜 케이스 고를 때 기준이 되나</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 두께와 소재, 실제 체감은 다릅니다</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 충전기 출력도 같이 봐야 하는 이유</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> 정가 대비 6% 할인, 지금 살 만한가</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">Qi2 인증이 왜 케이스 고를 때 기준이 되나</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">무선 충전은 스마트폰, 충전기,</p><p style="text-align:center;margin:0;color:#000000;">케이스가 다 맞아야</p><p style="text-align:center;margin:0;color:#000000;">목표 출력에 가까워지는 구조입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">충전기가 25W를 지원해도</p><p style="text-align:center;margin:0;color:#000000;">케이스에 자석이 어긋나 있으면</p><p style="text-align:center;margin:0;color:#000000;">실제 충전 속도는 떨어집니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">Qi2는 폰 뒤판과 충전기 사이에</p><p style="text-align:center;margin:0;color:#000000;">자석이 자동으로 정렬되도록 만든 규격입니다.</p><p style="text-align:center;margin:0;color:#000000;">자석 정렬이 안 맞는 케이스를 쓰면</p><p style="text-align:center;margin:0;color:#000000;">같은 충전기,</p><p style="text-align:center;margin:0;color:#000000;">같은 폰이어도 충전이 늦게 붙거나</p><p style="text-align:center;margin:0;color:#000000;">아예 인식이 안 되는 경우가 생깁니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">케이스 상세페이지에 &quot;Qi2</p><p style="text-align:center;margin:0;color:#000000;">25W 인증&quot;이라고</p><p style="text-align:center;margin:0;color:#000000;">적혀 있다면 이 정렬 문제부터</p><p style="text-align:center;margin:0;color:#000000;">해결됐다는 뜻입니다.</p><p style="text-align:center;margin:0;color:#000000;">반대로 아무 표기가 없는 저가 케이스는</p><p style="text-align:center;margin:0;color:#000000;">자석 위치나 세기가 규격에 안 맞을 수 있어서</p><p style="text-align:center;margin:0;color:#000000;">충전 속도가 들쭉날쭉할 수 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-2.jpg" alt="Qi2 제품 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">두께와 소재, 실제 체감은 다릅니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">무선 충전 인증이 됐다고 끝이 아닙니다.</p><p style="text-align:center;margin:0;color:#000000;">케이스가 두꺼우면 자석이 맞아도</p><p style="text-align:center;margin:0;color:#000000;">충전 효율 자체가 떨어질 수 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 케이스가 초슬림,</p><p style="text-align:center;margin:0;color:#000000;">아라미드 소재를 강조하는 이유가</p><p style="text-align:center;margin:0;color:#000000;">여기 있습니다.</p><p style="text-align:center;margin:0;color:#000000;">아라미드는 방탄조끼에도</p><p style="text-align:center;margin:0;color:#000000;">쓰이는 고강도 섬유로</p><p style="text-align:center;margin:0;color:#000000;">얇으면서도 내구성을 유지하기</p><p style="text-align:center;margin:0;color:#000000;">쉬운 소재입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">두꺼운 범퍼형 케이스와 비교하면</p><p style="text-align:center;margin:0;color:#000000;">손에 쥐는 두께 차이는 확실히 느껴지고,</p><p style="text-align:center;margin:0;color:#000000;">그만큼 충전대 위 자석 인식도 안정적일</p><p style="text-align:center;margin:0;color:#000000;">가능성이 높습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 소재가 얇은 만큼</p><p style="text-align:center;margin:0;color:#000000;">직접적인 충격 흡수력은 두꺼운 케이스보다</p><p style="text-align:center;margin:0;color:#000000;">낮을 수 있습니다.</p><p style="text-align:center;margin:0;color:#000000;">바닥에 자주 떨어뜨리는 습관이 있다면</p><p style="text-align:center;margin:0;color:#000000;">이 부분은 감안하고 선택하시는 게 맞습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-3.jpg" alt="Qi2 제품 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">케이스 하나 잘못 골라서 충전 속도부터 손해<br>보는 상황, 지금 확인해볼 가치는 있습니다.</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xNpY5upC</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">충전기 출력도 같이 봐야 하는 이유</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">케이스가 Qi2 25W 인증을 받았어도</p><p style="text-align:center;margin:0;color:#000000;">충전기 자체가 15W나 10W 출력이면</p><p style="text-align:center;margin:0;color:#000000;">케이스 성능을 다 못 씁니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">충전기 상자에 25W라고 적혀 있어도</p><p style="text-align:center;margin:0;color:#000000;">그건 최대 출력이고,</p><p style="text-align:center;margin:0;color:#000000;">실제 스마트폰에 전달되는 입력은</p><p style="text-align:center;margin:0;color:#000000;">기기와 케이스 조합에 따라 달라집니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 케이스를 25W 인증 충전기와 함께 쓰면</p><p style="text-align:center;margin:0;color:#000000;">자석 정렬과 출력 두 조건이 다 맞아</p><p style="text-align:center;margin:0;color:#000000;">무선 충전 속도를 온전히</p><p style="text-align:center;margin:0;color:#000000;">기대할 수 있습니다.</p><p style="text-align:center;margin:0;color:#000000;">반대로 기존에 쓰던 충전기가</p><p style="text-align:center;margin:0;color:#000000;">15W 이하라면</p><p style="text-align:center;margin:0;color:#000000;">케이스만 바꿔도 체감 차이는 크지</p><p style="text-align:center;margin:0;color:#000000;">않을 수 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-4.jpg" alt="Qi2 제품 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">케이스와 충전기,<br>두 조건이 같이 맞아야 합니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">정가 대비 6% 할인, 지금 살 만한가</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정가 49,000원에서</p><p style="text-align:center;margin:0;color:#000000;">45,900원으로</p><p style="text-align:center;margin:0;color:#000000;">6% 할인된 가격입니다.</p><p style="text-align:center;margin:0;color:#000000;">큰 폭은 아니지만 Qi2 25W 인증에</p><p style="text-align:center;margin:0;color:#000000;">아라미드 초슬림 소재까지</p><p style="text-align:center;margin:0;color:#000000;">포함된 걸 감안하면</p><p style="text-align:center;margin:0;color:#000000;">비인증 저가 케이스와 단순 가격만</p><p style="text-align:center;margin:0;color:#000000;">비교하긴 어렵습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">무선 충전을 매일 쓰는 분이라면</p><p style="text-align:center;margin:0;color:#000000;">케이스 값을 아끼려다 충전 속도에서</p><p style="text-align:center;margin:0;color:#000000;">매일 손해를 보는 셈이 될 수 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">케이스를 자주 바꾸지 않고</p><p style="text-align:center;margin:0;color:#000000;">한 번 살 때 오래 쓸 생각이라면</p><p style="text-align:center;margin:0;color:#000000;">초슬림 두께와 인증 여부,</p><p style="text-align:center;margin:0;color:#000000;">두 가지만 확인하고</p><p style="text-align:center;margin:0;color:#000000;">결정하시면 됩니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-20T00-11-55/img/01-5.jpg" alt="Qi2 제품 구성품 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">매일 무선 충전대에 올려두는 케이스라면,<br>인증 여부부터 다시 한번 짚어보시길 바랍니다.</span></b><br><br><b><span style="font-size:16px;color:#2563eb;">👉 Qi2 25W 인증 갤럭시 맥세이프 케이스 초슬림 카본 에어스킨아라미드 맥핏 갤럭시S26 울트라, 아라미드, 블랙<br>지금 가격 확인하기</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/xNpY5upC</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#갤럭시S26울트라맥세이프케이스 #갤럭시S26울트라초슬림케이스 #갤럭시S26울트라무선충전케이스 #Qi2인증갤럭시케이스 #갤럭시S26울트라아라미드케이스 #갤럭시맥세이프케이스추천 #갤럭시S26울트라카본케이스 #갤럭시맥세이프25W차이 #갤럭시S26울트라케이스리뷰 #얇은갤럭시케이스무선충전</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">자석 충전대에 폰을 올렸는데
+아이콘만 뜨고 배터리가 안 늘어난 적,
+다들 한 번쯤 있으실 거예요.
+
+
+케이스 두께 때문인지,
+자석 위치가 안 맞아서인지
+헷갈리다가 결국 케이스 벗기고
+충전하게 되죠.
+
+
+이 케이스는 갤럭시S26
+울트라 전용으로 나온
+Qi2 25W 인증 맥세이프 케이스입니다.
+초슬림에 카본 무늬
+아라미드 소재를 썼고
+색상은 블랙, 가격은 45,900원입니다.
+
+
+폰을 자주 무선 충전대에 올려두는 분,
+케이스 벗기는 게 귀찮아서 계속 낀 채 쓰는
+분께 맞습니다.
+반대로 유선 충전만 쓰거나 얇은
+케이스는 상관없다는 분에게는
+굳이 이 가격대를 낼 이유가 크지 않습니다.
+
+
+사진1
+
+
+이 글에서 다루는 것
+
+1. Qi2 인증이 왜 케이스 고를 때 기준이 되나
+2. 두께와 소재, 실제 체감은 다릅니다
+3. 충전기 출력도 같이 봐야 하는 이유
+4. 정가 대비 6% 할인, 지금 살 만한가
+
+
+Qi2 인증이 왜 케이스 고를 때 기준이 되나
+
+
+무선 충전은 스마트폰, 충전기,
+케이스가 다 맞아야
+목표 출력에 가까워지는 구조입니다.
+
+
+충전기가 25W를 지원해도
+케이스에 자석이 어긋나 있으면
+실제 충전 속도는 떨어집니다.
+
+
+Qi2는 폰 뒤판과 충전기 사이에
+자석이 자동으로 정렬되도록 만든 규격입니다.
+자석 정렬이 안 맞는 케이스를 쓰면
+같은 충전기,
+같은 폰이어도 충전이 늦게 붙거나
+아예 인식이 안 되는 경우가 생깁니다.
+
+
+케이스 상세페이지에 &quot;Qi2
+25W 인증&quot;이라고
+적혀 있다면 이 정렬 문제부터
+해결됐다는 뜻입니다.
+반대로 아무 표기가 없는 저가 케이스는
+자석 위치나 세기가 규격에 안 맞을 수 있어서
+충전 속도가 들쭉날쭉할 수 있습니다.
+
+
+사진2
+
+
+두께와 소재, 실제 체감은 다릅니다
+
+
+무선 충전 인증이 됐다고 끝이 아닙니다.
+케이스가 두꺼우면 자석이 맞아도
+충전 효율 자체가 떨어질 수 있습니다.
+
+
+이 케이스가 초슬림,
+아라미드 소재를 강조하는 이유가
+여기 있습니다.
+아라미드는 방탄조끼에도
+쓰이는 고강도 섬유로
+얇으면서도 내구성을 유지하기
+쉬운 소재입니다.
+
+
+두꺼운 범퍼형 케이스와 비교하면
+손에 쥐는 두께 차이는 확실히 느껴지고,
+그만큼 충전대 위 자석 인식도 안정적일
+가능성이 높습니다.
+
+
+다만 소재가 얇은 만큼
+직접적인 충격 흡수력은 두꺼운 케이스보다
+낮을 수 있습니다.
+바닥에 자주 떨어뜨리는 습관이 있다면
+이 부분은 감안하고 선택하시는 게 맞습니다.
+
+
+사진3
+
+
+케이스 하나 잘못 골라서 충전 속도부터 손해
+보는 상황, 지금 확인해볼 가치는 있습니다.
+
+https://naver.me/xNpY5upC
+
+
+충전기 출력도 같이 봐야 하는 이유
+
+
+케이스가 Qi2 25W 인증을 받았어도
+충전기 자체가 15W나 10W 출력이면
+케이스 성능을 다 못 씁니다.
+
+
+충전기 상자에 25W라고 적혀 있어도
+그건 최대 출력이고,
+실제 스마트폰에 전달되는 입력은
+기기와 케이스 조합에 따라 달라집니다.
+
+
+이 케이스를 25W 인증 충전기와 함께 쓰면
+자석 정렬과 출력 두 조건이 다 맞아
+무선 충전 속도를 온전히
+기대할 수 있습니다.
+반대로 기존에 쓰던 충전기가
+15W 이하라면
+케이스만 바꿔도 체감 차이는 크지
+않을 수 있습니다.
+
+
+사진4
+
+
+케이스와 충전기,
+두 조건이 같이 맞아야 합니다
+
+
+정가 대비 6% 할인, 지금 살 만한가
+
+
+정가 49,000원에서
+45,900원으로
+6% 할인된 가격입니다.
+큰 폭은 아니지만 Qi2 25W 인증에
+아라미드 초슬림 소재까지
+포함된 걸 감안하면
+비인증 저가 케이스와 단순 가격만
+비교하긴 어렵습니다.
+
+
+무선 충전을 매일 쓰는 분이라면
+케이스 값을 아끼려다 충전 속도에서
+매일 손해를 보는 셈이 될 수 있습니다.
+
+
+케이스를 자주 바꾸지 않고
+한 번 살 때 오래 쓸 생각이라면
+초슬림 두께와 인증 여부,
+두 가지만 확인하고
+결정하시면 됩니다.
+
+
+사진5
+
+
+매일 무선 충전대에 올려두는 케이스라면,
+인증 여부부터 다시 한번 짚어보시길 바랍니다.
+
+https://naver.me/xNpY5upC
+
+
+#갤럭시S26울트라맥세이프케이스 #갤럭시S26울트라초슬림케이스 #갤럭시S26울트라무선충전케이스 #Qi2인증갤럭시케이스 #갤럭시S26울트라아라미드케이스 #갤럭시맥세이프케이스추천 #갤럭시S26울트라카본케이스 #갤럭시맥세이프25W차이 #갤럭시S26울트라케이스리뷰 #얇은갤럭시케이스무선충전</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage) {
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      say(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.'
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.'
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+})();
+</script>
+</body>
+</html>

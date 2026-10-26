@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>올스텐 에어프라이어 22L, 3년마다 코팅 새로 사는 분들 보세요</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" style="background:#eef3fc;color:#23477e;border:1.5px solid #c3d4f2;">디지털/가전</span></div>
+  <h1 id="titleText" class="visually-hidden">올스텐 에어프라이어 22L, 3년마다 코팅 새로 사는 분들 보세요</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">올스텐 오븐에어프라이어 대용량 22L 스텐</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="올스텐 에어프라이어 22L, 3년마다 코팅 새로 사는 분들 보세요"><span class="tp-num">1</span><span class="tp-text">올스텐 에어프라이어 22L, 3년마다 코팅 새로 사는 분들 보세요</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="올스텐 오븐에어프라이어 대용량 스텐 – 25% 할인 정보 정리"><span class="tp-num">2</span><span class="tp-text">올스텐 오븐에어프라이어 대용량 스텐 – 25% 할인 정보 정리</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="코팅 벗겨진 에어프라이어 또 사기 전에, 스텐이 답인 이유"><span class="tp-num">3</span><span class="tp-text">코팅 벗겨진 에어프라이어 또 사기 전에, 스텐이 답인 이유</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<div id="msg"></div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/yuujuu11/224309256910" target="_blank" rel="noopener noreferrer">올스텐 오븐 에어프라이어 추천- 22L 대용량으로 바꾸고 나서 달라진 것들</a></li>
+      <li><a href="https://blog.naver.com/cjsdbdp/224365274690" target="_blank" rel="noopener noreferrer">주방 가전 필수템 성능이 더 좋아진 디디오랩 올스텐 스팀 에어프라이어 마스터 PRO</a></li>
+      <li><a href="https://blog.naver.com/love_jjoono/224318422495" target="_blank" rel="noopener noreferrer">올스텐 에어프라이어, 넉넉한 22L 대용량이 돋보이는 스테나</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 3장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-1.jpg" alt="올스텐 에어프라이어 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-2.jpg" alt="올스텐 에어프라이어 제품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-3.jpg" alt="올스텐 에어프라이어 추가 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 3</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-3.jpg" data-n="3">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">3년 전에 산 에어프라이어, 슬쩍 열어보셨나요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">바닥 코팅이 벗겨져서 음식이 눌어붙기 시작했다면,</p><p style="text-align:center;margin:0;color:#000000;">그거 위생 문제로 넘어가는 신호입니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-1.jpg" alt="올스텐 에어프라이어 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">코팅 제품, 왜 3년마다 같은 고민을 할까요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">에어프라이어 코팅은 소모품에 가깝습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">주 3회 이상 요리하시는 분이라면 코팅 벗겨지는 시점이</p><p style="text-align:center;margin:0;color:#000000;">생각보다 빨리 옵니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">모서리부터 벗겨지고, 바스켓 안쪽에 흠집이 생기고,</p><p style="text-align:center;margin:0;color:#000000;">그 틈으로 음식물이 스며듭니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 과정을 이미 한번 겪어보셨다면,</p><p style="text-align:center;margin:0;color:#000000;">다음 선택은 코팅이 아니라 스텐이어야 하는 이유가</p><p style="text-align:center;margin:0;color:#000000;">여기 있습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:17px;color:#0f172a;">코팅 제품을 또 사면 3년 뒤에<br>똑같은 고민을 하게 됩니다.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">22L, 숫자로만 보면 감이 안 옵니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">용량 숫자는 직접 안 재보면 헷갈립니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">대략 이렇게 나눠서 보시면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">5~8L는 1인용, 냉동식품 데우기 위주고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">10~15L는 2인 가구, 간단한 조리 정도입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">20~25L부터는 3~4인 가구, 통닭 한 마리,</p><p style="text-align:center;margin:0;color:#000000;">오븐 대용까지 가능한 구간입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">올스텐 제품은 22L로 이 구간 정확히 걸쳐 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">오븐 따로 두긴 부담스럽고,</p><p style="text-align:center;margin:0;color:#000000;">바스켓형 작은 제품은 아쉬운 그 지점이요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-2.jpg" alt="올스텐 에어프라이어 제품 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">지금 298,000원,<br>정가보다 10만원 낮은 가격입니다.<br>스텐 재질과 22L 용량이 궁금하시면 아래에서<br>바로 확인해보세요.</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/x1uPjNF3</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">오븐형과 바스켓형, 쓰임이 다릅니다</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">바스켓을 흔들어서 꺼내는 일반 에어프라이어와 오븐형은</p><p style="text-align:center;margin:0;color:#000000;">구조가 다릅니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">오븐형은 안이 들여다보이고,</p><p style="text-align:center;margin:0;color:#000000;">트레이를 층으로 나눠 쓸 수 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 번에 두 가지 요리를 따로 조리할 수</p><p style="text-align:center;margin:0;color:#000000;">있다는 뜻입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이미 하나 써봤고 코팅이 상해서 다시 찾는 경우,</p><p style="text-align:center;margin:0;color:#000000;">오븐을 살까 말까 고민하던 경우라면 이 구조가 두 가지</p><p style="text-align:center;margin:0;color:#000000;">역할을 대신해줍니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">사기 전에 딱 하나만 재보세요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">20L대 오븐형은 전자레인지만 한 자리를 차지합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이거 확인 안 하고 샀다가 자리 없어서 애먹는 게 이</p><p style="text-align:center;margin:0;color:#000000;">카테고리 후회 1위입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가로, 세로, 높이 재는 건 누구나 합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여기서 하나 더,</p><p style="text-align:center;margin:0;color:#000000;">열이 빠질 위쪽 여유 공간까지 같이 확인하셔야 합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">주방 상판에 딱 그 자리가 전자레인지 자리</p><p style="text-align:center;margin:0;color:#000000;">하나뿐이라면, 미리 재보고 결정하시는 걸 권합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지금 298,000원,</p><p style="text-align:center;margin:0;color:#000000;">정가 398,000원에서 25% 할인된 가격입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 조건이 계속 유지될지는 알 수 없으니 미리</p><p style="text-align:center;margin:0;color:#000000;">확인해보시는 게 좋습니다.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts/2026-08-09T10-24-03/img/03-3.jpg" alt="올스텐 에어프라이어 추가 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">이미지 출처: 공식 상품 페이지</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">이 제품, 지금 사야 할까요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">기준은 간단합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지금 쓰는 에어프라이어 코팅이 벗겨졌는지</p><p style="text-align:center;margin:0;color:#000000;">보시면 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">벗겨졌다면 스텐으로 넘어가세요.</p><p style="text-align:center;margin:0;color:#000000;">같은 고민을 또 반복하지 않는 방법입니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">아직 멀쩡하거나 처음 에어프라이어를 사시는 거라면,</p><p style="text-align:center;margin:0;color:#000000;">이 가격대는 아직 과합니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">저가 코팅 제품으로 시작해보시고,</p><p style="text-align:center;margin:0;color:#000000;">코팅이 상하는 시점에 다시 스텐을 고민하셔도</p><p style="text-align:center;margin:0;color:#000000;">늦지 않습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">주 1~2회 냉동식품 데우는 정도,</p><p style="text-align:center;margin:0;color:#000000;">자리가 애매한 주방,</p><p style="text-align:center;margin:0;color:#000000;">예열 기다리는 걸 못 견디는 성격이라면 이 제품은</p><p style="text-align:center;margin:0;color:#000000;">방향이 맞지 않을 수 있습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">반대로 주 3회 이상 요리하고,</p><p style="text-align:center;margin:0;color:#000000;">오븐 자리 고민 중이고,</p><p style="text-align:center;margin:0;color:#000000;">코팅 벗겨진 걸 이미 겪어보셨다면 평점 4.82점,</p><p style="text-align:center;margin:0;color:#000000;">리뷰 5,909건이 그 선택을 뒷받침해줄</p><p style="text-align:center;margin:0;color:#000000;">자료가 됩니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">코팅 벗겨진 에어프라이어를 또 사려던 참이었다면,</p><p style="text-align:center;margin:0;color:#000000;">이번엔 스텐을 확인해보시는 게 좋습니다.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">25% 할인이 언제까지 유지될지는 알 수 없으니,</p><p style="text-align:center;margin:0;color:#000000;">지금 가격을 확인해두세요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><blockquote style="text-align:center;font-style:normal;"><b><span style="font-size:18px;color:#2563eb;">코팅 벗겨진 에어프라이어를 또 사려던 참이었다면,<br>이번엔 스텐을 확인해보시는 게 좋습니다.<br>25% 할인이 언제까지 유지될지는 알 수 없으니,<br>지금 가격을 확인해두세요.</span></b><br><br><b><span style="font-size:16px;color:#2563eb;">👉 올스텐 오븐에어프라이어 대용량 22L 스텐<br>가격·구성 확인하기</span></b></blockquote><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/x1uPjNF3</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#대용량에어프라이어 #에어프라이어22L #오븐형에어프라이어 #에어프라이어추천 #스텐에어프라이어 #에어프라이어대용량 #올스텐에어프라이어 #에어프라이어가격비교 #에어프라이어용량비교 #가정용에어프라이어추천</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">3년 전에 산 에어프라이어, 슬쩍 열어보셨나요.
+
+
+바닥 코팅이 벗겨져서 음식이 눌어붙기 시작했다면,
+그거 위생 문제로 넘어가는 신호입니다.
+
+
+[사진 1 넣기]
+
+
+코팅 제품, 왜 3년마다 같은 고민을 할까요
+
+
+에어프라이어 코팅은 소모품에 가깝습니다.
+
+
+주 3회 이상 요리하시는 분이라면 코팅 벗겨지는 시점이
+생각보다 빨리 옵니다.
+
+
+모서리부터 벗겨지고, 바스켓 안쪽에 흠집이 생기고,
+그 틈으로 음식물이 스며듭니다.
+
+
+이 과정을 이미 한번 겪어보셨다면,
+다음 선택은 코팅이 아니라 스텐이어야 하는 이유가
+여기 있습니다.
+
+
+코팅 제품을 또 사면 3년 뒤에
+똑같은 고민을 하게 됩니다.
+
+
+22L, 숫자로만 보면 감이 안 옵니다
+
+
+용량 숫자는 직접 안 재보면 헷갈립니다.
+
+
+대략 이렇게 나눠서 보시면 됩니다.
+
+
+5~8L는 1인용, 냉동식품 데우기 위주고요.
+
+
+10~15L는 2인 가구, 간단한 조리 정도입니다.
+
+
+20~25L부터는 3~4인 가구, 통닭 한 마리,
+오븐 대용까지 가능한 구간입니다.
+
+
+올스텐 제품은 22L로 이 구간 정확히 걸쳐 있습니다.
+
+
+오븐 따로 두긴 부담스럽고,
+바스켓형 작은 제품은 아쉬운 그 지점이요.
+
+
+[사진 2 넣기]
+
+
+지금 298,000원,
+정가보다 10만원 낮은 가격입니다.
+스텐 재질과 22L 용량이 궁금하시면 아래에서
+바로 확인해보세요.
+
+https://naver.me/x1uPjNF3
+
+
+오븐형과 바스켓형, 쓰임이 다릅니다
+
+
+바스켓을 흔들어서 꺼내는 일반 에어프라이어와 오븐형은
+구조가 다릅니다.
+
+
+오븐형은 안이 들여다보이고,
+트레이를 층으로 나눠 쓸 수 있습니다.
+
+
+한 번에 두 가지 요리를 따로 조리할 수
+있다는 뜻입니다.
+
+
+이미 하나 써봤고 코팅이 상해서 다시 찾는 경우,
+오븐을 살까 말까 고민하던 경우라면 이 구조가 두 가지
+역할을 대신해줍니다.
+
+
+사기 전에 딱 하나만 재보세요
+
+
+20L대 오븐형은 전자레인지만 한 자리를 차지합니다.
+
+
+이거 확인 안 하고 샀다가 자리 없어서 애먹는 게 이
+카테고리 후회 1위입니다.
+
+
+가로, 세로, 높이 재는 건 누구나 합니다.
+
+
+여기서 하나 더,
+열이 빠질 위쪽 여유 공간까지 같이 확인하셔야 합니다.
+
+
+주방 상판에 딱 그 자리가 전자레인지 자리
+하나뿐이라면, 미리 재보고 결정하시는 걸 권합니다.
+
+
+지금 298,000원,
+정가 398,000원에서 25% 할인된 가격입니다.
+
+
+이 조건이 계속 유지될지는 알 수 없으니 미리
+확인해보시는 게 좋습니다.
+
+
+[사진 3 넣기]
+
+
+이 제품, 지금 사야 할까요
+
+
+기준은 간단합니다.
+
+
+지금 쓰는 에어프라이어 코팅이 벗겨졌는지
+보시면 됩니다.
+
+
+벗겨졌다면 스텐으로 넘어가세요.
+같은 고민을 또 반복하지 않는 방법입니다.
+
+
+아직 멀쩡하거나 처음 에어프라이어를 사시는 거라면,
+이 가격대는 아직 과합니다.
+
+
+저가 코팅 제품으로 시작해보시고,
+코팅이 상하는 시점에 다시 스텐을 고민하셔도
+늦지 않습니다.
+
+
+주 1~2회 냉동식품 데우는 정도,
+자리가 애매한 주방,
+예열 기다리는 걸 못 견디는 성격이라면 이 제품은
+방향이 맞지 않을 수 있습니다.
+
+
+반대로 주 3회 이상 요리하고,
+오븐 자리 고민 중이고,
+코팅 벗겨진 걸 이미 겪어보셨다면 평점 4.82점,
+리뷰 5,909건이 그 선택을 뒷받침해줄
+자료가 됩니다.
+
+
+코팅 벗겨진 에어프라이어를 또 사려던 참이었다면,
+이번엔 스텐을 확인해보시는 게 좋습니다.
+
+
+25% 할인이 언제까지 유지될지는 알 수 없으니,
+지금 가격을 확인해두세요.
+
+
+코팅 벗겨진 에어프라이어를 또 사려던 참이었다면,
+이번엔 스텐을 확인해보시는 게 좋습니다.
+25% 할인이 언제까지 유지될지는 알 수 없으니,
+지금 가격을 확인해두세요.
+
+https://naver.me/x1uPjNF3
+
+
+#대용량에어프라이어 #에어프라이어22L #오븐형에어프라이어 #에어프라이어추천 #스텐에어프라이어 #에어프라이어대용량 #올스텐에어프라이어 #에어프라이어가격비교 #에어프라이어용량비교 #가정용에어프라이어추천</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage) {
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      say(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        say('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.'
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.'
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+})();
+</script>
+</body>
+</html>
