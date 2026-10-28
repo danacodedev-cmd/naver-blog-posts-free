@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>가열식 가습기 추천 전에 신생아 방에서 먼저 걸러야 할 기능</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 예약 카드 + 자동 작성 버튼. 집 와이파이에서, 이 맥에서 node server.js가 켜져 있을
+     때만 동작한다 — 공개 인터넷 중계는 쓰지 않는다(보안상 열지 않기로 했다). */
+  .sched-card { display: flex; flex-direction: column; justify-content: center; gap: 1px;
+    min-height: 48px; padding: 6px 14px; border-radius: 12px; background: #ede9fe;
+    color: #6d28d9; border: 1px solid #6d28d933; flex-shrink: 0; }
+  .sched-card.none { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+  .sched-card-label { font-size: 11px; font-weight: 700; opacity: .75; letter-spacing: .2px; }
+  .sched-card-when { font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+  .sched-card-time { margin-left: 8px; padding-left: 8px; border-left: 1.5px solid currentColor; }
+  #autoDraftBtn { min-height: 48px; padding: 0 20px; border-radius: 12px; background: #03c75a;
+    color: #fff; font-weight: 700; flex: 1; min-width: 0; }
+  #autoDraftBtn:hover { background: #02b351; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  #autoDraftMsg { display: none; font-size: 13px; line-height: 1.45; color: #6d28d9;
+    background: #f5f3ff; padding: 9px 16px; border-bottom: 1px solid #ede9fe; }
+  #autoDraftMsg.show { display: block; }
+  @media (max-width: 380px) { .sched-card-when { font-size: 15px; } #autoDraftBtn { flex-basis: 100%; } }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #keywordResearch { max-width: 700px; margin: 14px auto 0; padding: 16px 18px; background: #fff;
+    border: 1px solid #dbeafe; border-radius: 10px; color: #334155; box-sizing: border-box; }
+  #keywordResearch h2 { margin: 0 0 12px; font-size: 15px; color: #0f172a; }
+  #keywordResearch div + div { margin-top: 12px; }
+  #keywordResearch b { display: block; margin-bottom: 6px; font-size: 12px; color: #64748b; }
+  #keywordResearch p { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+  #keywordResearch span { display: inline-block; padding: 6px 9px; border-radius: 999px;
+    background: #eff6ff; color: #1d4ed8; font-size: 12.5px; font-weight: 700; }
+  #keywordResearch small { display: block; margin-top: 12px; color: #94a3b8; font-size: 11.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="디지털/가전" style="background:#eef3fc;color:#23477e;border:1.5px solid #c3d4f2;">디지털/가전</span></div>
+  <h1 id="titleText" class="visually-hidden">가열식 가습기 추천 전에 신생아 방에서 먼저 걸러야 할 기능</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">에어메이드 가열식 신생아 아기 살균 자동세척 더 위대한 가습기 2.0 AMH-4502</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="가열식 가습기 추천 전에 신생아 방에서 먼저 걸러야 할 기능"><span class="tp-num">1</span><span class="tp-text">가열식 가습기 추천 전에 신생아 방에서 먼저 걸러야 할 기능</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="신생아 가습기 가열식으로 바꾸고 나서야 알게 된 세척 주기"><span class="tp-num">2</span><span class="tp-text">신생아 가습기 가열식으로 바꾸고 나서야 알게 된 세척 주기</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="가열식 가습기 세척 자동으로 안 되면 신생아 방엔 못 들인다"><span class="tp-num">3</span><span class="tp-text">가열식 가습기 세척 자동으로 안 되면 신생아 방엔 못 들인다</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <div class="sched-card"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">10월 29일 (수)<span class="sched-card-time">16:30</span></span></div>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
+</div>
+<div id="autoDraftMsg"></div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<section id="keywordResearch" aria-label="SEO 키워드 선정 근거">
+  <h2>SEO 키워드 선정 근거</h2>
+  <div><b>메인 키워드 3개</b><p><span>가습기</span><span>가열식 가습기</span><span>신생아 가습기</span></p></div>
+  <div><b>네이버 자동완성에서 고른 최종 키워드 3개</b><p><span>가열식 가습기 추천</span><span>신생아 가습기 가열식</span><span>가열식 가습기 세척</span></p></div>
+  <small>이 영역은 작성자 확인용이며 본문 복사에는 포함되지 않습니다.</small>
+</section>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/7678ymym/224440436988" target="_blank" rel="noopener noreferrer">가을 겨울 실내 습도 관리, 가열식 가습기가 필요한 순간이에요</a></li>
+      <li><a href="https://blog.naver.com/gndhs/224447579114" target="_blank" rel="noopener noreferrer">대용량 스텐 가열식 가습기 조지루시 추천 신제품 사용 후기</a></li>
+      <li><a href="https://blog.naver.com/oceandy/224444118811" target="_blank" rel="noopener noreferrer">겨울철 신생아 아기 가습기, 통세척 가능한 대용량 올스텐 가열식 3종 중 무엇을 사야 할까? (케어....</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 2장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-48-05/img/02-1.jpg" alt="에어메이드 가열식가습기 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-48-05/img/02-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-48-05/img/02-2.jpg" alt="에어메이드 가열식가습기 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-48-05/img/02-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">아기 키우면서 가습기 하나</p><p style="text-align:center;margin:0;color:#000000;">들이려고 하면 생각보다 고민할</p><p style="text-align:center;margin:0;color:#000000;">게 많더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가열식 가습기 추천 받아서</p><p style="text-align:center;margin:0;color:#000000;">찾아보다가, 결국 중요한</p><p style="text-align:center;margin:0;color:#000000;">건 위생이랑 관리</p><p style="text-align:center;margin:0;color:#000000;">편의성이라는 걸 느꼈어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">매일 쓰는 물건인데 균</p><p style="text-align:center;margin:0;color:#000000;">걱정하면서 틀기는 싫잖아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-48-05/img/02-1.jpg" alt="에어메이드 가열식가습기 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> 가열식이 위생적이라는 게 무슨 말일까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 3L 대용량 수조, 어떤 상황에서 편할까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 자동세척 기능은 관리에 어떻게 도움이 될까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> 스테인리스 수조 소재는 왜 중요할까</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">가열식이 위생적이라는 게 무슨 말일까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이것저것 찾아보고 고르면서</p><p style="text-align:center;margin:0;color:#000000;">느낀 건데, 가열식 가습기는</p><p style="text-align:center;margin:0;color:#000000;">물을 100℃로 끓여서</p><p style="text-align:center;margin:0;color:#000000;">분무하는 방식이라 균 걱정</p><p style="text-align:center;margin:0;color:#000000;">없이 안심하고 틀 수 있다는</p><p style="text-align:center;margin:0;color:#000000;">얘기를 많이 보게 되더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">초음파식이랑 비교하면서</p><p style="text-align:center;margin:0;color:#000000;">가열식 가습기 추천을 찾는</p><p style="text-align:center;margin:0;color:#000000;">분들이 많은 이유도</p><p style="text-align:center;margin:0;color:#000000;">이거더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">신생아 가습기 가열식을</p><p style="text-align:center;margin:0;color:#000000;">원하는 부모님들이 특히 이</p><p style="text-align:center;margin:0;color:#000000;">부분을 중요하게</p><p style="text-align:center;margin:0;color:#000000;">보시는 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">뜨거운 물로 가습을 하는</p><p style="text-align:center;margin:0;color:#000000;">거니까, 수조 안에 균이</p><p style="text-align:center;margin:0;color:#000000;">그대로 남아있을 걱정은</p><p style="text-align:center;margin:0;color:#000000;">덜어도 되는 셈이죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">아기 방에 두고 쓰기에는 이</p><p style="text-align:center;margin:0;color:#000000;">방식이 마음이 좀 놓이는</p><p style="text-align:center;margin:0;color:#000000;">포인트인 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-48-05/img/02-2.jpg" alt="에어메이드 가열식가습기 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">사진은 공식 상품 페이지 기준입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">3L 대용량 수조, 어떤 상황에서 편할까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">써보신 분들 얘기 들어보니,</p><p style="text-align:center;margin:0;color:#000000;">3L 대용량 수조라 물을 한 번</p><p style="text-align:center;margin:0;color:#000000;">가득 채워두면 오랫동안 신경 안</p><p style="text-align:center;margin:0;color:#000000;">써도 된다는 후기가 많더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">밤에 아기 재우고 나서 물</p><p style="text-align:center;margin:0;color:#000000;">채우러 다시 들어가는 것도</p><p style="text-align:center;margin:0;color:#000000;">번거로운 일인데,</p><p style="text-align:center;margin:0;color:#000000;">대용량이면 그런 수고를</p><p style="text-align:center;margin:0;color:#000000;">줄일 수 있는 부분이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">자는 동안 물이 부족해질까 신경</p><p style="text-align:center;margin:0;color:#000000;">쓸 일이 적어지는 거죠.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 작은 방이나 자리를 많이</p><p style="text-align:center;margin:0;color:#000000;">차지하면 안 되는 공간이라면,</p><p style="text-align:center;margin:0;color:#000000;">이 정도 수조 용량이 오히려</p><p style="text-align:center;margin:0;color:#000000;">부담스러울 수도 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">본체 크기도 그만큼 있을 테니</p><p style="text-align:center;margin:0;color:#000000;">놓을 자리는 미리 가늠해보시는</p><p style="text-align:center;margin:0;color:#000000;">게 좋을 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">그래서 저도 수조 소재랑 세척<br>방식부터 비교해보면서 가격을 좀<br>찾아봤는데요,<br>넾다세일로 지금 가격 확인해보면<br>좋을 것 같아요.</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#8a8f96;">⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</span></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FtoP8EA3</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">자동세척 기능은 관리에 어떻게 도움이 될까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가열식 가습기 세척이 매번</p><p style="text-align:center;margin:0;color:#000000;">번거롭다는 얘기를 자주 듣는데,</p><p style="text-align:center;margin:0;color:#000000;">이 제품은 자동세척 기능이</p><p style="text-align:center;margin:0;color:#000000;">있어서 그 부분이 덜</p><p style="text-align:center;margin:0;color:#000000;">수고스럽다는 점이 눈에 띄더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">육아하면서 가습기까지 손으로 매번</p><p style="text-align:center;margin:0;color:#000000;">닦아내는 건 솔직히 쉽지</p><p style="text-align:center;margin:0;color:#000000;">않은 일이거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">자동세척이 있으면 관리에 드는</p><p style="text-align:center;margin:0;color:#000000;">시간과 손이 줄어드는 셈이니,</p><p style="text-align:center;margin:0;color:#000000;">바쁜 육아 중에는 꽤 실질적인</p><p style="text-align:center;margin:0;color:#000000;">도움이 될 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그렇다고 세척을 아예 신경</p><p style="text-align:center;margin:0;color:#000000;">안 써도 되는 건 아니고,</p><p style="text-align:center;margin:0;color:#000000;">기본적인 관리는 그래도</p><p style="text-align:center;margin:0;color:#000000;">필요하다는 점은 염두에</p><p style="text-align:center;margin:0;color:#000000;">두시면 좋을 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">스테인리스 수조 소재는 왜 중요할까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">관심 갖고 보다 보니,</p><p style="text-align:center;margin:0;color:#000000;">수조 내부가 부식에 강한</p><p style="text-align:center;margin:0;color:#000000;">SUS 316L 스테인리스</p><p style="text-align:center;margin:0;color:#000000;">소재로 되어 있다는 점도</p><p style="text-align:center;margin:0;color:#000000;">확인이 되더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">플라스틱 수조는 시간이</p><p style="text-align:center;margin:0;color:#000000;">지나면 변색되거나 세균이</p><p style="text-align:center;margin:0;color:#000000;">번식하기 쉬운 틈이 생길</p><p style="text-align:center;margin:0;color:#000000;">수 있는데, 스테인리스</p><p style="text-align:center;margin:0;color:#000000;">소재는 그런 부분에서</p><p style="text-align:center;margin:0;color:#000000;">상대적으로 위생을</p><p style="text-align:center;margin:0;color:#000000;">유지하기에 유리한 소재로</p><p style="text-align:center;margin:0;color:#000000;">알려져 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">매일 물을 채우고 가열하는</p><p style="text-align:center;margin:0;color:#000000;">제품이니, 수조 소재가</p><p style="text-align:center;margin:0;color:#000000;">무엇인지는 생각보다 중요한</p><p style="text-align:center;margin:0;color:#000000;">기준이 되는 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 스테인리스 수조는 일반</p><p style="text-align:center;margin:0;color:#000000;">플라스틱 제품보다 본체 무게가</p><p style="text-align:center;margin:0;color:#000000;">있을 수밖에 없어서,</p><p style="text-align:center;margin:0;color:#000000;">물 채운 상태로 옮길 때는 조금</p><p style="text-align:center;margin:0;color:#000000;">힘이 들어갈 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 이건 한 번 놓을</p><p style="text-align:center;margin:0;color:#000000;">자리를 정해두고 그 자리에서</p><p style="text-align:center;margin:0;color:#000000;">계속 쓰는 식으로 쓰면 크게</p><p style="text-align:center;margin:0;color:#000000;">신경 안 쓰여요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">결국 신생아 가습기 가열식을</p><p style="text-align:center;margin:0;color:#000000;">고를 때는 위생 방식,</p><p style="text-align:center;margin:0;color:#000000;">수조 용량, 세척 편의성,</p><p style="text-align:center;margin:0;color:#000000;">소재까지 같이 보는 게</p><p style="text-align:center;margin:0;color:#000000;">중요한 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가열식 가습기 추천을</p><p style="text-align:center;margin:0;color:#000000;">알아보시는 중이라면 이</p><p style="text-align:center;margin:0;color:#000000;">네 가지 기준으로 한번</p><p style="text-align:center;margin:0;color:#000000;">비교해보시는 것도 도움이</p><p style="text-align:center;margin:0;color:#000000;">될 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">매번 물 채우고 세척하는 번거로움<br>없이 쓰고 싶다면,<br>넾다세일 적용된 지금 가격으로<br>한번 보고 결정하셔도 늦지<br>않을 것 같아요.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/FtoP8EA3</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#에어메이드 #가열식가습기 #가습기 #조용한 #가열식 #안전한 #저소음 #산후조리원 #아기 #대용량 #가열식가습기추천 #신생아가습기가열식</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">아기 키우면서 가습기 하나
+들이려고 하면 생각보다 고민할
+게 많더라구요.
+
+
+가열식 가습기 추천 받아서
+찾아보다가, 결국 중요한
+건 위생이랑 관리
+편의성이라는 걸 느꼈어요.
+
+
+매일 쓰는 물건인데 균
+걱정하면서 틀기는 싫잖아요.
+
+
+사진1
+
+
+이 글에서 다루는 것
+
+1. 가열식이 위생적이라는 게 무슨 말일까
+2. 3L 대용량 수조, 어떤 상황에서 편할까
+3. 자동세척 기능은 관리에 어떻게 도움이 될까
+4. 스테인리스 수조 소재는 왜 중요할까
+
+
+가열식이 위생적이라는 게 무슨 말일까
+
+
+이것저것 찾아보고 고르면서
+느낀 건데, 가열식 가습기는
+물을 100℃로 끓여서
+분무하는 방식이라 균 걱정
+없이 안심하고 틀 수 있다는
+얘기를 많이 보게 되더라구요.
+
+
+초음파식이랑 비교하면서
+가열식 가습기 추천을 찾는
+분들이 많은 이유도
+이거더라구요.
+
+
+신생아 가습기 가열식을
+원하는 부모님들이 특히 이
+부분을 중요하게
+보시는 것 같아요.
+
+
+뜨거운 물로 가습을 하는
+거니까, 수조 안에 균이
+그대로 남아있을 걱정은
+덜어도 되는 셈이죠.
+
+
+아기 방에 두고 쓰기에는 이
+방식이 마음이 좀 놓이는
+포인트인 것 같아요.
+
+
+사진2
+
+
+3L 대용량 수조, 어떤 상황에서 편할까
+
+
+써보신 분들 얘기 들어보니,
+3L 대용량 수조라 물을 한 번
+가득 채워두면 오랫동안 신경 안
+써도 된다는 후기가 많더라구요.
+
+
+밤에 아기 재우고 나서 물
+채우러 다시 들어가는 것도
+번거로운 일인데,
+대용량이면 그런 수고를
+줄일 수 있는 부분이에요.
+
+
+자는 동안 물이 부족해질까 신경
+쓸 일이 적어지는 거죠.
+
+
+다만 작은 방이나 자리를 많이
+차지하면 안 되는 공간이라면,
+이 정도 수조 용량이 오히려
+부담스러울 수도 있어요.
+
+
+본체 크기도 그만큼 있을 테니
+놓을 자리는 미리 가늠해보시는
+게 좋을 것 같아요.
+
+
+그래서 저도 수조 소재랑 세척
+방식부터 비교해보면서 가격을 좀
+찾아봤는데요,
+넾다세일로 지금 가격 확인해보면
+좋을 것 같아요.
+
+https://naver.me/FtoP8EA3
+
+
+자동세척 기능은 관리에 어떻게 도움이 될까
+
+
+가열식 가습기 세척이 매번
+번거롭다는 얘기를 자주 듣는데,
+이 제품은 자동세척 기능이
+있어서 그 부분이 덜
+수고스럽다는 점이 눈에 띄더라구요.
+
+
+육아하면서 가습기까지 손으로 매번
+닦아내는 건 솔직히 쉽지
+않은 일이거든요.
+
+
+자동세척이 있으면 관리에 드는
+시간과 손이 줄어드는 셈이니,
+바쁜 육아 중에는 꽤 실질적인
+도움이 될 것 같아요.
+
+
+그렇다고 세척을 아예 신경
+안 써도 되는 건 아니고,
+기본적인 관리는 그래도
+필요하다는 점은 염두에
+두시면 좋을 것 같아요.
+
+
+스테인리스 수조 소재는 왜 중요할까
+
+
+관심 갖고 보다 보니,
+수조 내부가 부식에 강한
+SUS 316L 스테인리스
+소재로 되어 있다는 점도
+확인이 되더라구요.
+
+
+플라스틱 수조는 시간이
+지나면 변색되거나 세균이
+번식하기 쉬운 틈이 생길
+수 있는데, 스테인리스
+소재는 그런 부분에서
+상대적으로 위생을
+유지하기에 유리한 소재로
+알려져 있어요.
+
+
+매일 물을 채우고 가열하는
+제품이니, 수조 소재가
+무엇인지는 생각보다 중요한
+기준이 되는 것 같아요.
+
+
+다만 스테인리스 수조는 일반
+플라스틱 제품보다 본체 무게가
+있을 수밖에 없어서,
+물 채운 상태로 옮길 때는 조금
+힘이 들어갈 수 있어요.
+
+
+근데 이건 한 번 놓을
+자리를 정해두고 그 자리에서
+계속 쓰는 식으로 쓰면 크게
+신경 안 쓰여요.
+
+
+결국 신생아 가습기 가열식을
+고를 때는 위생 방식,
+수조 용량, 세척 편의성,
+소재까지 같이 보는 게
+중요한 것 같아요.
+
+
+가열식 가습기 추천을
+알아보시는 중이라면 이
+네 가지 기준으로 한번
+비교해보시는 것도 도움이
+될 것 같아요.
+
+
+매번 물 채우고 세척하는 번거로움
+없이 쓰고 싶다면,
+넾다세일 적용된 지금 가격으로
+한번 보고 결정하셔도 늦지
+않을 것 같아요.
+
+https://naver.me/FtoP8EA3
+
+
+#에어메이드 #가열식가습기 #가습기 #조용한 #가열식 #안전한 #저소음 #산후조리원 #아기 #대용량 #가열식가습기추천 #신생아가습기가열식</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
+      sayWithCategory
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+
+  // "네이버에 자동 작성" — 이 맥(localhost:3000)에서 node server.js가 켜져 있을 때만
+  // 동작한다. 공개 인터넷을 거치는 중계는 일부러 안 쓴다 — 페이지 소스에 적힌 주소를
+  // 아무나 흉내 내면 이 맥에서 네이버 창이 열릴 수 있어서다. 집 와이파이에서 이 페이지를
+  // 이 맥의 브라우저로 열었을 때만 쓰는 버튼이다.
+  var autoMsg = document.getElementById('autoDraftMsg');
+  function autoSay(text) {
+    autoMsg.textContent = text;
+    autoMsg.classList.add('show');
+  }
+  // 이 페이지 자체가 이미 이 Mac(localhost:3000)에서 열려 있으면 같은 출처라
+  // 상대 경로로 부르고, 공개 GitHub Pages에서 열려 있으면 절대 주소로 부른다.
+  // HTTPS 페이지에서 http://localhost 로 보내는 요청은 사파리·최신 크롬이 혼합
+  // 콘텐츠로 보고 조용히 막아 "Failed to fetch"만 뜬다 — 그게 막히면 이 Mac의
+  // 브라우저로 http://localhost:3000/archive/... 를 열어 쓰라고 안내한다.
+  var API_BASE = /^(localhost|127.0.0.1)$/.test(location.hostname) ? '' : 'http://localhost:3000';
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // resultsArchive.js가 파일을 "<폴더>/01-제목.html"로 저장하므로, 주소만으로
+      // 배치 폴더와 이 글의 순번을 안다 — 서버에 다시 물어볼 필요가 없다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      if (autoBtn.disabled) return;
+      autoBtn.disabled = true;
+      autoSay('이 Mac에 자동 작성을 요청하는 중…');
+      fetch(API_BASE + '/api/auto-draft', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folder: folder, index: idx, title: chosenTitle.trim() }),
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        if (!data || !data.ok) throw new Error((data && data.error) || '요청이 거부됐습니다');
+        pollAutoDraft(data.jobId, Date.now());
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        autoSay('요청을 보내지 못했어요 — node server.js가 켜져 있는지 확인하고, 그래도 안 되면 이 Mac의 브라우저로 http://localhost:3000/archive/' + folder + '/' + file + ' 를 열어 거기서 눌러주세요. (' + (e && e.message || '') + ')');
+      });
+    });
+  }
+  function pollAutoDraft(jobId, t0) {
+    setTimeout(function () {
+      fetch(API_BASE + '/api/auto-draft/' + jobId)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data || !data.ok) { autoBtn.disabled = false; autoSay('작업을 찾지 못했습니다.'); return; }
+          if (data.status === 'done') { autoBtn.disabled = false; autoSay('✅ ' + data.message); return; }
+          if (data.status === 'error') { autoBtn.disabled = false; autoSay('작성 실패: ' + data.message); return; }
+          autoSay(data.message || '네이버 창에 작성하는 중…');
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          pollAutoDraft(jobId, t0);
+        })
+        .catch(function () { pollAutoDraft(jobId, t0); });
+    }, 1200);
+  }
+})();
+</script>
+</body>
+</html>
