@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>화장실 문 교체 비용, ABS도어로 하루 만에 끝낸 시공 과정과 실제 체감</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 실수로 선택·복사되는 걸 막아둡니다
+     (어차피 #post 밖이라 "본문 복사" 버튼에는 안 잡히지만, 손으로 드래그하는 것도 막습니다). */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 7px 13px; font-size: 13px; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #copyBtn { background: #03c75a; color: #fff; padding: 12px 14px; flex: 1; min-width: 0; }
+  #copyProductNameBtn { background: #eef4ff; color: #2563eb; padding: 12px 22px; flex-shrink: 0; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 예약 카드 + 자동 작성 버튼. 집 와이파이에서, 이 맥에서 node server.js가 켜져 있을
+     때만 동작한다 — 공개 인터넷 중계는 쓰지 않는다(보안상 열지 않기로 했다). */
+  .sched-card { display: flex; flex-direction: column; justify-content: center; gap: 1px;
+    min-height: 48px; padding: 6px 14px; border-radius: 12px; background: #ede9fe;
+    color: #6d28d9; border: 1px solid #6d28d933; flex-shrink: 0; }
+  .sched-card.none { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+  .sched-card-label { font-size: 11px; font-weight: 700; opacity: .75; letter-spacing: .2px; }
+  .sched-card-when { font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+  .sched-card-time { margin-left: 8px; padding-left: 8px; border-left: 1.5px solid currentColor; }
+  #autoDraftBtn { min-height: 48px; padding: 0 20px; border-radius: 12px; background: #03c75a;
+    color: #fff; font-weight: 700; flex: 1; min-width: 0; }
+  #autoDraftBtn:hover { background: #02b351; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  #autoDraftMsg { display: none; font-size: 13px; line-height: 1.45; color: #6d28d9;
+    background: #f5f3ff; padding: 9px 16px; border-bottom: 1px solid #ede9fe; }
+  #autoDraftMsg.show { display: block; }
+  @media (max-width: 380px) { .sched-card-when { font-size: 15px; } #autoDraftBtn { flex-basis: 100%; } }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #keywordResearch { max-width: 700px; margin: 14px auto 0; padding: 16px 18px; background: #fff;
+    border: 1px solid #dbeafe; border-radius: 10px; color: #334155; box-sizing: border-box; }
+  #keywordResearch h2 { margin: 0 0 12px; font-size: 15px; color: #0f172a; }
+  #keywordResearch div + div { margin-top: 12px; }
+  #keywordResearch b { display: block; margin-bottom: 6px; font-size: 12px; color: #64748b; }
+  #keywordResearch p { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+  #keywordResearch span { display: inline-block; padding: 6px 9px; border-radius: 999px;
+    background: #eff6ff; color: #1d4ed8; font-size: 12.5px; font-weight: 700; }
+  #keywordResearch small { display: block; margin-top: 12px; color: #94a3b8; font-size: 11.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+    <button id="publishToggle" type="button">발행 전</button>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="가구/인테리어" style="background:#f6f2ec;color:#6b543a;border:1.5px solid #e0d3c0;">가구/인테리어</span></div>
+  <h1 id="titleText" class="visually-hidden">화장실 문 교체 비용, ABS도어로 하루 만에 끝낸 시공 과정과 실제 체감</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">방문교체 ABS도어 화장실문 시공설치 / ABS도어 교체</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="화장실 문 교체 비용, ABS도어로 하루 만에 끝낸 시공 과정과 실제 체감"><span class="tp-num">1</span><span class="tp-text">화장실 문 교체 비용, ABS도어로 하루 만에 끝낸 시공 과정과 실제 체감</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="ABS도어교체 전후 문짝 두께와 마감 차이, 직접 보니 이게 답이었다"><span class="tp-num">2</span><span class="tp-text">ABS도어교체 전후 문짝 두께와 마감 차이, 직접 보니 이게 답이었다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="화장실 문 교체 셀프로 가능한지 틀과 문짝 선택부터 설치까지 순서대로 담았다"><span class="tp-num">3</span><span class="tp-text">화장실 문 교체 셀프로 가능한지 틀과 문짝 선택부터 설치까지 순서대로 담았다</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <div class="sched-card none"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">시간 미정</span></div>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
+</div>
+<div id="autoDraftMsg"></div>
+<div class="actionbar">
+  <button id="copyBtn" type="button">본문 복사</button>
+  <button id="copyProductNameBtn" type="button">제품명 복사</button>
+</div>
+<section id="keywordResearch" aria-label="SEO 키워드 선정 근거">
+  <h2>SEO 키워드 선정 근거</h2>
+  <div><b>메인 키워드 3개</b><p><span>방문교체</span><span>화장실문교체</span><span>ABS도어</span></p></div>
+  <div><b>네이버 자동완성에서 고른 최종 키워드 3개</b><p><span>화장실 문 교체 비용</span><span>ABS도어교체</span><span>화장실 문 교체 셀프</span></p></div>
+  <small>이 영역은 작성자 확인용이며 본문 복사에는 포함되지 않습니다.</small>
+</section>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/silruat2/224445712967" target="_blank" rel="noopener noreferrer">순천문고리 순천문손잡이｜연향동 노인복지센터 화장실 문고리 파손 교체</a></li>
+      <li><a href="https://blog.naver.com/aegi2001/224445410020" target="_blank" rel="noopener noreferrer">[만수동 문고리 교체] 화장실 문이 꽉 잠겼을 때! 문손잡이 강제 개방 및 교체 수리 후기</a></li>
+      <li><a href="https://blog.naver.com/sjh050100/224443207094" target="_blank" rel="noopener noreferrer">천안 방문 손잡이 교체 - 부식된 화장실 문고리 [천안 차암동 효성해링턴 아파트]</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 2장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-47-58/img/03-1.jpg" alt="방문교체 기타가구부속품 상세 스펙 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-47-58/img/03-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-47-58/img/03-2.jpg" alt="방문교체 기타가구부속품 색상 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-47-58/img/03-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">화장실 문 교체 비용이 얼마나</p><p style="text-align:center;margin:0;color:#000000;">나올지부터 궁금해서 찾아보시는</p><p style="text-align:center;margin:0;color:#000000;">분들 많으실 거예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">문짝이 뒤틀려서 잘 안</p><p style="text-align:center;margin:0;color:#000000;">닫히거나, 색이 누렇게</p><p style="text-align:center;margin:0;color:#000000;">변한 걸 보면서도 선뜩</p><p style="text-align:center;margin:0;color:#000000;">공사까지 들어가기는</p><p style="text-align:center;margin:0;color:#000000;">망설여지거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">집 전체를 뜯어내는 큰</p><p style="text-align:center;margin:0;color:#000000;">공사라고 생각하면 당연히</p><p style="text-align:center;margin:0;color:#000000;">부담스러운 게 맞아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그런데 이게 문짝만 바꾸는</p><p style="text-align:center;margin:0;color:#000000;">방식도 있고,</p><p style="text-align:center;margin:0;color:#000000;">문틀까지 같이 바꾸는 방식도</p><p style="text-align:center;margin:0;color:#000000;">따로 있다는 걸 알고 나면</p><p style="text-align:center;margin:0;color:#000000;">생각이 조금 달라지더라구요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-47-58/img/03-1.jpg" alt="방문교체 기타가구부속품 상세 스펙 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> ABS도어가 정확히 뭔가요</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 문짝만 교체할지, 문틀까지 세트로 할지</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 실측부터 시공까지 어떻게 진행되나요</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> 결국 어떤 기준으로 골라야 할까요</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">ABS도어가 정확히 뭔가요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">ABS도어는 민무늬나 베이직</p><p style="text-align:center;margin:0;color:#000000;">디자인으로 나오는 문짝 종류예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 상품도 &quot;ABS도어</p><p style="text-align:center;margin:0;color:#000000;">문짝 문틀 방문교체&quot;</p><p style="text-align:center;margin:0;color:#000000;">구성으로 민무늬·베이직도어</p><p style="text-align:center;margin:0;color:#000000;">1개 기준으로 올라와 있거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">화장실문이나 욕실문,</p><p style="text-align:center;margin:0;color:#000000;">방문에 쓰이는 걸로 상품</p><p style="text-align:center;margin:0;color:#000000;">태그에도 나와 있고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">무늬가 복잡하지 않고</p><p style="text-align:center;margin:0;color:#000000;">깔끔한 쪽을 찾으시는</p><p style="text-align:center;margin:0;color:#000000;">분이라면 민무늬·베이직</p><p style="text-align:center;margin:0;color:#000000;">중에서 고르는 구조로</p><p style="text-align:center;margin:0;color:#000000;">보시면 될 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">디자인이 다양하게 갈라지는</p><p style="text-align:center;margin:0;color:#000000;">제품은 아니라서,</p><p style="text-align:center;margin:0;color:#000000;">화려한 패턴을 기대하시면</p><p style="text-align:center;margin:0;color:#000000;">좀 심심하게 느껴질 수도</p><p style="text-align:center;margin:0;color:#000000;">있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 화장실문은 어차피</p><p style="text-align:center;margin:0;color:#000000;">패턴보다 깔끔하게 맞는 게</p><p style="text-align:center;margin:0;color:#000000;">더 중요한 공간이라 저는</p><p style="text-align:center;margin:0;color:#000000;">크게 아쉬운 포인트는</p><p style="text-align:center;margin:0;color:#000000;">아니라고 봤어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-10-28T05-47-58/img/03-2.jpg" alt="방문교체 기타가구부속품 색상 이미지" width="600"><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:11px;color:#999;">공식 상품 페이지에서 가져온 이미지입니다</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">문짝만 교체할지, 문틀까지 세트로 할지</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여기서 선택지가</p><p style="text-align:center;margin:0;color:#000000;">두 가지로 나뉘어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">상세페이지에 보면 [도어]</p><p style="text-align:center;margin:0;color:#000000;">교체 추가옵션과</p><p style="text-align:center;margin:0;color:#000000;">[도어+문틀] 세트</p><p style="text-align:center;margin:0;color:#000000;">추가옵션이 따로</p><p style="text-align:center;margin:0;color:#000000;">구성돼 있거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">문틀 자체는 상태가 괜찮고</p><p style="text-align:center;margin:0;color:#000000;">문짝만 틀어지거나 낡은</p><p style="text-align:center;margin:0;color:#000000;">경우라면 [도어]</p><p style="text-align:center;margin:0;color:#000000;">옵션만으로 교체가 되는</p><p style="text-align:center;margin:0;color:#000000;">거고, 문틀까지 같이</p><p style="text-align:center;margin:0;color:#000000;">변형됐거나 교체하고 싶다면</p><p style="text-align:center;margin:0;color:#000000;">[도어+문틀] 세트</p><p style="text-align:center;margin:0;color:#000000;">옵션으로 가는 방식이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">ABS도어교체를 알아보시는</p><p style="text-align:center;margin:0;color:#000000;">분들이 이 부분에서 헷갈려</p><p style="text-align:center;margin:0;color:#000000;">하시더라구요,</p><p style="text-align:center;margin:0;color:#000000;">전체를 다 뜯어야 하는 줄</p><p style="text-align:center;margin:0;color:#000000;">알았다가 옵션이 나뉘어 있는</p><p style="text-align:center;margin:0;color:#000000;">걸 보고 선택이 편해졌다는</p><p style="text-align:center;margin:0;color:#000000;">얘기를 들었어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 브랜드에서 올라온</p><p style="text-align:center;margin:0;color:#000000;">&quot;셀프실측 방문교체 ABS도어&quot;</p><p style="text-align:center;margin:0;color:#000000;">상품은 민자도어 중백색으로</p><p style="text-align:center;margin:0;color:#000000;">구성된 것도 있어서,</p><p style="text-align:center;margin:0;color:#000000;">색상이나 구성 폭이 궁금하면</p><p style="text-align:center;margin:0;color:#000000;">그쪽도 참고해볼 만해요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">저도 이것저것 찾아보다가 문짝만<br>할지 문틀까지 할지 가격 차이부터<br>궁금해서 찾아봤는데요,<br>지금 올라온 조건 한번 보시면<br>도움 될 것 같아요.</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#8a8f96;">⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</span></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/5WUtcZrA</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">실측부터 시공까지 어떻게 진행되나요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 상품은 실측서비스가</p><p style="text-align:center;margin:0;color:#000000;">포함된 구성이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">문짝 1개 시공 기준으로 돼</p><p style="text-align:center;margin:0;color:#000000;">있고, 영림 ABS도어로 문짝과</p><p style="text-align:center;margin:0;color:#000000;">문틀 교체 시공까지 묶여 있는</p><p style="text-align:center;margin:0;color:#000000;">방식이라 현장에서 치수를 재고</p><p style="text-align:center;margin:0;color:#000000;">맞는 사양으로 들어가는</p><p style="text-align:center;margin:0;color:#000000;">흐름으로 보시면 돼요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">화장실 문 교체 셀프로 직접</p><p style="text-align:center;margin:0;color:#000000;">재단하고 다는 방법을 찾는</p><p style="text-align:center;margin:0;color:#000000;">분들도 계신데,</p><p style="text-align:center;margin:0;color:#000000;">이 구성은 실측부터 시공까지</p><p style="text-align:center;margin:0;color:#000000;">포함된 쪽이라 치수를 잘못</p><p style="text-align:center;margin:0;color:#000000;">재서 다시 맞추는 수고는</p><p style="text-align:center;margin:0;color:#000000;">줄어드는 구조예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">다만 시공 일정을 맞춰야 하는</p><p style="text-align:center;margin:0;color:#000000;">부분은 있으니,</p><p style="text-align:center;margin:0;color:#000000;">당장 오늘내일 바로 교체해야 하는</p><p style="text-align:center;margin:0;color:#000000;">상황이라면 일정 조율이 먼저</p><p style="text-align:center;margin:0;color:#000000;">필요하다는 점은 알고</p><p style="text-align:center;margin:0;color:#000000;">계시는 게 좋아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">여닫이문 기준으로 문선몰딩,</p><p style="text-align:center;margin:0;color:#000000;">도어스토퍼 같은 부속 작업과</p><p style="text-align:center;margin:0;color:#000000;">묶여서 진행되는 경우도 있다고</p><p style="text-align:center;margin:0;color:#000000;">하니, 화장실문리폼을 넓게 보고</p><p style="text-align:center;margin:0;color:#000000;">계신 분들은 이 범위까지 같이</p><p style="text-align:center;margin:0;color:#000000;">챙겨보시면 좋을 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">결국 어떤 기준으로 골라야 할까요</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">화장실문이든 방문이든,</p><p style="text-align:center;margin:0;color:#000000;">문짝만 틀어진 상태인지</p><p style="text-align:center;margin:0;color:#000000;">문틀까지 변형된 상태인지를</p><p style="text-align:center;margin:0;color:#000000;">먼저 보는 게 순서예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">문짝만 문제라면 [도어]</p><p style="text-align:center;margin:0;color:#000000;">옵션으로 끝나고,</p><p style="text-align:center;margin:0;color:#000000;">문틀까지 손봐야 한다면</p><p style="text-align:center;margin:0;color:#000000;">[도어+문틀]</p><p style="text-align:center;margin:0;color:#000000;">세트로 가는 거고요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 구분만 해두면 화장실 문</p><p style="text-align:center;margin:0;color:#000000;">교체 비용을 가늠할 때도 어느</p><p style="text-align:center;margin:0;color:#000000;">쪽 옵션을 기준으로 봐야 할지가</p><p style="text-align:center;margin:0;color:#000000;">명확해지더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">지금 집 화장실문이나 방문</p><p style="text-align:center;margin:0;color:#000000;">상태를 한번 들여다보시고,</p><p style="text-align:center;margin:0;color:#000000;">문짝만인지 문틀까지인지 먼저</p><p style="text-align:center;margin:0;color:#000000;">체크해보신 다음에 어느 옵션이</p><p style="text-align:center;margin:0;color:#000000;">맞는지 가늠해보시면 될 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">정가 230,000원이던 게 지금<br>219,500원이라 5% 내려와<br>있는 상태라서,<br>교체 생각 있으시면 이 가격대일<br>때 구성 한번 확인해 보시는 것도<br>괜찮을 것 같아요.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/5WUtcZrA</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#방문교체 #기타가구부속품 #가구부속품 #천안방문손잡이교체 #아산방문손잡이교체 #화장실문교체비용 #ABS도어교체 #화장실문교체셀프 #화장실문교체 #화장실문 #화장실문고리 #방문교체비용</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">화장실 문 교체 비용이 얼마나
+나올지부터 궁금해서 찾아보시는
+분들 많으실 거예요.
+
+
+문짝이 뒤틀려서 잘 안
+닫히거나, 색이 누렇게
+변한 걸 보면서도 선뜩
+공사까지 들어가기는
+망설여지거든요.
+
+
+집 전체를 뜯어내는 큰
+공사라고 생각하면 당연히
+부담스러운 게 맞아요.
+
+
+그런데 이게 문짝만 바꾸는
+방식도 있고,
+문틀까지 같이 바꾸는 방식도
+따로 있다는 걸 알고 나면
+생각이 조금 달라지더라구요.
+
+
+사진1
+
+
+이 글에서 다루는 것
+
+1. ABS도어가 정확히 뭔가요
+2. 문짝만 교체할지, 문틀까지 세트로 할지
+3. 실측부터 시공까지 어떻게 진행되나요
+4. 결국 어떤 기준으로 골라야 할까요
+
+
+ABS도어가 정확히 뭔가요
+
+
+ABS도어는 민무늬나 베이직
+디자인으로 나오는 문짝 종류예요.
+
+
+이 상품도 &quot;ABS도어
+문짝 문틀 방문교체&quot;
+구성으로 민무늬·베이직도어
+1개 기준으로 올라와 있거든요.
+
+
+화장실문이나 욕실문,
+방문에 쓰이는 걸로 상품
+태그에도 나와 있고요.
+
+
+무늬가 복잡하지 않고
+깔끔한 쪽을 찾으시는
+분이라면 민무늬·베이직
+중에서 고르는 구조로
+보시면 될 것 같아요.
+
+
+디자인이 다양하게 갈라지는
+제품은 아니라서,
+화려한 패턴을 기대하시면
+좀 심심하게 느껴질 수도
+있어요.
+
+
+근데 화장실문은 어차피
+패턴보다 깔끔하게 맞는 게
+더 중요한 공간이라 저는
+크게 아쉬운 포인트는
+아니라고 봤어요.
+
+
+사진2
+
+
+문짝만 교체할지, 문틀까지 세트로 할지
+
+
+여기서 선택지가
+두 가지로 나뉘어요.
+
+
+상세페이지에 보면 [도어]
+교체 추가옵션과
+[도어+문틀] 세트
+추가옵션이 따로
+구성돼 있거든요.
+
+
+문틀 자체는 상태가 괜찮고
+문짝만 틀어지거나 낡은
+경우라면 [도어]
+옵션만으로 교체가 되는
+거고, 문틀까지 같이
+변형됐거나 교체하고 싶다면
+[도어+문틀] 세트
+옵션으로 가는 방식이에요.
+
+
+ABS도어교체를 알아보시는
+분들이 이 부분에서 헷갈려
+하시더라구요,
+전체를 다 뜯어야 하는 줄
+알았다가 옵션이 나뉘어 있는
+걸 보고 선택이 편해졌다는
+얘기를 들었어요.
+
+
+같은 브랜드에서 올라온
+&quot;셀프실측 방문교체 ABS도어&quot;
+상품은 민자도어 중백색으로
+구성된 것도 있어서,
+색상이나 구성 폭이 궁금하면
+그쪽도 참고해볼 만해요.
+
+
+저도 이것저것 찾아보다가 문짝만
+할지 문틀까지 할지 가격 차이부터
+궁금해서 찾아봤는데요,
+지금 올라온 조건 한번 보시면
+도움 될 것 같아요.
+
+https://naver.me/5WUtcZrA
+
+
+실측부터 시공까지 어떻게 진행되나요
+
+
+이 상품은 실측서비스가
+포함된 구성이에요.
+
+
+문짝 1개 시공 기준으로 돼
+있고, 영림 ABS도어로 문짝과
+문틀 교체 시공까지 묶여 있는
+방식이라 현장에서 치수를 재고
+맞는 사양으로 들어가는
+흐름으로 보시면 돼요.
+
+
+화장실 문 교체 셀프로 직접
+재단하고 다는 방법을 찾는
+분들도 계신데,
+이 구성은 실측부터 시공까지
+포함된 쪽이라 치수를 잘못
+재서 다시 맞추는 수고는
+줄어드는 구조예요.
+
+
+다만 시공 일정을 맞춰야 하는
+부분은 있으니,
+당장 오늘내일 바로 교체해야 하는
+상황이라면 일정 조율이 먼저
+필요하다는 점은 알고
+계시는 게 좋아요.
+
+
+여닫이문 기준으로 문선몰딩,
+도어스토퍼 같은 부속 작업과
+묶여서 진행되는 경우도 있다고
+하니, 화장실문리폼을 넓게 보고
+계신 분들은 이 범위까지 같이
+챙겨보시면 좋을 것 같아요.
+
+
+결국 어떤 기준으로 골라야 할까요
+
+
+화장실문이든 방문이든,
+문짝만 틀어진 상태인지
+문틀까지 변형된 상태인지를
+먼저 보는 게 순서예요.
+
+
+문짝만 문제라면 [도어]
+옵션으로 끝나고,
+문틀까지 손봐야 한다면
+[도어+문틀]
+세트로 가는 거고요.
+
+
+이 구분만 해두면 화장실 문
+교체 비용을 가늠할 때도 어느
+쪽 옵션을 기준으로 봐야 할지가
+명확해지더라구요.
+
+
+지금 집 화장실문이나 방문
+상태를 한번 들여다보시고,
+문짝만인지 문틀까지인지 먼저
+체크해보신 다음에 어느 옵션이
+맞는지 가늠해보시면 될 것 같아요.
+
+
+정가 230,000원이던 게 지금
+219,500원이라 5% 내려와
+있는 상태라서,
+교체 생각 있으시면 이 가격대일
+때 구성 한번 확인해 보시는 것도
+괜찮을 것 같아요.
+
+https://naver.me/5WUtcZrA
+
+
+#방문교체 #기타가구부속품 #가구부속품 #천안방문손잡이교체 #아산방문손잡이교체 #화장실문교체비용 #ABS도어교체 #화장실문교체셀프 #화장실문교체 #화장실문 #화장실문고리 #방문교체비용</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    say('');
+    copyBody(
+      Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+      '복사됐습니다. 붙여넣은 뒤 본문의 사진N 글자를 세 번 클릭해 선택하고 사진을 붙여넣으세요.',
+      sayWithCategory
+    );
+  });
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // Plain text only, so this works even where the rich-copy button above can't (e.g. the
+  // Naver Blog app, which drops formatted paste entirely but takes plain text fine).
+  function copyPlainText(text, label) {
+    say('');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        say(label + '이(가) 복사됐습니다.');
+      }).catch(function () {
+        say(label + ' 복사가 차단됐습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+      });
+    } else {
+      say('이 브라우저는 자동 복사를 지원하지 않습니다. ' + label + '을(를) 직접 선택해서 복사해주세요.');
+    }
+  }
+
+  var productNameBtn = document.getElementById('copyProductNameBtn');
+  if (productNameBtn) {
+    productNameBtn.addEventListener('click', function () {
+      copyPlainText(document.getElementById('productNameText').textContent, '제품명');
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+
+  // "네이버에 자동 작성" — 이 맥(localhost:3000)에서 node server.js가 켜져 있을 때만
+  // 동작한다. 공개 인터넷을 거치는 중계는 일부러 안 쓴다 — 페이지 소스에 적힌 주소를
+  // 아무나 흉내 내면 이 맥에서 네이버 창이 열릴 수 있어서다. 집 와이파이에서 이 페이지를
+  // 이 맥의 브라우저로 열었을 때만 쓰는 버튼이다.
+  var autoMsg = document.getElementById('autoDraftMsg');
+  function autoSay(text) {
+    autoMsg.textContent = text;
+    autoMsg.classList.add('show');
+  }
+  // 이 페이지 자체가 이미 이 Mac(localhost:3000)에서 열려 있으면 같은 출처라
+  // 상대 경로로 부르고, 공개 GitHub Pages에서 열려 있으면 절대 주소로 부른다.
+  // HTTPS 페이지에서 http://localhost 로 보내는 요청은 사파리·최신 크롬이 혼합
+  // 콘텐츠로 보고 조용히 막아 "Failed to fetch"만 뜬다 — 그게 막히면 이 Mac의
+  // 브라우저로 http://localhost:3000/archive/... 를 열어 쓰라고 안내한다.
+  var API_BASE = /^(localhost|127.0.0.1)$/.test(location.hostname) ? '' : 'http://localhost:3000';
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // resultsArchive.js가 파일을 "<폴더>/01-제목.html"로 저장하므로, 주소만으로
+      // 배치 폴더와 이 글의 순번을 안다 — 서버에 다시 물어볼 필요가 없다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      if (autoBtn.disabled) return;
+      autoBtn.disabled = true;
+      autoSay('이 Mac에 자동 작성을 요청하는 중…');
+      fetch(API_BASE + '/api/auto-draft', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folder: folder, index: idx, title: chosenTitle.trim() }),
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        if (!data || !data.ok) throw new Error((data && data.error) || '요청이 거부됐습니다');
+        pollAutoDraft(data.jobId, Date.now());
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        autoSay('요청을 보내지 못했어요 — node server.js가 켜져 있는지 확인하고, 그래도 안 되면 이 Mac의 브라우저로 http://localhost:3000/archive/' + folder + '/' + file + ' 를 열어 거기서 눌러주세요. (' + (e && e.message || '') + ')');
+      });
+    });
+  }
+  function pollAutoDraft(jobId, t0) {
+    setTimeout(function () {
+      fetch(API_BASE + '/api/auto-draft/' + jobId)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data || !data.ok) { autoBtn.disabled = false; autoSay('작업을 찾지 못했습니다.'); return; }
+          if (data.status === 'done') { autoBtn.disabled = false; autoSay('✅ ' + data.message); return; }
+          if (data.status === 'error') { autoBtn.disabled = false; autoSay('작성 실패: ' + data.message); return; }
+          autoSay(data.message || '네이버 창에 작성하는 중…');
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          pollAutoDraft(jobId, t0);
+        })
+        .catch(function () { pollAutoDraft(jobId, t0); });
+    }, 1200);
+  }
+})();
+</script>
+</body>
+</html>
