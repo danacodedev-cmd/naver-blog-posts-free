@@ -818,6 +818,15 @@ https://naver.me/551UISGb
       if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
       var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
       if (autoBtn.disabled) return;
+      // 공개 사이트(https)에서는 http://localhost 로 보내는 요청이 브라우저 자체
+      // 정책(혼합 콘텐츠)으로 100% 막힌다 — 코드로 우회할 방법이 없다. fetch를
+      // 시도해서 "Failed to fetch"를 보여주는 대신, 바로 같은 글의 로컬(localhost)
+      // 주소로 이 탭을 이동시킨다. 거기서는 같은 출처라 버튼이 바로 동작한다.
+      if (API_BASE) {
+        autoSay('이 Mac 버전으로 이동합니다…');
+        location.href = API_BASE + '/archive/' + folder + '/' + file;
+        return;
+      }
       autoBtn.disabled = true;
       autoSay('이 Mac에 자동 작성을 요청하는 중…');
       fetch(API_BASE + '/api/auto-draft', {
