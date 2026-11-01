@@ -149,7 +149,7 @@
   <h1 id="titleText" class="visually-hidden">&quot;포스파티딜세린 효능 궁금해서 고민이라면?&quot; 서울대 위바이옴 20만원 할인</h1>
   <div class="product-name">엑셀 상품명: <span id="productNameText">서울대 위바이옴 두뇌엔 닥터PS 맥스플러스 포스파티딜세린 분말 30포, 4개</span></div>
   <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
-<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;포스파티딜세린 효능 궁금해서 고민이라면?&quot; 서울대 위바이옴 20만원 할인"><span class="tp-num">1</span><span class="tp-text">&quot;포스파티딜세린 효능 궁금해서 고민이라면?&quot; 서울대 위바이옴 20만원 할인</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;두뇌영양제 효능 진짜 있을지 궁금하다고?&quot; 닥터PS 맥스플러스로 확인했다"><span class="tp-num">2</span><span class="tp-text">&quot;두뇌영양제 효능 진짜 있을지 궁금하다고?&quot; 닥터PS 맥스플러스로 확인했다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;기억력 영양제 추천, 39만원대가 19만원대?&quot; 서울대 위바이옴 30포 살펴봤다"><span class="tp-num">3</span><span class="tp-text">&quot;기억력 영양제 추천, 39만원대가 19만원대?&quot; 서울대 위바이옴 30포 살펴봤다</span><span class="tp-mark">사용 중</span></button></div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;포스파티딜세린 효능 궁금해서 고민이라면?&quot; 서울대 위바이옴 20만원 할인"><span class="tp-num">1</span><span class="tp-text">&quot;포스파티딜세린 효능 궁금해서 고민이라면?&quot; 서울대 위바이옴 20만원 할인</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;두뇌영양제 효능 진짜 있을지 궁금하다고?&quot; 닥터PS 맥스플러스, 직접 먹어봤다"><span class="tp-num">2</span><span class="tp-text">&quot;두뇌영양제 효능 진짜 있을지 궁금하다고?&quot; 닥터PS 맥스플러스, 직접 먹어봤다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;기억력 영양제 추천 찾는다고?&quot; 서울대 위바이옴 30포 39만원대가 19만원대"><span class="tp-num">3</span><span class="tp-text">&quot;기억력 영양제 추천 찾는다고?&quot; 서울대 위바이옴 30포 39만원대가 19만원대</span><span class="tp-mark">사용 중</span></button></div>
 </div>
 <div class="actionbar">
   <div class="sched-card"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">11월 4일 (화)<span class="sched-card-time">19:00</span></span></div>
@@ -820,6 +820,15 @@ https://naver.me/xxonxHbh
       if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
       var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
       if (autoBtn.disabled) return;
+      // 공개 사이트(https)에서는 http://localhost 로 보내는 요청이 브라우저 자체
+      // 정책(혼합 콘텐츠)으로 100% 막힌다 — 코드로 우회할 방법이 없다. fetch를
+      // 시도해서 "Failed to fetch"를 보여주는 대신, 바로 같은 글의 로컬(localhost)
+      // 주소로 이 탭을 이동시킨다. 거기서는 같은 출처라 버튼이 바로 동작한다.
+      if (API_BASE) {
+        autoSay('이 Mac 버전으로 이동합니다…');
+        location.href = API_BASE + '/archive/' + folder + '/' + file;
+        return;
+      }
       autoBtn.disabled = true;
       autoSay('이 Mac에 자동 작성을 요청하는 중…');
       fetch(API_BASE + '/api/auto-draft', {

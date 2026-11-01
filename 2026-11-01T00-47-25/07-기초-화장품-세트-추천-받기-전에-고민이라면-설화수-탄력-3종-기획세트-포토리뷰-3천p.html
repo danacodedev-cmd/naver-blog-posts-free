@@ -149,7 +149,7 @@
   <h1 id="titleText" class="visually-hidden">&quot;기초 화장품 세트 추천 받기 전에 고민이라면?&quot; 설화수 탄력 3종 기획세트, 포토리뷰 3천p</h1>
   <div class="product-name">엑셀 상품명: <span id="productNameText">[포토리뷰3천p] 설화수 탄력 3종 기획세트 (자음수150 + 자음유액125 + 탄력크림50 + 윤조에센스15 + 자음수15 + 자음유액15 + 탄력크림5. 단위:ml)</span></div>
   <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
-<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;기초 화장품 세트 추천 받기 전에 고민이라면?&quot; 설화수 탄력 3종 기획세트, 포토리뷰 3천p"><span class="tp-num">1</span><span class="tp-text">&quot;기초 화장품 세트 추천 받기 전에 고민이라면?&quot; 설화수 탄력 3종 기획세트, 포토리뷰 3천p</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;부모님 화장품 선물 뭐가 좋을지 고민된다고?&quot; 설화수 탄력 3종으로 확인했다"><span class="tp-num">2</span><span class="tp-text">&quot;부모님 화장품 선물 뭐가 좋을지 고민된다고?&quot; 설화수 탄력 3종으로 확인했다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;부모님 화장품 선물 추천, 아무거나 못 고르겠더라&quot; 설화수 탄력 3종 기획세트 구성은?"><span class="tp-num">3</span><span class="tp-text">&quot;부모님 화장품 선물 추천, 아무거나 못 고르겠더라&quot; 설화수 탄력 3종 기획세트 구성은?</span><span class="tp-mark">사용 중</span></button></div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;기초 화장품 세트 추천 받기 전에 고민이라면?&quot; 설화수 탄력 3종 기획세트, 포토리뷰 3천p"><span class="tp-num">1</span><span class="tp-text">&quot;기초 화장품 세트 추천 받기 전에 고민이라면?&quot; 설화수 탄력 3종 기획세트, 포토리뷰 3천p</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;부모님 화장품 선물 뭐가 좋을지 고민된다고?&quot; 설화수 탄력 3종, 이거였다"><span class="tp-num">2</span><span class="tp-text">&quot;부모님 화장품 선물 뭐가 좋을지 고민된다고?&quot; 설화수 탄력 3종, 이거였다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;부모님 화장품 선물 추천, 아무거나 못 고르겠더라&quot; 설화수 탄력 3종 기획세트 구성은?"><span class="tp-num">3</span><span class="tp-text">&quot;부모님 화장품 선물 추천, 아무거나 못 고르겠더라&quot; 설화수 탄력 3종 기획세트 구성은?</span><span class="tp-mark">사용 중</span></button></div>
 </div>
 <div class="actionbar">
   <div class="sched-card"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">11월 2일 (일)<span class="sched-card-time">11:30</span></span></div>
@@ -778,6 +778,15 @@ https://naver.me/IIDJqjxS
       if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
       var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
       if (autoBtn.disabled) return;
+      // 공개 사이트(https)에서는 http://localhost 로 보내는 요청이 브라우저 자체
+      // 정책(혼합 콘텐츠)으로 100% 막힌다 — 코드로 우회할 방법이 없다. fetch를
+      // 시도해서 "Failed to fetch"를 보여주는 대신, 바로 같은 글의 로컬(localhost)
+      // 주소로 이 탭을 이동시킨다. 거기서는 같은 출처라 버튼이 바로 동작한다.
+      if (API_BASE) {
+        autoSay('이 Mac 버전으로 이동합니다…');
+        location.href = API_BASE + '/archive/' + folder + '/' + file;
+        return;
+      }
       autoBtn.disabled = true;
       autoSay('이 Mac에 자동 작성을 요청하는 중…');
       fetch(API_BASE + '/api/auto-draft', {

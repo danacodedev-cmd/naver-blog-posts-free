@@ -149,7 +149,7 @@
   <h1 id="titleText" class="visually-hidden">&quot;피부관리기추천 받기 전에 고민이라면?&quot; 이오에이 풀써마 PRO 60만원 할인</h1>
   <div class="product-name">엑셀 상품명: <span id="productNameText">[신제품|무이자 12개월] 이오에이 장나라 풀써마 PRO 6.78MHz 고주파 피부관리기 홈케어 뷰티디바이스</span></div>
   <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
-<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;피부관리기추천 받기 전에 고민이라면?&quot; 이오에이 풀써마 PRO 60만원 할인"><span class="tp-num">1</span><span class="tp-text">&quot;피부관리기추천 받기 전에 고민이라면?&quot; 이오에이 풀써마 PRO 60만원 할인</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;홈케어 디바이스 효과 있을지 궁금하다고?&quot; 풀써마 PRO로 확인했다"><span class="tp-num">2</span><span class="tp-text">&quot;홈케어 디바이스 효과 있을지 궁금하다고?&quot; 풀써마 PRO로 확인했다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;모공 관리 기기, 110만원대가 49만원대?&quot; 이오에이 풀써마 PRO 6.78MHz 살펴봤다"><span class="tp-num">3</span><span class="tp-text">&quot;모공 관리 기기, 110만원대가 49만원대?&quot; 이오에이 풀써마 PRO 6.78MHz 살펴봤다</span><span class="tp-mark">사용 중</span></button></div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;피부관리기추천 받기 전에 고민이라면?&quot; 이오에이 풀써마 PRO 60만원 할인"><span class="tp-num">1</span><span class="tp-text">&quot;피부관리기추천 받기 전에 고민이라면?&quot; 이오에이 풀써마 PRO 60만원 할인</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;홈케어 디바이스 효과 있을지 궁금하다고?&quot; 풀써마 PRO, 직접 써봤다"><span class="tp-num">2</span><span class="tp-text">&quot;홈케어 디바이스 효과 있을지 궁금하다고?&quot; 풀써마 PRO, 직접 써봤다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;모공 관리 기기 찾는다고?&quot; 이오에이 풀써마 PRO 6.78MHz 110만원대가 49만원대"><span class="tp-num">3</span><span class="tp-text">&quot;모공 관리 기기 찾는다고?&quot; 이오에이 풀써마 PRO 6.78MHz 110만원대가 49만원대</span><span class="tp-mark">사용 중</span></button></div>
 </div>
 <div class="actionbar">
   <div class="sched-card"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">11월 5일 (수)<span class="sched-card-time">09:00</span></span></div>
@@ -795,6 +795,15 @@ https://naver.me/Gmp4F6mV
       if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
       var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
       if (autoBtn.disabled) return;
+      // 공개 사이트(https)에서는 http://localhost 로 보내는 요청이 브라우저 자체
+      // 정책(혼합 콘텐츠)으로 100% 막힌다 — 코드로 우회할 방법이 없다. fetch를
+      // 시도해서 "Failed to fetch"를 보여주는 대신, 바로 같은 글의 로컬(localhost)
+      // 주소로 이 탭을 이동시킨다. 거기서는 같은 출처라 버튼이 바로 동작한다.
+      if (API_BASE) {
+        autoSay('이 Mac 버전으로 이동합니다…');
+        location.href = API_BASE + '/archive/' + folder + '/' + file;
+        return;
+      }
       autoBtn.disabled = true;
       autoSay('이 Mac에 자동 작성을 요청하는 중…');
       fetch(API_BASE + '/api/auto-draft', {

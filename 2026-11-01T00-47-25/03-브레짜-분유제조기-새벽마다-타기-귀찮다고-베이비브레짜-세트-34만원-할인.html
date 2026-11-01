@@ -149,7 +149,7 @@
   <h1 id="titleText" class="visually-hidden">&quot;브레짜 분유제조기 새벽마다 타기 귀찮다고?&quot; 베이비브레짜 세트 34만원 할인</h1>
   <div class="product-name">엑셀 상품명: <span id="productNameText">베이비 브레짜 올인원 젖병세척기 블랙 + 분유제조기 블랙 맘마존SET</span></div>
   <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
-<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;브레짜 분유제조기 새벽마다 타기 귀찮다고?&quot; 베이비브레짜 세트 34만원 할인"><span class="tp-num">1</span><span class="tp-text">&quot;브레짜 분유제조기 새벽마다 타기 귀찮다고?&quot; 베이비브레짜 세트 34만원 할인</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;자동분유제조기 온도 안 맞을까 걱정된다고?&quot; 베이비브레짜로 확인했다"><span class="tp-num">2</span><span class="tp-text">&quot;자동분유제조기 온도 안 맞을까 걱정된다고?&quot; 베이비브레짜로 확인했다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;출수형 분유포트, 94만원대가 60만원대?&quot; 베이비브레짜 맘마존SET 살펴봤다"><span class="tp-num">3</span><span class="tp-text">&quot;출수형 분유포트, 94만원대가 60만원대?&quot; 베이비브레짜 맘마존SET 살펴봤다</span><span class="tp-mark">사용 중</span></button></div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="&quot;브레짜 분유제조기 새벽마다 타기 귀찮다고?&quot; 베이비브레짜 세트 34만원 할인"><span class="tp-num">1</span><span class="tp-text">&quot;브레짜 분유제조기 새벽마다 타기 귀찮다고?&quot; 베이비브레짜 세트 34만원 할인</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;자동분유제조기 온도 안 맞을까 걱정된다고?&quot; 베이비브레짜 써보고 알았다"><span class="tp-num">2</span><span class="tp-text">&quot;자동분유제조기 온도 안 맞을까 걱정된다고?&quot; 베이비브레짜 써보고 알았다</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="&quot;출수형 분유포트 찾는다고?&quot; 베이비브레짜 맘마존SET 94만원대가 60만원대"><span class="tp-num">3</span><span class="tp-text">&quot;출수형 분유포트 찾는다고?&quot; 베이비브레짜 맘마존SET 94만원대가 60만원대</span><span class="tp-mark">사용 중</span></button></div>
 </div>
 <div class="actionbar">
   <div class="sched-card"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">11월 1일 (토)<span class="sched-card-time">16:30</span></span></div>
@@ -804,6 +804,15 @@ https://naver.me/F3EK6fAd
       if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
       var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
       if (autoBtn.disabled) return;
+      // 공개 사이트(https)에서는 http://localhost 로 보내는 요청이 브라우저 자체
+      // 정책(혼합 콘텐츠)으로 100% 막힌다 — 코드로 우회할 방법이 없다. fetch를
+      // 시도해서 "Failed to fetch"를 보여주는 대신, 바로 같은 글의 로컬(localhost)
+      // 주소로 이 탭을 이동시킨다. 거기서는 같은 출처라 버튼이 바로 동작한다.
+      if (API_BASE) {
+        autoSay('이 Mac 버전으로 이동합니다…');
+        location.href = API_BASE + '/archive/' + folder + '/' + file;
+        return;
+      }
       autoBtn.disabled = true;
       autoSay('이 Mac에 자동 작성을 요청하는 중…');
       fetch(API_BASE + '/api/auto-draft', {
