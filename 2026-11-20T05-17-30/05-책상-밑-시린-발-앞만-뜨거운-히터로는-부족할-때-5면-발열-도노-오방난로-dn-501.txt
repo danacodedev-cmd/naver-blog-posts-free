@@ -243,68 +243,6 @@ https://naver.me/GO60ldFs
 가장 잘 어울리는 쪽일 거예요.
 
 
-───────────
-
-
-Before
-publishing:
-- The heater's
-specs are missing.
-
-
-The "확인된 사양" in
-the input is the
-도노 20L vacuum
-cleaner filter
-set, not this heater.
-
-
-So the post has no
-power, wattage,
-size, safety or
-electricity-cost
-figures.
-
-
-If you re-scrape
-the real specs,
-the post can be
-much stronger.
-- No price data.
-
-
-The product info
-has no list
-price or sale
-price, so the
-titles have no
-price or
-discount,
-and the CTAs
-only point to
-the current
-price via the link.
-- Section 4 changed.
-
-
-The plan's last
-section
-("상세페이지에서 꼭 확인할
-사양") conflicted
-with the rule
-against telling
-readers to go
-check the
-detail page.
-
-
-I replaced it with
-"이런 분께 맞고,
-이런 분은 굳이" (who it
-suits, who can
-skip it).
-
-
 한 방향만 보는 히터가
 아쉬웠다면, 둘러앉는 자리에 맞는
 오면 히터 가격부터 여기서
