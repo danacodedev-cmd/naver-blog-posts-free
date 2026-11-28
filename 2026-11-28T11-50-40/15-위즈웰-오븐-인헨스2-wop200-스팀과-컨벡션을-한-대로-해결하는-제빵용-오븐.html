@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>위즈웰 오븐 인헨스2 WOP200, 스팀과 컨벡션을 한 대로 해결하는 제빵용 오븐</title>
+<style>
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; background: #f5f6f7; }
+  /* Only the action row is sticky. The whole header used to be, and once it carried the
+     title, the product name and three full-length title candidates it stood ~400px tall on
+     a phone — half the screen, permanently, with the article reading through the gap left
+     over. The title scrolls away now; the two buttons that get used on every visit stay. */
+  .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 10px 16px 12px; }
+  .topbar-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .topbar h1 { font-size: 16px; line-height: 1.4; margin: 10px 0 0; font-weight: 700; letter-spacing: -0.2px; }
+  /* Excel 상품명은 확인용일 뿐 글의 일부가 아니므로, 손으로 드래그해 실수로 선택되는 걸
+     막아둡니다. */
+  .product-name { font-size: 12px; color: #999; margin-top: 6px; user-select: none; -webkit-user-select: none; }
+  button { font-family: inherit; border: 0; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: #f1f3f5; color: #495057; border-radius: 8px; padding: 7px 12px; font-size: 13px;
+    font-weight: 700; text-decoration: none; display: inline-block; }
+  /* 네이버 자동 작성 버튼 바로 옆. 자동 작성은 매번 누르는 버튼이라 폭을 넓게 잡고,
+     발행여부는 어쩌다 한 번 바꾸는 상태 표시라 글자만큼만 차지한다. */
+  #publishToggle { background: #f1f3f5; color: #868e96; padding: 0 16px; min-height: 48px;
+    border-radius: 12px; font-size: 13px; flex-shrink: 0; }
+  #publishToggle.published { background: #e6f8ee; color: #03a353; }
+  /* The action row: primary copy takes the width it needs to be the obvious tap target,
+     the secondary sits beside it rather than wrapping onto its own line. */
+  .actionbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #e5e7eb;
+    padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+  #msg { display: none; font-size: 13px; line-height: 1.45; color: #02a94e; background: #f0fdf4;
+    padding: 9px 16px; border-bottom: 1px solid #dcfce7; }
+  #msg.show { display: block; }
+  /* 예약 카드 + 자동 작성 버튼. 집 와이파이에서, 이 맥에서 node server.js가 켜져 있을
+     때만 동작한다 — 공개 인터넷 중계는 쓰지 않는다(보안상 열지 않기로 했다). */
+  .sched-card { display: flex; flex-direction: column; justify-content: center; gap: 1px;
+    min-height: 48px; padding: 6px 14px; border-radius: 12px; background: #ede9fe;
+    color: #6d28d9; border: 1px solid #6d28d933; flex-shrink: 0; }
+  .sched-card.none { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+  .sched-card-label { font-size: 11px; font-weight: 700; opacity: .75; letter-spacing: .2px; }
+  .sched-card-when { font-size: 17px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+  .sched-card-time { margin-left: 8px; padding-left: 8px; border-left: 1.5px solid currentColor; }
+  #autoDraftBtn { min-height: 48px; padding: 0 20px; border-radius: 12px; background: #03c75a;
+    color: #fff; font-weight: 700; flex: 1; min-width: 0; }
+  #autoDraftBtn:hover { background: #02b351; }
+  #autoDraftBtn:disabled { opacity: .6; cursor: default; }
+  #autoDraftMsg { display: none; font-size: 13px; line-height: 1.45; color: #6d28d9;
+    background: #f5f3ff; padding: 9px 16px; border-bottom: 1px solid #ede9fe; }
+  #autoDraftMsg.show { display: block; }
+  /* 좁은 화면에서는 예약 카드 + 발행여부가 한 줄, 자동 작성 버튼이 그 아래 한 줄을
+     차지한다 — 셋을 억지로 한 줄에 쑤셔 넣으면 "네이버에 자동 작성" 글자가 세로로
+     쪼개져 읽힌다. */
+  @media (max-width: 380px) {
+    .sched-card-when { font-size: 15px; }
+    .actionbar { flex-wrap: wrap; }
+    .sched-card { order: 1; }
+    #publishToggle { order: 2; margin-left: auto; }
+    #autoDraftBtn { order: 3; flex-basis: 100%; }
+  }
+  /* 카테고리 팝업. 복사 버튼이 화면 위쪽이라 스크롤을 내린 상태에서 누르면 상단 띠는
+     화면 밖에 있습니다 — 팝업은 어디서 누르든 눈앞에 뜹니다. */
+  #catPop { position: fixed; inset: 0; background: rgba(17,24,39,.55); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #catPop[hidden] { display: none; }
+  #catPopBox { background: #fff; border-radius: 14px; padding: 26px 22px 18px;
+    max-width: 340px; width: 100%; text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+  #catPopLead { margin: 0 0 6px; font-size: 13px; color: #6b7280; }
+  #catPopName { margin: 0 0 10px; font-size: 27px; font-weight: 800; color: #111827;
+    line-height: 1.25; word-break: keep-all; }
+  #catPopNote { margin: 0 0 18px; font-size: 14px; line-height: 1.55; color: #374151;
+    word-break: keep-all; }
+  #catPopBox.warn #catPopName { color: #b45309; }
+  #catPopBox.warn #catPopNote { color: #92400e; font-weight: 700; }
+  #catPopOk { width: 100%; background: #03c75a; color: #fff; border: 0; border-radius: 9px;
+    padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+  /* 카테고리를 바꿔야 하는 글에서만 켜집니다. 초록 안내와 같은 모양이면 "복사됐다"는
+     평범한 알림으로 읽히고 그냥 지나갑니다. */
+  #msg.warn { color: #b45309; background: #fffbeb; border-bottom-color: #fde68a; }
+  /* 카테고리 줄. 뒤에 붙는 사진 안내보다 먼저, 크게 읽히게 떼어 놓습니다. */
+  #msg .cat-line { display: block; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  #msg.warn .cat-line { font-size: 16.5px; }
+  #keywordResearch { max-width: 700px; margin: 14px auto 0; padding: 16px 18px; background: #fff;
+    border: 1px solid #dbeafe; border-radius: 10px; color: #334155; box-sizing: border-box; }
+  #keywordResearch h2 { margin: 0 0 12px; font-size: 15px; color: #0f172a; }
+  #keywordResearch div + div { margin-top: 12px; }
+  #keywordResearch b { display: block; margin-bottom: 6px; font-size: 12px; color: #64748b; }
+  #keywordResearch p { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+  #keywordResearch span { display: inline-block; padding: 6px 9px; border-radius: 999px;
+    background: #eff6ff; color: #1d4ed8; font-size: 12.5px; font-weight: 700; }
+  #keywordResearch small { display: block; margin-top: 12px; color: #94a3b8; font-size: 11.5px; }
+  #post { background: #fff; max-width: 700px; margin: 20px auto; padding: 28px 24px; font-size: 15px; line-height: 1.8; color: #111; }
+  #post img { max-width: 100%; height: auto; }
+  #post blockquote { margin: 20px 0; padding: 12px 16px; background: #f6f7f8; border-radius: 8px; }
+  #manualCopyBox { display: none; width: 100%; max-width: 700px; margin: 12px auto 40px; max-height: 50vh;
+    overflow: auto; padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; background: #fff; }
+  #manualCopyBox img { max-width: 100%; }
+  /* 참고한 상위 글 목록. #post 밖에 두는 게 핵심입니다 — "본문 복사"는 #post만 읽으므로
+     이 링크들은 네이버에 붙여넣는 내용에 절대 섞이지 않습니다. */
+  #refs { max-width: 700px; margin: 14px auto 40px; padding: 14px 18px; background: #fff;
+    border: 1px dashed #cbd5e1; border-radius: 8px; font-size: 13px; color: #555; }
+  #refs h2 { font-size: 13px; margin: 0 0 8px; color: #64748b; font-weight: 700; }
+  #refs ol { margin: 0; padding-left: 18px; }
+  #refs li { margin: 5px 0; line-height: 1.5; }
+  #refs a { color: #2563eb; }
+  #refs .note { margin: 9px 0 0; font-size: 12px; color: #94a3b8; }
+  /* 사진 목록. #refs 와 같은 이유로 #post 밖에 둡니다 — "본문 복사"가 절대 집어가지 않습니다. */
+  #photos { max-width: 700px; margin: 14px auto 0; padding: 14px 18px; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 8px; }
+  #photos h2 { font-size: 13px; margin: 0 0 6px; color: #111; font-weight: 700; }
+  #photos .note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: #555; }
+  #photos ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .photo-item { display: flex; align-items: center; gap: 12px; }
+  .photo-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; flex-shrink: 0;
+    background: #f1f3f5; }
+  .photo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .photo-n { font-size: 12.5px; color: #868e96; font-weight: 700; }
+  .photo-copy { background: #eef4ff; color: #2563eb; padding: 9px 16px; font-size: 13.5px; }
+  .photo-copy.done { background: #e6f8ee; color: #03a353; }
+  #copyBodyOnlyBtn { background: #f1f3f5; color: #495057; padding: 4px 9px; font-size: 12.5px;
+    border-radius: 6px; vertical-align: 1px; }
+  #photos .note-last { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid #f1f3f5; }
+  /* Always open. Hiding these behind a toggle meant the one decision this page exists for —
+     which of the three titles to publish — took a tap to even see. They are the page's main
+     content, so they are laid out as such, and the selected one doubles as the heading:
+     showing a separate <h1> above the list repeated the same sentence twice on screen. */
+  .tp-label { font-size: 12px; color: #adb5bd; font-weight: 600; margin: 12px 0 7px; }
+  #titlePicker { display: flex; flex-direction: column; gap: 7px; }
+  .title-opt { position: relative; background: #fff; color: #495057; border: 1px solid #e5e7eb;
+    border-radius: 10px; padding: 11px 12px 11px 34px; font-size: 13.5px; font-weight: 500;
+    text-align: left; line-height: 1.5; cursor: pointer; }
+  .title-opt .tp-num { position: absolute; left: 12px; top: 11px; width: 17px; height: 17px;
+    border-radius: 50%; background: #f1f3f5; color: #adb5bd; font-size: 11px; font-weight: 700;
+    line-height: 17px; text-align: center; }
+  .title-opt .tp-mark { display: none; }
+  .title-opt.active { background: #f4f9ff; border-color: #2563eb; color: #12408f; font-weight: 700;
+    box-shadow: 0 0 0 1px #2563eb inset; }
+  .title-opt.active .tp-num { background: #2563eb; color: #fff; }
+  .title-opt.active .tp-mark { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px;
+    background: #2563eb; color: #fff; font-size: 10.5px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+  /* The copy script reads the selected title from here. It stays in the DOM as the page's
+     real heading for assistive tech, but is not painted — the highlighted row above is what
+     a sighted reader sees, and printing it twice was the original complaint. */
+  .cat-wrap { text-align: center; margin: 10px 0 18px; }
+  .cat-chip { display: inline-block; padding: 8px 26px; border-radius: 999px;
+    font-size: 21px; font-weight: 500; letter-spacing: 0.2px; line-height: 1.3; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-nav">
+    <a class="back-btn" href="https://danacodedev-cmd.github.io/naver-blog-posts-free/">← 목록</a>
+  </div>
+  <div class="cat-wrap"><span class="cat-chip" id="catChip" data-category="디지털/가전" style="background:#eef3fc;color:#23477e;border:1.5px solid #c3d4f2;">디지털/가전</span></div>
+  <h1 id="titleText" class="visually-hidden">위즈웰 오븐 인헨스2 WOP200, 스팀과 컨벡션을 한 대로 해결하는 제빵용 오븐</h1>
+  <div class="product-name">엑셀 상품명: <span id="productNameText">위즈웰 인헨스2 스팀오븐 베이킹 제과 컨벡션 전기 오븐기 제빵 WOP200 자도르</span></div>
+  <div class="tp-label">제목 — 누르면 그 제목으로 복사됩니다</div>
+<div id="titlePicker"><button type="button" class="title-opt active" data-title="위즈웰 오븐 인헨스2 WOP200, 스팀과 컨벡션을 한 대로 해결하는 제빵용 오븐"><span class="tp-num">1</span><span class="tp-text">위즈웰 오븐 인헨스2 WOP200, 스팀과 컨벡션을 한 대로 해결하는 제빵용 오븐</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="위즈웰 오븐 WOP200 자도르, 식빵 겉이 바싹 말라 나오던 홈베이커라면"><span class="tp-num">2</span><span class="tp-text">위즈웰 오븐 WOP200 자도르, 식빵 겉이 바싹 말라 나오던 홈베이커라면</span><span class="tp-mark">사용 중</span></button><button type="button" class="title-opt" data-title="위즈웰 오븐 인헨스2 스팀오븐, 바게트 껍질은 바삭하게 속은 촉촉하게 굽고 싶다면"><span class="tp-num">3</span><span class="tp-text">위즈웰 오븐 인헨스2 스팀오븐, 바게트 껍질은 바삭하게 속은 촉촉하게 굽고 싶다면</span><span class="tp-mark">사용 중</span></button></div>
+</div>
+<div class="actionbar">
+  <div class="sched-card none"><span class="sched-card-label">예약 발행</span><span class="sched-card-when">시간 미정</span></div>
+  <button id="autoDraftBtn" type="button">네이버에 자동 작성</button>
+  <button id="publishToggle" type="button">발행 전</button>
+</div>
+<div id="autoDraftMsg"></div>
+<section id="keywordResearch" aria-label="SEO 키워드 선정 근거">
+  <h2>SEO 키워드 선정 근거</h2>
+  <div><b>메인 키워드 3개</b><p><span>스팀오븐</span><span>컨벡션 오븐</span><span>전기오븐</span></p></div>
+  <div><b>네이버 자동완성에서 고른 최종 키워드 3개</b><p><span>위즈웰 오븐</span><span>스팀오븐</span><span>위즈웰 컨벡션 오븐</span></p></div>
+  <small>이 영역은 작성자 확인용이며 본문 복사에는 포함되지 않습니다.</small>
+</section>
+<div id="msg"></div>
+<div id="catPop" hidden>
+  <div id="catPopBox" role="dialog" aria-modal="true" aria-labelledby="catPopName">
+    <p id="catPopLead">네이버 블로그 카테고리</p>
+    <p id="catPopName"></p>
+    <p id="catPopNote"></p>
+    <button type="button" id="catPopOk">알겠습니다</button>
+  </div>
+</div>
+<div id="refs">
+  <h2>참고한 상위 노출 글 3개</h2>
+  <ol>
+      <li><a href="https://blog.naver.com/rinnaikorea_official/224491512012" target="_blank" rel="noopener noreferrer">[린나이 고객후기] 전자레인지부터 에어프라이어까지! 린나이 전기복합오븐 25L 사용 후기</a></li>
+      <li><a href="https://blog.naver.com/wvmkr938760_le/224493893611" target="_blank" rel="noopener noreferrer">마이디어 컨벡션 전기오븐 아이보리 68L, MTO68ABA-MCZBYL</a></li>
+      <li><a href="https://blog.naver.com/dlawldnjs224/224494215511" target="_blank" rel="noopener noreferrer">리큅 LOV-EO45GY 디지털 오븐 45L 발효 컨벡션 홈베이킹 추천 후기</a></li>
+  </ol>
+  <p class="note">글 작성에 참고한 글입니다. 이 영역은 "본문 복사"에 포함되지 않습니다.</p>
+</div>
+<div id="photos">
+  <h2>사진 10장</h2>
+  <p class="note">사진은 붙여넣기로 함께 보낼 수 없습니다 — 네이버가 외부 주소는 자기 서버에 올리지 않고, 이미지 데이터를 직접 넣으면 "허용되지 않는 이미지 형식"으로 막습니다. 아래 <b>사진 복사</b>를 누르고, 본문에 있는 <b>사진N</b> 글자를 <b>세 번 클릭</b>해 줄째로 선택한 뒤 붙여넣으세요. 사진이 그 글자를 <b>대신 차지해서 따로 지울 게 없습니다</b>.</p>
+  <ul>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-1.jpg" alt="위즈웰 전기오븐 코팅 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 1</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-1.jpg" data-n="1">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-2.jpg" alt="위즈웰 전기오븐 구성품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 2</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-2.jpg" data-n="2">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-3.jpg" alt="위즈웰 전기오븐 상세 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 3</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-3.jpg" data-n="3">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-4.jpg" alt="위즈웰 전기오븐 제품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 4</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-4.jpg" data-n="4">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-5.jpg" alt="위즈웰 전기오븐 구성품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 5</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-5.jpg" data-n="5">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-6.jpg" alt="위즈웰 전기오븐 크기 비교 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 6</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-6.jpg" data-n="6">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-7.jpg" alt="위즈웰 전기오븐 제품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 7</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-7.jpg" data-n="7">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-8.jpg" alt="위즈웰 전기오븐 센서 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 8</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-8.jpg" data-n="8">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-9.jpg" alt="위즈웰 전기오븐 제품 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 9</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-9.jpg" data-n="9">사진 복사</button>
+        </div>
+      </li>
+      <li class="photo-item">
+        <img class="photo-thumb" src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-10.jpg" alt="위즈웰 전기오븐 용량 이미지" loading="lazy">
+        <div class="photo-meta">
+          <span class="photo-n">사진 10</span>
+          <button type="button" class="photo-copy" data-src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-10.jpg" data-n="10">사진 복사</button>
+        </div>
+      </li>
+  </ul>
+  <p class="note note-last">본문은 위 "본문 복사"로 먼저 넣으세요. 사진 없이 본문만 다시 복사하려면 <button type="button" id="copyBodyOnlyBtn">본문만 복사</button>.</p>
+</div>
+<div id="post"><div style="text-align:center;"><p style="text-align:center;margin:0;color:#000000;">위즈웰 오븐 인헨스2(WOP200)는</p><p style="text-align:center;margin:0;color:#000000;">조리대 위에 자리를</p><p style="text-align:center;margin:0;color:#000000;">따로 내줄 수 있는</p><p style="text-align:center;margin:0;color:#000000;">주방이라면 잘 맞는 오븐이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">반대로 붙박이장 안에 넣는</p><p style="text-align:center;margin:0;color:#000000;">빌트인 설치를</p><p style="text-align:center;margin:0;color:#000000;">생각했다면 맞지 않아요.</p><p style="text-align:center;margin:0;color:#000000;">빌트인 설치는 안 된다고</p><p style="text-align:center;margin:0;color:#000000;">분명하게 나와 있거든요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">스팀 컨벡션 오븐은 본체 크기만큼</p><p style="text-align:center;margin:0;color:#000000;">주변에 비워둘 공간도 중요해서,</p><p style="text-align:center;margin:0;color:#000000;">사기 전에 자리부터 재보는 게</p><p style="text-align:center;margin:0;color:#000000;">제일 확실한 순서인 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-1.jpg" alt="위즈웰 전기오븐 코팅 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-2.jpg" alt="위즈웰 전기오븐 구성품 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;">이 글에서 다루는 것</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">①</span> 조리대 위 어디에 둘 수 있을까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">②</span> 스팀오븐 물통, 어느 쪽에 여유를 둘까</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">③</span> 위즈웰 컨벡션 오븐, 굽고 난 뒤 관리는</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-weight:700;">④</span> 혼자서 옮길 수 있는 무게일까</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">조리대 위 어디에 둘 수 있을까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이것저것 찾아보고</p><p style="text-align:center;margin:0;color:#000000;">고르면서 느낀 건데,</p><p style="text-align:center;margin:0;color:#000000;">본체 치수보다 먼저 봐야 하는 게</p><p style="text-align:center;margin:0;color:#000000;">주변에 비워둘 공간이더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 좌우와 뒤쪽으로</p><p style="text-align:center;margin:0;color:#000000;">15cm 이상,</p><p style="text-align:center;margin:0;color:#000000;">위쪽으로 30cm 이상을</p><p style="text-align:center;margin:0;color:#000000;">비워둬야 하는 오븐이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그래서 벽에 딱 붙이거나</p><p style="text-align:center;margin:0;color:#000000;">상부장 바로 밑에</p><p style="text-align:center;margin:0;color:#000000;">끼워 넣는 배치는</p><p style="text-align:center;margin:0;color:#000000;">처음부터 빼고 생각해야 해요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">위로 30cm는</p><p style="text-align:center;margin:0;color:#000000;">생각보다 꽤 높거든요.</p><p style="text-align:center;margin:0;color:#000000;">상부장이 낮게 달린 주방이면</p><p style="text-align:center;margin:0;color:#000000;">상부장이 없는 조리대 끝 쪽이</p><p style="text-align:center;margin:0;color:#000000;">오히려 나을 수 있어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-3.jpg" alt="위즈웰 전기오븐 상세 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-4.jpg" alt="위즈웰 전기오븐 제품 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가로로 계산해 보면</p><p style="text-align:center;margin:0;color:#000000;">본체 폭에 양옆 15cm씩,</p><p style="text-align:center;margin:0;color:#000000;">합쳐서 30cm가 더</p><p style="text-align:center;margin:0;color:#000000;">필요한 셈이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">전자레인지나 에어프라이어 옆에</p><p style="text-align:center;margin:0;color:#000000;">바짝 붙여 나란히 두려던 자리라면</p><p style="text-align:center;margin:0;color:#000000;">그 사이도 15cm는 띄워야 하니까</p><p style="text-align:center;margin:0;color:#000000;">배치를 다시 짜야 할 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">깊이 쪽도 뒤로</p><p style="text-align:center;margin:0;color:#000000;">15cm를 더해야 해서,</p><p style="text-align:center;margin:0;color:#000000;">조리대가 얕은 집이면 오븐이</p><p style="text-align:center;margin:0;color:#000000;">앞으로 얼마나 나오는지도</p><p style="text-align:center;margin:0;color:#000000;">같이 따져보게 되더라구요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">솔직히 이 부분은 좀 아쉬워요.</p><p style="text-align:center;margin:0;color:#000000;">작은 주방이라면 오븐 하나에</p><p style="text-align:center;margin:0;color:#000000;">꽤 넓은 자리를 내줘야 하니까요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-5.jpg" alt="위즈웰 전기오븐 구성품 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 이건 처음 자리 잡을 때</p><p style="text-align:center;margin:0;color:#000000;">한 번만 신경 쓰면 되는 일이라,</p><p style="text-align:center;margin:0;color:#000000;">일단 놓고 나면 크게</p><p style="text-align:center;margin:0;color:#000000;">신경 안 쓰여요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">조리대가 전부 상부장 밑이라</p><p style="text-align:center;margin:0;color:#000000;">위로 30cm를 낼 자리가</p><p style="text-align:center;margin:0;color:#000000;">하나도 없다면,</p><p style="text-align:center;margin:0;color:#000000;">솔직히 이 모델은 굳이</p><p style="text-align:center;margin:0;color:#000000;">살 필요가 없다고 봐요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">나라면 결제 전에 줄자로</p><p style="text-align:center;margin:0;color:#000000;">오븐 둘 자리의</p><p style="text-align:center;margin:0;color:#000000;">위·옆·뒤를 먼저 재고,</p><p style="text-align:center;margin:0;color:#000000;">위로 30cm가 안 나오면</p><p style="text-align:center;margin:0;color:#000000;">그 자리는 포기하고 다른</p><p style="text-align:center;margin:0;color:#000000;">곳을 찾겠어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-6.jpg" alt="위즈웰 전기오븐 크기 비교 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">스팀오븐 물통, 어느 쪽에 여유를 둘까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">스팀오븐이라 물통이 따로</p><p style="text-align:center;margin:0;color:#000000;">있는데,</p><p style="text-align:center;margin:0;color:#000000;">크기는 가로 119mm,</p><p style="text-align:center;margin:0;color:#000000;">깊이 109mm,</p><p style="text-align:center;margin:0;color:#000000;">높이 36mm예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">높이가 36mm니까</p><p style="text-align:center;margin:0;color:#000000;">위로 높게 솟은 통이 아니라</p><p style="text-align:center;margin:0;color:#000000;">납작한 편이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">가로 119mm면 손바닥</p><p style="text-align:center;margin:0;color:#000000;">하나 남짓한 폭이라,</p><p style="text-align:center;margin:0;color:#000000;">한 손으로 들고 싱크대까지</p><p style="text-align:center;margin:0;color:#000000;">오가기에 부담 없는 크기 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">물통이 있는 쪽은 15cm 이상</p><p style="text-align:center;margin:0;color:#000000;">여유를 두면 쓰기</p><p style="text-align:center;margin:0;color:#000000;">수월하다고 나와 있어요.</p><p style="text-align:center;margin:0;color:#000000;">옆 공간 15cm는 어차피</p><p style="text-align:center;margin:0;color:#000000;">비워야 하니까,</p><p style="text-align:center;margin:0;color:#000000;">물통 쪽만큼은 조금 더 넉넉하게</p><p style="text-align:center;margin:0;color:#000000;">두는 게 좋겠더라구요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-7.jpg" alt="위즈웰 전기오븐 제품 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">굽기 전에 물통을</p><p style="text-align:center;margin:0;color:#000000;">빼서 채우는 장면을</p><p style="text-align:center;margin:0;color:#000000;">떠올려 보면, 손이 들어갈 틈이</p><p style="text-align:center;margin:0;color:#000000;">있어야 편하잖아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">물통 쪽이 벽을 향하면</p><p style="text-align:center;margin:0;color:#000000;">물을 채울 때마다 오븐을</p><p style="text-align:center;margin:0;color:#000000;">앞으로 당겨야 할 수도 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">설치 기준도 15cm,</p><p style="text-align:center;margin:0;color:#000000;">물통 쪽 여유도 15cm라서</p><p style="text-align:center;margin:0;color:#000000;">물통 쪽을 트인 방향으로만 두면</p><p style="text-align:center;margin:0;color:#000000;">두 기준을 한 번에 맞출 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그래서 나라면 물통 쪽을</p><p style="text-align:center;margin:0;color:#000000;">벽이 아니라 트인 쪽으로</p><p style="text-align:center;margin:0;color:#000000;">돌려 놓겠어요.</p><p style="text-align:center;margin:0;color:#000000;">스팀을 자주 안 쓸 집이라면</p><p style="text-align:center;margin:0;color:#000000;">이 여유는 조금 덜</p><p style="text-align:center;margin:0;color:#000000;">중요해질 거예요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">설치에 필요한 여유 공간과 물통<br>크기가 상세페이지에 수치로 정리돼<br>있어요. 줄자로 우리 집 자리를<br>재면서 같이 보면 들어갈지<br>바로 감이 와요.</span></b></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:13px;color:#8a8f96;">⬇️ 지금 할인받을 수 있는 가격, 아래에서 확인해보세요 ⬇️</span></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GDQ67HOY</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">위즈웰 컨벡션 오븐, 굽고 난 뒤 관리는</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">빵이나 쿠키를 굽고 나면</p><p style="text-align:center;margin:0;color:#000000;">레일에 떨어진 부스러기가</p><p style="text-align:center;margin:0;color:#000000;">은근히 신경 쓰이잖아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">이 제품은 오븐 레일을 떼어내서</p><p style="text-align:center;margin:0;color:#000000;">따로 씻을 수</p><p style="text-align:center;margin:0;color:#000000;">있게 되어 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">레일이 고정돼 있으면</p><p style="text-align:center;margin:0;color:#000000;">오븐 안에 손을 넣고</p><p style="text-align:center;margin:0;color:#000000;">닦아야 하는데,</p><p style="text-align:center;margin:0;color:#000000;">빼서 싱크대에서 헹굴 수 있다는 건</p><p style="text-align:center;margin:0;color:#000000;">꽤 큰 차이인 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그리고 5kg까지 지지하도록</p><p style="text-align:center;margin:0;color:#000000;">설계돼 있다고 나와 있어요.</p><p style="text-align:center;margin:0;color:#000000;">홈베이킹 정도의 무게라면</p><p style="text-align:center;margin:0;color:#000000;">버티는 힘 걱정은 덜어도</p><p style="text-align:center;margin:0;color:#000000;">될 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-8.jpg" alt="위즈웰 전기오븐 센서 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">한 달에 한두 번 굽는 집이라면</p><p style="text-align:center;margin:0;color:#000000;">레일 탈부착이 고르는 결정적인</p><p style="text-align:center;margin:0;color:#000000;">이유까지는 아닐 수 있어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">근데 주말마다 쿠키나 식빵을</p><p style="text-align:center;margin:0;color:#000000;">몇 판씩 굽는 집이라면,</p><p style="text-align:center;margin:0;color:#000000;">굽고 나서 정리하는 시간이</p><p style="text-align:center;margin:0;color:#000000;">매번 짧아지는 쪽이 훨씬</p><p style="text-align:center;margin:0;color:#000000;">크게 와닿아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">자주 굽는 집일수록 이 부분이</p><p style="text-align:center;margin:0;color:#000000;">매번 체감되는 장점이라,</p><p style="text-align:center;margin:0;color:#000000;">위즈웰 컨벡션 오븐을 고른다면</p><p style="text-align:center;margin:0;color:#000000;">레일 탈부착을 꽤 크게</p><p style="text-align:center;margin:0;color:#000000;">쳐줄 것 같아요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-9.jpg" alt="위즈웰 전기오븐 제품 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:19px;">혼자서 옮길 수 있는 무게일까</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">본체 무게는 14.8kg이에요.</p><p style="text-align:center;margin:0;color:#000000;">구성품을 뺀 무게라서</p><p style="text-align:center;margin:0;color:#000000;">트레이까지 넣으면</p><p style="text-align:center;margin:0;color:#000000;">그보다 더 나가요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">10kg 쌀 한 포대보다 묵직한 편이라</p><p style="text-align:center;margin:0;color:#000000;">대청소 때 혼자 번쩍 들어 옮기기엔</p><p style="text-align:center;margin:0;color:#000000;">조금 부담스러운 무게예요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">처음 설치할 때 위·옆·뒤 간격을</p><p style="text-align:center;margin:0;color:#000000;">맞추느라 자리를 몇 번</p><p style="text-align:center;margin:0;color:#000000;">바꿔보게 되는데,</p><p style="text-align:center;margin:0;color:#000000;">가능하면 한 번에 자리를 정하거나</p><p style="text-align:center;margin:0;color:#000000;">둘이 같이 옮기는 게 나아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">옮기기 전에는 트레이 같은</p><p style="text-align:center;margin:0;color:#000000;">구성품을 먼저 빼두세요.</p><p style="text-align:center;margin:0;color:#000000;">그래야 14.8kg 본체 무게만</p><p style="text-align:center;margin:0;color:#000000;">들면 돼요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><img src="https://danacodedev-cmd.github.io/naver-blog-posts-free/2026-11-28T11-50-40/img/15-10.jpg" alt="위즈웰 전기오븐 용량 이미지" width="600"><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">자리를 자주 바꿀 생각이 없다면</p><p style="text-align:center;margin:0;color:#000000;">무게는 크게 따질</p><p style="text-align:center;margin:0;color:#000000;">부분이 아니에요.</p><p style="text-align:center;margin:0;color:#000000;">나라면 무게보다는 앞에서 말한</p><p style="text-align:center;margin:0;color:#000000;">설치 공간을 먼저 보겠어요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">같은 브랜드에도 데일리 오븐 40L나</p><p style="text-align:center;margin:0;color:#000000;">디지털 컨벡션 오븐처럼</p><p style="text-align:center;margin:0;color:#000000;">이름에 스팀이 안 붙은</p><p style="text-align:center;margin:0;color:#000000;">라인이 있어요.</p><p style="text-align:center;margin:0;color:#000000;">스팀을 쓸 계획이 분명할 때만</p><p style="text-align:center;margin:0;color:#000000;">인헨스2를 고르는 게</p><p style="text-align:center;margin:0;color:#000000;">맞는 것 같아요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">반대로 물통 쪽 여유까지 챙겨서</p><p style="text-align:center;margin:0;color:#000000;">스팀을 꾸준히 쓸 집이라면,</p><p style="text-align:center;margin:0;color:#000000;">설치 공간을 한 번</p><p style="text-align:center;margin:0;color:#000000;">맞춰두는 수고가</p><p style="text-align:center;margin:0;color:#000000;">충분히 값을 하는 쪽이라고 봐요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">정리하면 위즈웰 오븐은</p><p style="text-align:center;margin:0;color:#000000;">빌트인 대신 조리대 위에</p><p style="text-align:center;margin:0;color:#000000;">위로 30cm,</p><p style="text-align:center;margin:0;color:#000000;">옆과 뒤로 15cm를</p><p style="text-align:center;margin:0;color:#000000;">비워둘 수 있는 집에</p><p style="text-align:center;margin:0;color:#000000;">맞는 오븐이에요.</p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">그 자리만 나온다면</p><p style="text-align:center;margin:0;color:#000000;">물통과 레일 관리는</p><p style="text-align:center;margin:0;color:#000000;">번거롭지 않은 편이라,</p><p style="text-align:center;margin:0;color:#000000;">위즈웰 오븐을 두고 고민 중이라면</p><p style="text-align:center;margin:0;color:#000000;">줄자부터 꺼내 보시는 게 좋겠어요.</p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><b><span style="font-size:15px;color:#2563eb;">조리대 한쪽을 오븐 자리로 비워둘<br>수 있는 홈베이커라면 이 모델이<br>맞아요. 다 굽고 레일만 빼서<br>헹구면 정리가 끝나니까,<br>자리 치수부터 맞춰 보세요.</span></b></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;">https://naver.me/GDQ67HOY</p><p style="text-align:center;margin:0;color:#000000;"><span style="font-size:12px;color:#999999;">※ 가격·재고는 글 작성 시점 기준이라 달라질 수 있습니다.</span></p><p style="margin:0;"><br></p><p style="margin:0;"><br></p><p style="text-align:center;margin:0;color:#000000;"><span style="color:#02a94e;">#위즈웰 #전기오븐 #오븐 #린나이 #린나이코리아 #위즈웰오븐 #스팀오븐 #위즈웰컨벡션오븐 #오븐전자레인지 #컨벡션오븐 #오븐렌지 #제과제빵오븐</span></p></div></div>
+<div id="manualCopyBox" contenteditable="true"></div>
+<!-- generator.js's flattenToPlainText() output, verbatim — see buildStandalonePage's
+     comment for why this has to be the copy source instead of the rendered DOM's text. -->
+<div id="plainSource" style="display:none" aria-hidden="true">위즈웰 오븐 인헨스2(WOP200)는
+조리대 위에 자리를
+따로 내줄 수 있는
+주방이라면 잘 맞는 오븐이에요.
+
+
+반대로 붙박이장 안에 넣는
+빌트인 설치를
+생각했다면 맞지 않아요.
+빌트인 설치는 안 된다고
+분명하게 나와 있거든요.
+
+
+스팀 컨벡션 오븐은 본체 크기만큼
+주변에 비워둘 공간도 중요해서,
+사기 전에 자리부터 재보는 게
+제일 확실한 순서인 것 같아요.
+
+
+사진1
+
+
+사진2
+
+
+이 글에서 다루는 것
+
+1. 조리대 위 어디에 둘 수 있을까
+2. 스팀오븐 물통, 어느 쪽에 여유를 둘까
+3. 위즈웰 컨벡션 오븐, 굽고 난 뒤 관리는
+4. 혼자서 옮길 수 있는 무게일까
+
+
+조리대 위 어디에 둘 수 있을까
+
+
+이것저것 찾아보고
+고르면서 느낀 건데,
+본체 치수보다 먼저 봐야 하는 게
+주변에 비워둘 공간이더라구요.
+
+
+이 제품은 좌우와 뒤쪽으로
+15cm 이상,
+위쪽으로 30cm 이상을
+비워둬야 하는 오븐이에요.
+
+
+그래서 벽에 딱 붙이거나
+상부장 바로 밑에
+끼워 넣는 배치는
+처음부터 빼고 생각해야 해요.
+
+
+위로 30cm는
+생각보다 꽤 높거든요.
+상부장이 낮게 달린 주방이면
+상부장이 없는 조리대 끝 쪽이
+오히려 나을 수 있어요.
+
+
+사진3
+
+
+사진4
+
+
+가로로 계산해 보면
+본체 폭에 양옆 15cm씩,
+합쳐서 30cm가 더
+필요한 셈이에요.
+
+
+전자레인지나 에어프라이어 옆에
+바짝 붙여 나란히 두려던 자리라면
+그 사이도 15cm는 띄워야 하니까
+배치를 다시 짜야 할 수 있어요.
+
+
+깊이 쪽도 뒤로
+15cm를 더해야 해서,
+조리대가 얕은 집이면 오븐이
+앞으로 얼마나 나오는지도
+같이 따져보게 되더라구요.
+
+
+솔직히 이 부분은 좀 아쉬워요.
+작은 주방이라면 오븐 하나에
+꽤 넓은 자리를 내줘야 하니까요.
+
+
+사진5
+
+
+근데 이건 처음 자리 잡을 때
+한 번만 신경 쓰면 되는 일이라,
+일단 놓고 나면 크게
+신경 안 쓰여요.
+
+
+조리대가 전부 상부장 밑이라
+위로 30cm를 낼 자리가
+하나도 없다면,
+솔직히 이 모델은 굳이
+살 필요가 없다고 봐요.
+
+
+나라면 결제 전에 줄자로
+오븐 둘 자리의
+위·옆·뒤를 먼저 재고,
+위로 30cm가 안 나오면
+그 자리는 포기하고 다른
+곳을 찾겠어요.
+
+
+사진6
+
+
+스팀오븐 물통, 어느 쪽에 여유를 둘까
+
+
+스팀오븐이라 물통이 따로
+있는데,
+크기는 가로 119mm,
+깊이 109mm,
+높이 36mm예요.
+
+
+높이가 36mm니까
+위로 높게 솟은 통이 아니라
+납작한 편이에요.
+
+
+가로 119mm면 손바닥
+하나 남짓한 폭이라,
+한 손으로 들고 싱크대까지
+오가기에 부담 없는 크기 같아요.
+
+
+물통이 있는 쪽은 15cm 이상
+여유를 두면 쓰기
+수월하다고 나와 있어요.
+옆 공간 15cm는 어차피
+비워야 하니까,
+물통 쪽만큼은 조금 더 넉넉하게
+두는 게 좋겠더라구요.
+
+
+사진7
+
+
+굽기 전에 물통을
+빼서 채우는 장면을
+떠올려 보면, 손이 들어갈 틈이
+있어야 편하잖아요.
+
+
+물통 쪽이 벽을 향하면
+물을 채울 때마다 오븐을
+앞으로 당겨야 할 수도 있어요.
+
+
+설치 기준도 15cm,
+물통 쪽 여유도 15cm라서
+물통 쪽을 트인 방향으로만 두면
+두 기준을 한 번에 맞출 수 있어요.
+
+
+그래서 나라면 물통 쪽을
+벽이 아니라 트인 쪽으로
+돌려 놓겠어요.
+스팀을 자주 안 쓸 집이라면
+이 여유는 조금 덜
+중요해질 거예요.
+
+
+설치에 필요한 여유 공간과 물통
+크기가 상세페이지에 수치로 정리돼
+있어요. 줄자로 우리 집 자리를
+재면서 같이 보면 들어갈지
+바로 감이 와요.
+
+https://naver.me/GDQ67HOY
+
+
+위즈웰 컨벡션 오븐, 굽고 난 뒤 관리는
+
+
+빵이나 쿠키를 굽고 나면
+레일에 떨어진 부스러기가
+은근히 신경 쓰이잖아요.
+
+
+이 제품은 오븐 레일을 떼어내서
+따로 씻을 수
+있게 되어 있어요.
+
+
+레일이 고정돼 있으면
+오븐 안에 손을 넣고
+닦아야 하는데,
+빼서 싱크대에서 헹굴 수 있다는 건
+꽤 큰 차이인 것 같아요.
+
+
+그리고 5kg까지 지지하도록
+설계돼 있다고 나와 있어요.
+홈베이킹 정도의 무게라면
+버티는 힘 걱정은 덜어도
+될 것 같아요.
+
+
+사진8
+
+
+한 달에 한두 번 굽는 집이라면
+레일 탈부착이 고르는 결정적인
+이유까지는 아닐 수 있어요.
+
+
+근데 주말마다 쿠키나 식빵을
+몇 판씩 굽는 집이라면,
+굽고 나서 정리하는 시간이
+매번 짧아지는 쪽이 훨씬
+크게 와닿아요.
+
+
+자주 굽는 집일수록 이 부분이
+매번 체감되는 장점이라,
+위즈웰 컨벡션 오븐을 고른다면
+레일 탈부착을 꽤 크게
+쳐줄 것 같아요.
+
+
+사진9
+
+
+혼자서 옮길 수 있는 무게일까
+
+
+본체 무게는 14.8kg이에요.
+구성품을 뺀 무게라서
+트레이까지 넣으면
+그보다 더 나가요.
+
+
+10kg 쌀 한 포대보다 묵직한 편이라
+대청소 때 혼자 번쩍 들어 옮기기엔
+조금 부담스러운 무게예요.
+
+
+처음 설치할 때 위·옆·뒤 간격을
+맞추느라 자리를 몇 번
+바꿔보게 되는데,
+가능하면 한 번에 자리를 정하거나
+둘이 같이 옮기는 게 나아요.
+
+
+옮기기 전에는 트레이 같은
+구성품을 먼저 빼두세요.
+그래야 14.8kg 본체 무게만
+들면 돼요.
+
+
+사진10
+
+
+자리를 자주 바꿀 생각이 없다면
+무게는 크게 따질
+부분이 아니에요.
+나라면 무게보다는 앞에서 말한
+설치 공간을 먼저 보겠어요.
+
+
+같은 브랜드에도 데일리 오븐 40L나
+디지털 컨벡션 오븐처럼
+이름에 스팀이 안 붙은
+라인이 있어요.
+스팀을 쓸 계획이 분명할 때만
+인헨스2를 고르는 게
+맞는 것 같아요.
+
+
+반대로 물통 쪽 여유까지 챙겨서
+스팀을 꾸준히 쓸 집이라면,
+설치 공간을 한 번
+맞춰두는 수고가
+충분히 값을 하는 쪽이라고 봐요.
+
+
+정리하면 위즈웰 오븐은
+빌트인 대신 조리대 위에
+위로 30cm,
+옆과 뒤로 15cm를
+비워둘 수 있는 집에
+맞는 오븐이에요.
+
+
+그 자리만 나온다면
+물통과 레일 관리는
+번거롭지 않은 편이라,
+위즈웰 오븐을 두고 고민 중이라면
+줄자부터 꺼내 보시는 게 좋겠어요.
+
+
+조리대 한쪽을 오븐 자리로 비워둘
+수 있는 홈베이커라면 이 모델이
+맞아요. 다 굽고 레일만 빼서
+헹구면 정리가 끝나니까,
+자리 치수부터 맞춰 보세요.
+
+https://naver.me/GDQ67HOY
+
+
+#위즈웰 #전기오븐 #오븐 #린나이 #린나이코리아 #위즈웰오븐 #스팀오븐 #위즈웰컨벡션오븐 #오븐전자레인지 #컨벡션오븐 #오븐렌지 #제과제빵오븐</div>
+
+<script>
+(function () {
+  var post = document.getElementById('post');
+  var msg = document.getElementById('msg');
+  var manualBox = document.getElementById('manualCopyBox');
+
+  // #msg is hidden until it has something to say — an always-present empty strip under the
+  // buttons was just dead space on a phone.
+  function say(text) {
+    msg.textContent = text || '';
+    msg.classList.toggle('show', Boolean(text));
+    msg.classList.remove('warn');
+  }
+
+  // 네이버 발행창은 카테고리가 "디지털/가전"으로 열립니다. 그 계열 글은 손댈 게 없고,
+  // 나머지는 바꿔야 하는데 그걸 자주 놓칩니다. 그래서 바꿔야 하는 글에서만 경고를 켭니다.
+  var DEFAULT_CATEGORY = '디지털/가전';
+
+  function postCategory() {
+    var chip = document.getElementById('catChip');
+    return chip ? (chip.getAttribute('data-category') || '') : '';
+  }
+
+  // 복사 직후에만 띄웁니다 — 편집기로 넘어가기 바로 전이라 놓치기 어렵습니다.
+  var catPop = document.getElementById('catPop');
+  var catPopBox = document.getElementById('catPopBox');
+  var catPopName = document.getElementById('catPopName');
+  var catPopNote = document.getElementById('catPopNote');
+  var catPopOk = document.getElementById('catPopOk');
+
+  function closeCatPop() {
+    if (catPop) catPop.hidden = true;
+  }
+  if (catPopOk) catPopOk.addEventListener('click', closeCatPop);
+  // 바깥을 눌러도 닫힙니다. 상자 안을 누른 건 닫지 않습니다.
+  if (catPop) {
+    catPop.addEventListener('click', function (e) { if (e.target === catPop) closeCatPop(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCatPop();
+  });
+
+  function showCatPop(cat) {
+    if (!catPop || !cat) return;
+    var needsChange = cat !== DEFAULT_CATEGORY;
+    catPopName.textContent = cat;
+    catPopNote.textContent = needsChange
+      ? '발행창은 ' + DEFAULT_CATEGORY + '으로 열립니다. 카테고리를 바꾸고 발행하세요.'
+      : '발행창 기본값과 같습니다. 그대로 두셔도 됩니다.';
+    catPopBox.classList.toggle('warn', needsChange);
+    catPop.hidden = false;
+    catPopOk.focus();
+  }
+
+  function sayWithCategory(text) {
+    var cat = postCategory();
+    say(text);
+    showCatPop(cat);
+  }
+
+  // Last resort: a visible, pre-selected contenteditable box. The user's own long-press →
+  // "복사" is a native OS gesture the browser handles directly (not something our JS
+  // triggers), so it picks up the real rich content — text, formatting, and images —
+  // even when the scripted copy attempt above was rejected or silently downgraded.
+  function showManualCopyBox(html) {
+    manualBox.innerHTML = html;
+    manualBox.style.display = 'block';
+    manualBox.scrollIntoView({ block: 'nearest' });
+    var range = document.createRange();
+    range.selectNodeContents(manualBox);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  // The body without its photos, each one replaced by the marker the plain-text flavour
+  // already uses.
+  //
+  // Photos cannot ride along in the paste at all. A remote <img src="https://…"> is kept by
+  // Naver as a reference it never uploads, so the image gets no 대표 button and does not count
+  // as a photo on the post. Inlining the bytes as a data: URI was tried next and the editor
+  // rejects it outright — "허용되지 않는 이미지 형식", nothing inserted. Dragging a thumbnail in
+  // was tried after that and fails for the same underlying reason: a drag between browser tabs
+  // hands over the image's address, not the file. So the body marks the spots, and the photos
+  // go in from the 사진 strip below.
+  //
+  // The marker is one short token alone on its own line so it can be selected with a single
+  // triple-click and pasted straight over — the photo replaces it, and there is nothing left
+  // to delete afterwards. It used to read "[사진 1 넣기]", which had to be deleted by hand
+  // after every photo.
+  //
+  // Built by cloning the rendered #post rather than re-rendering, so the paste stays the
+  // markup this page has already proven pastes correctly; the only edit is the swap.
+  function bodyHtmlForPaste() {
+    var clone = post.cloneNode(true);
+    var imgs = clone.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) {
+      var p = document.createElement('p');
+      p.setAttribute('style', 'text-align:center;margin:0;');
+      var span = document.createElement('span');
+      span.setAttribute('style', 'color:#999999;');
+      span.textContent = '사진' + (i + 1);
+      p.appendChild(span);
+      imgs[i].parentNode.replaceChild(p, imgs[i]);
+    }
+    return clone.innerHTML;
+  }
+
+  // The title line the body is pasted under. Built via DOM APIs (not string concatenation)
+  // so the title's own text is safely escaped the same way the rest of #post already is.
+  // Plain bold text, not <blockquote> — the quote-icon box (tried, then explicitly asked to
+  // be removed) was too much for a title. margin isn't in the small set of CSS the editor is
+  // known to keep on paste (see the file header comment), so a real empty paragraph is used
+  // for the gap below the title instead of relying on it.
+  function titleHtml() {
+    var titleP = document.createElement('p');
+    titleP.setAttribute('style', 'text-align:center;margin:0;');
+    var titleB = document.createElement('b');
+    var titleSpan = document.createElement('span');
+    titleSpan.setAttribute('style', 'font-size:23px;color:#0f172a;');
+    titleSpan.textContent = document.getElementById('titleText').textContent;
+    titleB.appendChild(titleSpan);
+    titleP.appendChild(titleB);
+    var titleGap = document.createElement('p');
+    titleGap.setAttribute('style', 'margin:0;');
+    titleGap.innerHTML = '<br>';
+    return titleP.outerHTML + titleGap.outerHTML;
+  }
+
+  // The plain-text flavour always uses the [사진 N 넣기] markers, whichever button was
+  // pressed: it exists for the Naver Blog app, which drops HTML entirely, so its photos
+  // have to be placed by hand no matter what the HTML carried.
+  function plainTextPayload() {
+    var plainSource = document.getElementById('plainSource');
+    var bodyText = plainSource && plainSource.textContent ? plainSource.textContent : post.innerText;
+    return document.getElementById('titleText').textContent + '\n\n' + bodyText;
+  }
+
+  // navigator.clipboard.write() is the only copy mechanism that reliably carries rich HTML on
+  // mobile. This page is always served over https, so it's always available where the browser
+  // supports it at all — there's no plain-http case here that would need a fallback API.
+  //
+  // document.execCommand('copy') used to be tried first, even from inside a hidden
+  // contenteditable holder. That turned out to be worse than not trying: on iOS Safari,
+  // execCommand('copy') returns true — reporting success — while silently copying plain text
+  // only, images and formatting both dropped. Because it "succeeded", the code never fell
+  // through to the manual copy box below, which is the one path that actually works on iOS (a
+  // real long-press invokes the OS's own rich copy, which execCommand triggered from script
+  // cannot). So: real API or the manual box — nothing in between that can lie about whether
+  // it worked.
+  //
+  // htmlPromise is handed to ClipboardItem unresolved on purpose: inlining the photos is
+  // async, and Safari rejects a write() that isn't issued in the same tick as the click.
+  function copyBody(htmlPromise, okMessage, announce) {
+    var ok = announce || say;
+    var text = plainTextPayload();
+    if (!(navigator.clipboard && window.ClipboardItem)) {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('이 브라우저는 자동 복사를 지원하지 않습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+      return;
+    }
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlPromise.then(function (html) { return new Blob([html], { type: 'text/html' }); }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]).then(function () {
+      ok(okMessage);
+    }).catch(function () {
+      htmlPromise.then(function (html) {
+        showManualCopyBox(html);
+        ok('자동 복사가 차단됐습니다. 아래 글을 길게 눌러 복사하세요 (사진 포함, 이미 전체 선택되어 있습니다).');
+      });
+    });
+  }
+
+  var bodyOnlyBtn = document.getElementById('copyBodyOnlyBtn');
+  if (bodyOnlyBtn) {
+    bodyOnlyBtn.addEventListener('click', function () {
+      say('');
+      copyBody(
+        Promise.resolve(titleHtml() + bodyHtmlForPaste()),
+        '본문만 복사됐습니다. 붙여넣은 뒤 사진N 글자를 세 번 클릭해 선택하고 아래 사진을 붙여넣으세요.',
+        sayWithCategory
+      );
+    });
+  }
+
+  // A photo as an actual bitmap on the clipboard, which is what makes Naver upload it to its
+  // own storage — the whole point of the 사진 strip. PNG because it is the only image type
+  // browsers will put on the clipboard; the source JPEG is redrawn through a canvas to get
+  // there. The page and its images share an origin, so the canvas is never tainted.
+  // Decoded from a blob: URL rather than the original address, so the canvas can never be
+  // tainted regardless of how the page was opened.
+  function decodeImage(blob) {
+    if (window.createImageBitmap) return createImageBitmap(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('이미지 해석 실패')); };
+      img.src = url;
+    });
+  }
+
+  function pngBlob(src) {
+    return fetch(src)
+      .then(function (r) {
+        if (!r.ok) throw new Error('내려받기 실패 ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        if (blob.type === 'image/png') return blob;
+        return decodeImage(blob).then(function (img) {
+          var c = document.createElement('canvas');
+          c.width = img.width || img.naturalWidth;
+          c.height = img.height || img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          return new Promise(function (resolve, reject) {
+            c.toBlob(function (b) { b ? resolve(b) : reject(new Error('PNG 변환 실패')); }, 'image/png');
+          });
+        });
+      });
+  }
+
+  // PNG copies made as soon as the page opens, not when the button is pressed.
+  //
+  // Browsers tie a clipboard write to the click that started it. Converting on click meant
+  // handing ClipboardItem a Promise that only settled after a fetch, a decode and a re-encode
+  // — by then the permission had lapsed and the write came back refused ("사진 복사가
+  // 차단됐습니다"). The photos are small, so preparing them up front costs nothing and lets
+  // the click hand over a blob that already exists.
+  var pngCache = {};
+  function cachePng(src) {
+    pngBlob(src).then(function (b) { pngCache[src] = b; }).catch(function () {});
+  }
+
+  // Dragging a thumbnail into the editor was tried and does not work. dataTransfer.files was
+  // populated with the real JPEG — verified — but a drag between two browser tabs is handed to
+  // the target as the image's address rather than as a dropped file, so Naver ends up with the
+  // same remote URL it refuses to upload. Nothing to salvage there; the thumbnails are plain
+  // images again.
+
+  var photoBtns = document.querySelectorAll('.photo-copy');
+  Array.prototype.forEach.call(photoBtns, function (btn) {
+    cachePng(btn.getAttribute('data-src'));
+    btn.addEventListener('click', function () {
+      say('');
+      var n = btn.getAttribute('data-n');
+      var src = btn.getAttribute('data-src');
+      if (!(navigator.clipboard && window.ClipboardItem)) {
+        say('이 브라우저는 사진 복사를 지원하지 않습니다. 사진을 길게 눌러(또는 오른쪽 클릭해) 복사한 뒤 붙여넣으세요.');
+        return;
+      }
+      // The already-converted blob when it's ready, which is the case that actually works;
+      // the pending Promise only as a stopgap for a click that beats the conversion.
+      var data = pngCache[src] || pngBlob(src);
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': data })])
+        .then(function () {
+          Array.prototype.forEach.call(photoBtns, function (b) { b.classList.remove('done'); });
+          btn.classList.add('done');
+          say('사진 ' + n + '이(가) 복사됐습니다. 본문의 사진' + n + ' 글자를 세 번 클릭해 선택한 뒤 붙여넣으세요.');
+        })
+        .catch(function (e) {
+          // "Document is not focused" is its own case and by far the most likely one: the
+          // browser refuses a clipboard write while another window has focus, so switching to
+          // the editor before the copy lands kills it. Worth naming, because the generic
+          // wording sent people off to the download fallback for something they just have to
+          // do in a different order. Anything else prints the real error rather than being
+          // swallowed — the old message named the symptom only.
+          var msg = e && e.message ? e.message : String(e);
+          if (/not focused/i.test(msg)) {
+            say('이 창이 활성 상태가 아니어서 복사되지 않았습니다. 이 페이지를 한 번 누른 뒤 다시 "사진 복사"를 누르고, 그다음에 네이버 창으로 넘어가세요.');
+            return;
+          }
+          var why = e && e.name ? e.name + ': ' + msg : msg;
+          say('사진 복사 실패 — ' + why);
+        });
+    });
+  });
+
+  // Publish status has no backend to live in on a static site — tracked in this browser's
+  // localStorage instead, keyed by this exact page's path so the list pages (which resolve
+  // each link to the same absolute path) agree on the same status either way.
+  // Selecting a title only rewrites the heading element — "본문 복사" reads its text when
+  // building the clipboard payload, so the chosen title travels with the body automatically.
+  // Picking a title only rewrites the hidden heading element — the copy handler reads its
+  // text when assembling the clipboard payload, so the choice travels with the body without
+  // any further wiring.
+  var titleOpts = document.querySelectorAll('.title-opt');
+  Array.prototype.forEach.call(titleOpts, function (btn) {
+    btn.addEventListener('click', function () {
+      Array.prototype.forEach.call(titleOpts, function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('titleText').textContent = btn.getAttribute('data-title');
+      say('이 제목으로 복사됩니다.');
+    });
+  });
+
+  var publishBtn = document.getElementById('publishToggle');
+  var publishKey = 'nbp_published_' + location.pathname;
+  // The spreadsheet's value is the starting point; once this browser records a choice, that
+  // choice wins — the person tapping the button is looking at the post right now.
+  var sheetPublished = false;
+  function renderPublishState() {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    publishBtn.textContent = done ? '✅ 발행완료' : '발행 전';
+    publishBtn.classList.toggle('published', done);
+  }
+  publishBtn.addEventListener('click', function () {
+    var done = sheetPublished;
+    try {
+      var stored = localStorage.getItem(publishKey);
+      if (stored !== null) done = stored === '1';
+    } catch (e) {}
+    try { localStorage.setItem(publishKey, done ? '0' : '1'); } catch (e) {}
+    renderPublishState();
+  });
+  renderPublishState();
+  // Same bfcache-restore gap as the list pages' publishListScript — a back/forward
+  // navigation here can otherwise show a stale button until a manual reload.
+  window.addEventListener('pageshow', renderPublishState);
+
+  // "네이버에 자동 작성" — 이 맥(localhost:3000)에서 node server.js가 켜져 있을 때만
+  // 동작한다. 공개 인터넷을 거치는 중계는 일부러 안 쓴다 — 페이지 소스에 적힌 주소를
+  // 아무나 흉내 내면 이 맥에서 네이버 창이 열릴 수 있어서다. 집 와이파이에서 이 페이지를
+  // 이 맥의 브라우저로 열었을 때만 쓰는 버튼이다.
+  var autoMsg = document.getElementById('autoDraftMsg');
+  function autoSay(text) {
+    autoMsg.textContent = text;
+    autoMsg.classList.add('show');
+  }
+  // 이 페이지 자체가 이미 이 Mac(localhost:3000)에서 열려 있으면 같은 출처라
+  // 상대 경로로 부르고, 공개 GitHub Pages에서 열려 있으면 절대 주소로 부른다.
+  // HTTPS 페이지에서 http://localhost 로 보내는 요청은 사파리·최신 크롬이 혼합
+  // 콘텐츠로 보고 조용히 막아 "Failed to fetch"만 뜬다 — 그게 막히면 이 Mac의
+  // 브라우저로 http://localhost:3000/archive/... 를 열어 쓰라고 안내한다.
+  var API_BASE = /^(localhost|127.0.0.1)$/.test(location.hostname) ? '' : 'http://localhost:3000';
+  var autoBtn = document.getElementById('autoDraftBtn');
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function () {
+      // resultsArchive.js가 파일을 "<폴더>/01-제목.html"로 저장하므로, 주소만으로
+      // 배치 폴더와 이 글의 순번을 안다 — 서버에 다시 물어볼 필요가 없다.
+      var parts = location.pathname.split('/');
+      var file = decodeURIComponent(parts[parts.length - 1] || '');
+      var folder = decodeURIComponent(parts[parts.length - 2] || '');
+      var idx = parseInt(file.slice(0, 2), 10) - 1;
+      if (!folder || isNaN(idx) || idx < 0) { autoSay('이 글의 배치 정보를 주소에서 못 읽었습니다.'); return; }
+      var chosenTitle = (document.getElementById('titleText') || {}).textContent || '';
+      if (autoBtn.disabled) return;
+      // 공개 사이트(https)에서는 http://localhost 로 보내는 요청이 브라우저 자체
+      // 정책(혼합 콘텐츠)으로 100% 막힌다 — 코드로 우회할 방법이 없다. fetch를
+      // 시도해서 "Failed to fetch"를 보여주는 대신, 바로 같은 글의 로컬(localhost)
+      // 주소로 이 탭을 이동시킨다. 거기서는 같은 출처라 버튼이 바로 동작한다.
+      if (API_BASE) {
+        autoSay('이 Mac 버전으로 이동합니다…');
+        location.href = API_BASE + '/archive/' + folder + '/' + file;
+        return;
+      }
+      autoBtn.disabled = true;
+      autoSay('이 Mac에 자동 작성을 요청하는 중…');
+      fetch(API_BASE + '/api/auto-draft', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folder: folder, index: idx, title: chosenTitle.trim() }),
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        if (!data || !data.ok) throw new Error((data && data.error) || '요청이 거부됐습니다');
+        pollAutoDraft(data.jobId, Date.now());
+      }).catch(function (e) {
+        autoBtn.disabled = false;
+        autoSay('요청을 보내지 못했어요 — node server.js가 켜져 있는지 확인하고, 그래도 안 되면 이 Mac의 브라우저로 http://localhost:3000/archive/' + folder + '/' + file + ' 를 열어 거기서 눌러주세요. (' + (e && e.message || '') + ')');
+      });
+    });
+  }
+  function pollAutoDraft(jobId, t0) {
+    setTimeout(function () {
+      fetch(API_BASE + '/api/auto-draft/' + jobId)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data || !data.ok) { autoBtn.disabled = false; autoSay('작업을 찾지 못했습니다.'); return; }
+          if (data.status === 'done') { autoBtn.disabled = false; autoSay('✅ ' + data.message); return; }
+          if (data.status === 'error') { autoBtn.disabled = false; autoSay('작성 실패: ' + data.message); return; }
+          autoSay(data.message || '네이버 창에 작성하는 중…');
+          if (Date.now() - t0 > 20 * 60 * 1000) { autoBtn.disabled = false; return; }
+          pollAutoDraft(jobId, t0);
+        })
+        .catch(function () { pollAutoDraft(jobId, t0); });
+    }, 1200);
+  }
+})();
+</script>
+</body>
+</html>
